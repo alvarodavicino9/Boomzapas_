@@ -20,6 +20,8 @@ export interface Producto {
   nuevo?: boolean
   /** Fecha de alta (ISO), si la tabla la trae. */
   creado?: string
+  /** Oculto en la tienda desde el panel (modo local). */
+  oculto?: boolean
 }
 
 export interface CartItem {
@@ -50,6 +52,8 @@ export interface PedidoCreado {
   ok: boolean
   pedido_id: number | string
   total: number
+  /** Link de pago de Mercado Pago (Checkout Pro), si el pago es con Mercado Pago. */
+  init_point?: string
 }
 
 export type EstadoPedido = 'pendiente' | 'pagado' | 'enviado' | 'entregado' | 'cancelado'

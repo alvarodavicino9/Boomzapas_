@@ -82,6 +82,25 @@ export async function enviarResena(input: ResenaInput): Promise<Resena> {
   return resena
 }
 
+/** El dueño aprueba una reseña pendiente: pasa a mostrarse como publicada. */
+export function aprobarResena(id: string) {
+  write(read().map((r) => (r.id === id ? { ...r, pendiente: false } : r)))
+}
+
+/** El dueño carga una reseña real (por ejemplo, una que le llegó por Instagram): se publica directo. */
+export function agregarResenaPublicada(input: ResenaInput): Resena {
+  const resena: Resena = {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+    user: input.user.trim(),
+    text: input.text.trim(),
+    model: input.model?.trim() || undefined,
+    rating: input.rating,
+    fecha: new Date().toISOString(),
+  }
+  write([resena, ...read()])
+  return resena
+}
+
 export function quitarResena(id: string) {
   write(read().filter((r) => r.id !== id))
 }

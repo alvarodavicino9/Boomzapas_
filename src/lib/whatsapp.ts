@@ -46,3 +46,14 @@ export const buildOrderMessage = ({
     `Nombre: ${nombre}`,
   ].join('\n')
 }
+
+/** Número de un cliente argentino → formato internacional para wa.me (celulares: 549 + área + número). */
+export function numeroWhatsApp(telefono: string): string {
+  let d = telefono.replace(/\D/g, '')
+  if (d.startsWith('54')) return d.startsWith('549') ? d : `549${d.slice(2)}`
+  d = d.replace(/^0/, '')
+  return `549${d}`
+}
+
+export const waCliente = (telefono: string, message: string) =>
+  `https://wa.me/${numeroWhatsApp(telefono)}?text=${encodeURIComponent(message)}`

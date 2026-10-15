@@ -9,6 +9,7 @@ import { useUI } from '@/context/UIContext'
 import { SITE } from '@/config/site'
 import { ApiError, MODO_DEMO, crearPedido } from '@/lib/api'
 import { cn, transferPrice } from '@/lib/format'
+import { registrarPedidoDeTienda } from '@/lib/adminStore'
 import type { MetodoPago, PedidoPayload } from '@/types'
 
 type Step = 'datos' | 'pago' | 'listo'
@@ -104,7 +105,17 @@ export function CheckoutModal() {
     }
 
     if (MODO_DEMO) {
-      // Sin servidor conectado: el pedido se confirma por WhatsApp.
+      // Sin servidor conectado: el pedido se confirma por WhatsApp (y queda anotado en el panel de este navegador).
+      registrarPedidoDeTienda({
+        items,
+        total,
+        metodo,
+        entrega: form.entrega,
+        nombre: form.nombre.trim(),
+        telefono: form.telefono.trim(),
+        email: form.email.trim() || undefined,
+        direccion: form.entrega === 'envio' ? form.direccion.trim() : undefined,
+      })
       finish(undefined, true)
       setSubmitting(false)
       return
@@ -112,8 +123,12 @@ export function CheckoutModal() {
 
     try {
       const res = await crearPedido(payload)
-      // TODO(Mercado Pago): cuando exista el endpoint de Checkout Pro, acá se crea la preferencia
-      // con `res.pedido_id` y se redirige a su `init_point` en lugar de pedir el link por WhatsApp.
+      // Mercado Pago: el servidor devuelve el link de pago de Checkout Pro y llevamos al cliente ahí.
+      // Al volver, la página /pago/… confirma el resultado (y el webhook marca el pedido como pagado).
+      if (res.init_point) {
+        window.location.assign(res.init_point)
+        return
+      }
       finish(res.pedido_id, false)
     } catch (e) {
       setError(

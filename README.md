@@ -2,7 +2,7 @@
 
 Tienda online de Boom Zapas. **React 18 + Vite + TypeScript + Tailwind CSS 4 + Framer Motion.**
 Diseño: tienda clara con tarjetas redondeadas, Lexend Exa + Lexend y color de acento (ver "Diseño actual" abajo).
-Se conecta al backend `boomzapas-server` (Express + Supabase) en Railway.
+El servidor son **funciones de Vercel** (`/api`) que hablan con **Supabase** y **Mercado Pago**. Ya no se usa Railway.
 
 ## Empezar
 
@@ -19,17 +19,34 @@ npm run dev              # http://localhost:5173
 | `npm run typecheck` | Sólo chequeo de TypeScript                |
 | `npm run preview`   | Sirve el build localmente                 |
 
-**Variables de entorno** (`.env`):
+**Variables de entorno:** mirá `.env.example`. Resumen:
 
-- `VITE_API_URL`: URL del backend. Por defecto usa la de Railway.
-- `VITE_CONECTAR_API`: por defecto `false`: la tienda funciona **sin servidor ni Supabase** (catálogo local y pedidos por WhatsApp). Poné `true` para volver a conectar el backend.
+- `VITE_CONECTAR_API`: `false` (por defecto) = la tienda funciona **sin servidor ni base de datos** (catálogo local, pedidos por WhatsApp y panel con datos en el navegador). `true` = usa la API de Vercel.
+- Del lado servidor (se cargan en Vercel, nunca en el código): `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `ADMIN_TOKEN`, `MP_ACCESS_TOKEN` y, opcionalmente, `MP_WEBHOOK_SECRET` y `SITE_URL`.
 
-## Deploy en Netlify
+## Deploy en Vercel
 
-- Build command: `npm run build`
-- Publish directory: `dist`
-- `public/_redirects` ya está configurado para que las rutas (`/catalogo`, `/admin`, …) funcionen al recargar.
-- Agregá `VITE_API_URL` en *Site settings → Environment variables* si cambia el backend.
+- Framework: Vite. Build command `npm run build`, output `dist` (Vercel lo detecta solo).
+- La carpeta `api/` se despliega sola como funciones; `vercel.json` hace que las rutas de la tienda (`/catalogo`, `/admin`…) funcionen al recargar sin pisar `/api`.
+- Para probar las funciones en tu PC: `npx vercel dev` (necesita las variables de entorno; `npm run dev` sólo levanta la tienda).
+
+### Conectar todo (paso a paso)
+
+1. **Supabase:** en el *SQL Editor* ejecutá `supabase/resenas.sql` (crea la tabla de reseñas). Las tablas `productos`, `stock`, `clientes`, `pedidos` y `pedido_items` ya existen.
+2. **Vercel → Settings → Environment Variables:** cargá `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `ADMIN_TOKEN` y `MP_ACCESS_TOKEN`. Por último `VITE_CONECTAR_API=true`.
+3. **Redeploy** (Deployments → ⋯ → Redeploy) para que tome las variables.
+4. **Mercado Pago → Tus integraciones → Webhooks:** URL `https://TU-SITIO.vercel.app/api/mp/webhook`, evento *Pagos*. Si te da una clave secreta, cargala como `MP_WEBHOOK_SECRET`.
+5. Probá una compra con una cuenta de prueba de Mercado Pago antes de usar credenciales reales.
+
+### Qué hace la API (`api/`)
+
+| Ruta | Qué hace |
+| ---- | -------- |
+| `GET /api/productos` | Catálogo activo con stock |
+| `POST /api/pedido` | Crea el pedido. Lee **precios y stock de la base** (no del navegador), reserva el stock y, si el pago es con Mercado Pago, devuelve el link de Checkout Pro |
+| `POST /api/mp/webhook` | Mercado Pago avisa el pago; se consulta su estado real y el pedido pasa a `pagado` |
+| `POST /api/resenas` | Guarda una reseña pendiente de aprobación |
+| `/api/admin/*` | Panel: stats, pedidos, cambio de estado (al cancelar devuelve el stock), stock por talle y reseñas. Requieren el encabezado `x-admin-token` |
 
 ## Estructura
 
@@ -38,7 +55,7 @@ src/
 ├── config/site.ts          ← datos del negocio (WhatsApp, alias, horarios, descuento…)
 ├── types/                  ← tipos compartidos
 ├── lib/
-│   ├── api.ts              ← cliente del backend (tienda + admin)
+│   ├── api.ts              ← cliente de la API (tienda + admin)
 │   ├── normalize.ts        ← adapta filas de Supabase al tipo Producto
 │   ├── whatsapp.ts         ← links y mensajes de WhatsApp
 │   ├── stock.ts, format.ts
@@ -49,9 +66,11 @@ src/
 │   ├── catalog/            ← ProductCard, ProductDialog, ProductGrid, CatalogFilters
 │   ├── cart/               ← CartDrawer
 │   ├── checkout/           ← CheckoutModal (datos → pago → listo)
-│   ├── admin/              ← Login, Stats, Orders, Stock
+│   ├── admin/              ← Panel: Resumen, Pedidos, Productos y stock, Clientes, Reseñas, Herramientas
 │   └── ui/                 ← Button, Modal, Icon, Logo, Reveal…
-└── pages/                  ← Home, Catálogo, Envíos, Pagos, Nosotros, Contacto, Admin
+└── pages/                  ← Home, Catálogo, Envíos, Pagos, Nosotros, Contacto, Admin, Resultado de pago
+api/                        ← funciones de Vercel (Supabase + Mercado Pago)
+supabase/                   ← SQL para ejecutar en Supabase
 ```
 
 ## Qué cambió respecto a la versión anterior
@@ -70,9 +89,8 @@ src/
 1. **Logo:** el sello vive en `public/logo.png`; se muestra desde `src/components/ui/Logo.tsx`.
 2. **Reseñas:** `src/data/testimonials.ts` tiene un resumen de las reseñas reales; reemplazá por el texto exacto.
 3. **Columnas de Supabase:** si `productos` usa nombres distintos (`marca`, `categoria`, `imagenes`…), ajustá `src/lib/normalize.ts`.
-   Para `/admin` → Pedidos, `vista_pedidos` debería exponer `cliente_nombre`, `telefono`, `metodo_pago`, `total`, `estado`, `created_at`
-   (si usa otros nombres, se ajusta en `OrdersPanel.tsx`).
-4. **Estados de pedido** disponibles en admin: pendiente, pagado, enviado, entregado, cancelado.
+4. **Estados de pedido** en el panel: pendiente, pagado, enviado, entregado, cancelado.
+5. **Reseñas en el panel y en la tienda con la base conectada:** la API ya las guarda y modera (`/api/resenas`, `/api/admin/resenas`); falta mostrar las aprobadas en la tienda y moderarlas desde el panel cuando `VITE_CONECTAR_API=true`.
 
 ## Estados y fotos
 
@@ -81,17 +99,12 @@ src/
 - Sin foto, o si la imagen falla, se muestra una silueta gris de zapatilla. La portada (`Hero.tsx`) muestra tres fotos del catálogo por diapositiva.
 - Filtros del catálogo (talle, precio, categoría, marca, orden) viven en la URL.
 
-## Para la integración de Mercado Pago (siguiente paso)
+## Mercado Pago
 
-El punto de enganche está marcado con `TODO(Mercado Pago)` en `src/components/checkout/CheckoutModal.tsx`.
-Antes de integrarlo, en `boomzapas-server/server.js` conviene:
-
-- **No confiar en los precios que manda el navegador.** Hoy `POST /api/pedido` calcula el total con `precio_unit` del cliente;
-  hay que leer el precio desde `productos` en el servidor (y aplicar el descuento por transferencia ahí).
-- Validar stock antes de crear el pedido y descontarlo al confirmarse el pago.
-- Crear la preferencia de Checkout Pro en el backend (`mercadopago` ya está en las dependencias), devolver su `init_point`
-  y redirigir desde el front; confirmar el pago por **webhook** y marcar el pedido como `pagado`.
-- Restringir CORS al dominio de Netlify y mover `ADMIN_TOKEN` a una variable de entorno larga (no usar un valor simple).
+Ya integrado con **Checkout Pro**: al elegir "Mercado Pago" en el checkout, `POST /api/pedido` crea el pedido y la preferencia de pago,
+y la tienda lleva al cliente a Mercado Pago. Al volver cae en `/pago/exito`, `/pago/pendiente` o `/pago/error`; el pedido pasa a
+`pagado` por el **webhook** (`/api/mp/webhook`), que verifica el pago consultándolo a Mercado Pago y comprueba el monto.
+Si Mercado Pago no está configurado, la tienda ofrece cerrar el pedido por WhatsApp como hasta ahora.
 
 ## Diseño actual
 

@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
+import { Icon } from '@/components/ui/Icon'
 import { Logo } from '@/components/ui/Logo'
-import { ApiError, adminStats } from '@/lib/api'
+import { ApiError, MODO_DEMO, adminStats } from '@/lib/api'
 
 export function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
   const [value, setValue] = useState('')
@@ -12,11 +13,11 @@ export function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
     const token = value.trim()
-    if (!token) return setError('Ingresá el token de administrador.')
+    if (!token) return setError(MODO_DEMO ? 'Escribí una clave para entrar.' : 'Ingresá el token de administrador.')
     setLoading(true)
     setError(null)
     try {
-      await adminStats(token) // valida el token contra el backend
+      if (!MODO_DEMO) await adminStats(token) // valida el token contra el backend
       onLogin(token)
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'No se pudo validar el token.')
@@ -26,17 +27,20 @@ export function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
   }
 
   return (
-    <div className="grid min-h-dvh place-items-center px-5">
-      <form onSubmit={submit} className="w-full max-w-sm space-y-8 surface p-8" noValidate>
-        <div>
-          <Logo size={40} />
-          <h1 className="display-product mt-8">Panel admin</h1>
-          <p className="body-text mt-2">Ingresá tu token para gestionar pedidos y stock.</p>
+    <div
+      className="relative grid min-h-dvh place-items-center overflow-hidden bg-gallery px-5"
+      style={{ backgroundImage: 'radial-gradient(70% 55% at 50% 0%, rgb(var(--bz-glow, 150 12 20) / 0.35), transparent 70%)' }}
+    >
+      <form onSubmit={submit} className="surface relative w-full max-w-sm space-y-7 border border-line p-8" noValidate>
+        <div className="text-center">
+          <Logo size={72} className="mx-auto" />
+          <h1 className="font-display mt-6 text-[1.6rem] font-bold leading-none">Panel Boom Zapas</h1>
+          <p className="body-text mt-3">Pedidos, stock, clientes y reseñas en un solo lugar.</p>
         </div>
         <label className="block">
-          <span className="label block text-index">Token</span>
+          <span className="label block text-index">{MODO_DEMO ? 'Clave' : 'Token de administrador'}</span>
           <input
-            className="field-line normal-case"
+            className="field-line normal-case mt-2"
             type="password"
             autoComplete="current-password"
             value={value}
@@ -45,6 +49,12 @@ export function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
             autoFocus
           />
         </label>
+        {MODO_DEMO && (
+          <p className="flex items-start gap-2 rounded-xl bg-stage px-3 py-2.5 text-[12px] leading-4 text-index">
+            <Icon name="alert" size={14} className="mt-px shrink-0 text-[#f0a93b]" />
+            Modo local: entrá con cualquier clave. Los datos se guardan sólo en este navegador.
+          </p>
+        )}
         {error && (
           <p role="alert" className="label text-danger">
             {error}

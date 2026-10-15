@@ -12,6 +12,7 @@ const ContactPage = lazy(() => import('@/pages/ContactPage'))
 const HowToBuyPage = lazy(() => import('@/pages/HowToBuyPage'))
 const SizeGuidePage = lazy(() => import('@/pages/SizeGuidePage'))
 const AdminPage = lazy(() => import('@/pages/AdminPage'))
+const PaymentResultPage = lazy(() => import('@/pages/PaymentResultPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
         <Route path="como-comprar" element={<HowToBuyPage />} />
         <Route path="guia-de-talles" element={<SizeGuidePage />} />
         <Route path="nosotros" element={<AboutPage />} />
+        <Route path="pago/:resultado" element={<PaymentResultPage />} />
         <Route path="contacto" element={<ContactPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

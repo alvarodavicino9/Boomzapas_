@@ -9,7 +9,8 @@ import type {
 import { MOCK_PRODUCTOS } from '@/data/mock'
 import { normalizeProducto } from './normalize'
 
-const API_URL = (import.meta.env.VITE_API_URL ?? 'https://boomzapas-server-production.up.railway.app').replace(/\/$/, '')
+/** Por defecto la API vive en el mismo sitio (funciones de Vercel en /api). VITE_API_URL sólo hace falta si está en otro lado. */
+const API_URL = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
 /**
  * Por ahora la tienda NO se conecta al servidor ni a Supabase: usa el catálogo local
  * (src/data/fotosCatalogo.ts) y los pedidos se confirman por WhatsApp.
@@ -35,8 +36,7 @@ async function request<T>(path: string, init: RequestInit = {}, token?: string):
   try {
     res = await fetch(`${API_URL}${path}`, { ...init, headers: { ...headers, ...init.headers } })
   } catch {
-    const host = API_URL.replace(/^https?:\/\//, '')
-    throw new ApiError(`No pudimos conectarnos con el servidor (${host}). Revisá tu conexión o que el servidor esté activo.`, 0)
+    throw new ApiError('No pudimos conectarnos con el servidor. Revisá tu conexión e intentá de nuevo.', 0)
   }
 
   const body = await res.json().catch(() => null)
