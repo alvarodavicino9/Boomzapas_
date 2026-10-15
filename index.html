@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="es-AR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#070506" />
+    <script>
+      // Tema de color: ?tema=claro|verde|oscuro|rojo (se recuerda en este navegador).
+      (function () {
+        var temas = { claro: '#fafaf9', verde: '#fafaf9', oscuro: '#060608', rojo: '#070506' };
+        var t = 'rojo';
+        try {
+          var q = new URLSearchParams(location.search).get('tema');
+          if (q && temas[q]) localStorage.setItem('bz_tema', q);
+          var g = localStorage.getItem('bz_tema');
+          if (g && temas[g]) t = g;
+        } catch (e) {}
+        document.documentElement.setAttribute('data-theme', t);
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', temas[t]);
+      })();
+    </script>
+    <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+
+    <title>Boom Zapas · Zapatillas en Córdoba con envíos a todo el país</title>
+    <meta
+      name="description"
+      content="Zapatillas Nike, Adidas, Jordan, New Balance, Puma y Vans al mejor precio. Envíos a todo el país con Correo Argentino, retiro en Córdoba y pago con Mercado Pago, transferencia o WhatsApp."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Boom Zapas · Tu próximo par está acá" />
+    <meta
+      property="og:description"
+      content="Las mejores zapatillas al mejor precio. Estilo, comodidad y onda en cada paso."
+    />
+    <meta property="og:locale" content="es_AR" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "ShoeStore",
+        "name": "Boom Zapas",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Duarte Quirós 477",
+          "addressLocality": "Córdoba",
+          "addressCountry": "AR"
+        },
+        "sameAs": ["https://www.instagram.com/boom.zapass"]
+      }
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
