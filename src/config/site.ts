@@ -37,7 +37,7 @@ export const SITE = {
   ],
 } as const
 
-export const BRANDS = ['Nike', 'Adidas', 'Jordan', 'New Balance', 'Puma', 'Vans', 'Salomon'] as const
+export const BRANDS = ['Nike', 'Adidas', 'Jordan', 'New Balance', 'Puma', 'Vans'] as const
 
 export const CATEGORIAS = [
   { id: 'todos', label: 'Todos' },

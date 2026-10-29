@@ -1,5 +1,6 @@
 import type { Producto, StockTalle } from '@/types'
 import { fotoDeModelo, MODELOS_ORIGINALES } from '@/data/fotosCatalogo'
+import { fotosDeModelo, MODELOS_DRIVE } from '@/data/modelosDrive'
 
 const TALLES = ['38', '39', '40', '41', '42', '43', '44']
 
@@ -13,10 +14,61 @@ const stockDe = (id: number): StockTalle[] =>
   }))
 
 /**
- * Productos de prueba. Mientras la tienda esté sin conexión al servidor (modo local), este es el catálogo.
- * Son los 31 modelos de la página anterior, con sus fotos y precios.
+ * Modelos de Drive que reemplazan a uno que ya existía (mismo par, foto nueva).
+ * Conservan el id anterior para no romper pedidos ni ediciones hechas en el panel.
+ */
+const MISMO_ID: Record<string, number> = {
+  'Nike SB Dunk Panda': 1,
+  'Adidas Samba Clásicas': 3,
+  'Nike Air Force One': 21,
+  'Nike SB Dunk Grises': 23,
+  'Nike SB Dunk Total Black': 24,
+  'Nike SB Dunk Chocolate': 25,
+  // Los tres primeros con fotos reales (antes "530 Silver", "Dunk Low Crema" y "Samba Verde")
+  'New Balance 530 Platino': 32,
+  'Nike SB Dunk Total White': 33,
+  'Adidas Samba Verdes': 34,
+}
+const REEMPLAZADOS = new Set(Object.values(MISMO_ID))
+const NUEVOS = new Set([32, 33, 34, 35])
+
+let siguienteId = 36
+const conFotosDeEstudio: Producto[] = MODELOS_DRIVE.map((m) => {
+  const id = MISMO_ID[m.nombre] ?? siguienteId++
+  return {
+    id,
+    nombre: m.nombre,
+    marca: m.marca,
+    categoria: m.categoria,
+    precio: m.precio,
+    imagenes: fotosDeModelo(m),
+    descripcion: '',
+    stock: stockDe(id),
+    nuevo: NUEVOS.has(id) || undefined,
+  }
+})
+
+/**
+ * Catálogo mientras la tienda esté sin conexión al servidor (modo local).
+ *
+ * 1. Los modelos con fotos de estudio (Drive) + el New Balance 740 de las primeras fotos del negocio.
+ * 2. Los modelos de la página anterior que todavía no tienen fotos de estudio: quedan OCULTOS para que
+ *    la tienda se vea pareja. Siguen en el panel (Productos → Ocultos) y se pueden volver a mostrar.
+ * Los precios son de referencia.
  */
 export const MOCK_PRODUCTOS: Producto[] = [
+  ...conFotosDeEstudio,
+  {
+    id: 35,
+    nombre: 'New Balance 740 Bordó',
+    marca: 'New Balance',
+    categoria: 'running',
+    precio: 66900,
+    imagenes: ['nb740', 'nb740-detalle', 'nb740-suela'].map((f) => `/fotos/negocio/${f}.jpg`),
+    descripcion: '',
+    stock: stockDe(35),
+    nuevo: true,
+  },
   ...MODELOS_ORIGINALES.map<Producto>((m, i) => ({
     id: i + 1,
     nombre: m.nombre,
@@ -26,25 +78,6 @@ export const MOCK_PRODUCTOS: Producto[] = [
     imagenes: [fotoDeModelo(m.nombre)],
     descripcion: '',
     stock: stockDe(i + 1),
-  })),
-
-  // Con las fotos reales del negocio (3 vistas por modelo). Los precios son de ejemplo.
-  ...(
-    [
-      { nombre: 'New Balance 530 Silver', marca: 'New Balance', categoria: 'running', precio: 64900, fotos: ['nb530', 'nb530-detalle', 'nb530-suela'] },
-      { nombre: 'Nike Dunk Low Crema', marca: 'Nike', categoria: 'urbanas', precio: 61900, fotos: ['dunk', 'dunk-detalle', 'dunk-talon'] },
-      { nombre: 'Adidas Samba Verde', marca: 'Adidas', categoria: 'urbanas', precio: 58900, fotos: ['samba-verde', 'samba-lateral', 'samba-detalle'] },
-      { nombre: 'New Balance 740 Bordó', marca: 'New Balance', categoria: 'running', precio: 66900, fotos: ['nb740', 'nb740-detalle', 'nb740-suela'] },
-    ] as const
-  ).map<Producto>((m, i) => ({
-    id: MODELOS_ORIGINALES.length + i + 1,
-    nombre: m.nombre,
-    marca: m.marca,
-    categoria: m.categoria,
-    precio: m.precio,
-    imagenes: m.fotos.map((f) => `/fotos/negocio/${f}.jpg`),
-    descripcion: '',
-    stock: stockDe(MODELOS_ORIGINALES.length + i + 1),
-    nuevo: true,
-  })),
+    oculto: true,
+  })).filter((p) => !REEMPLAZADOS.has(p.id)),
 ]

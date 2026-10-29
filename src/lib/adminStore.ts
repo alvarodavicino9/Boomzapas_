@@ -100,6 +100,9 @@ function persistent<T>(key: string, init: () => T) {
 
 // ── Pedidos de ejemplo ────────────────────────────────────────────────────
 
+/** Los pedidos de ejemplo sólo usan modelos que se ven en la tienda. */
+const VISIBLES = MOCK_PRODUCTOS.filter((p) => !p.oculto)
+
 const NOMBRES = [
   ['Martina Gómez', '3516 21-4410'],
   ['Lucas Ferreyra', '3513 88-1203'],
@@ -135,7 +138,7 @@ function semilla(): PedidoAdmin[] {
     const nItems = rnd() > 0.8 ? 2 : 1
     const items: ItemPedido[] = []
     for (let k = 0; k < nItems; k++) {
-      const p = MOCK_PRODUCTOS[Math.floor(rnd() * MOCK_PRODUCTOS.length)]
+      const p = VISIBLES[Math.floor(rnd() * VISIBLES.length)]
       const talle = p.stock[Math.floor(rnd() * p.stock.length)]?.talle ?? '41'
       items.push({
         producto_id: p.id,

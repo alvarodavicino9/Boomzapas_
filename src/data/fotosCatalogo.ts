@@ -8,6 +8,8 @@
  *     acá una foto por nombre (ver normalize.ts). Así el catálogo real nunca queda
  *     con la silueta gris sólo porque la columna de imágenes está vacía.
  */
+import { fotosDeModelo, MODELOS_DRIVE } from '@/data/modelosDrive'
+
 export interface ModeloOriginal {
   nombre: string
   marca: string
@@ -63,16 +65,32 @@ const SLUGS = new Set(MODELOS_ORIGINALES.map((m) => slugify(m.nombre)))
 export const fotoDeModelo = (nombre: string): string => `${RUTA}/${slugify(nombre)}.jpg`
 
 /**
- * Busca la foto de la página anterior para un nombre de producto.
+ * Busca fotos locales para un nombre de producto (respaldo cuando la base no trae imágenes).
+ * Primero en los modelos con fotos de estudio (todas sus vistas) y después en la página anterior.
  * 1) coincidencia exacta del nombre; 2) uno contiene al otro ("Nike Zoom X" ↔ "Zoom X").
  */
-export function fotoLocal(nombre: string): string | undefined {
+export function fotosLocales(nombre: string): string[] {
   const s = slugify(nombre)
-  if (!s) return undefined
-  if (SLUGS.has(s)) return `${RUTA}/${s}.jpg`
-  let best: string | undefined
-  for (const k of SLUGS) {
-    if (k.length >= 6 && (s.includes(k) || k.includes(s)) && (!best || k.length > best.length)) best = k
+  if (!s) return []
+  const estudio = buscar(s, MODELOS_DRIVE, (m) => slugify(m.nombre))
+  if (estudio) return fotosDeModelo(estudio)
+  const anterior = buscar(s, [...SLUGS], (k) => k)
+  return anterior ? [`${RUTA}/${anterior}.jpg`] : []
+}
+
+/** Sólo la foto principal (compatibilidad). */
+export const fotoLocal = (nombre: string): string | undefined => fotosLocales(nombre)[0]
+
+function buscar<T>(s: string, lista: T[], key: (x: T) => string): T | undefined {
+  let best: T | undefined
+  let bestLen = 0
+  for (const x of lista) {
+    const k = key(x)
+    if (k === s) return x
+    if (k.length >= 6 && (s.includes(k) || k.includes(s)) && k.length > bestLen) {
+      best = x
+      bestLen = k.length
+    }
   }
-  return best ? `${RUTA}/${best}.jpg` : undefined
+  return best
 }
