@@ -9,6 +9,7 @@
  *     con la silueta gris sólo porque la columna de imágenes está vacía.
  */
 import { fotosDeModelo, MODELOS_DRIVE } from '@/data/modelosDrive'
+import { slugify } from '@/lib/slug'
 
 export interface ModeloOriginal {
   nombre: string
@@ -17,13 +18,7 @@ export interface ModeloOriginal {
   precio: number
 }
 
-export const slugify = (s: string): string =>
-  s
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
+export { slugify }
 
 export const MODELOS_ORIGINALES: ModeloOriginal[] = [
   { nombre: 'Nike SB Dunk Panda', marca: 'Nike', categoria: 'urbanas', precio: 60800 },

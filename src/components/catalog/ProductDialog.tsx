@@ -15,6 +15,7 @@ import { cn, formatARS, transferPrice } from '@/lib/format'
 import { getTalles, isSoldOut } from '@/lib/stock'
 import { getStatus } from '@/lib/status'
 import { waLink } from '@/lib/whatsapp'
+import { rutaProducto } from '@/lib/slug'
 import type { Producto } from '@/types'
 
 interface ProductDialogProps {
@@ -122,12 +123,33 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
     window.open(
       waLink(
         selected
-          ? `Hola Boom Zapas. Quiero consultar por: ${p.nombre} · Talle ${selected.talle} (${formatARS(p.precio)}).`
-          : `Hola Boom Zapas. Quiero consultar por: ${p.nombre} (${formatARS(p.precio)}). ¿Qué talles tienen?`,
+          ? `Hola Boom Zapas. Quiero consultar por: ${p.nombre} · Talle ${selected.talle} (${formatARS(p.precio)}).\n${link}`
+          : `Hola Boom Zapas. Quiero consultar por: ${p.nombre} (${formatARS(p.precio)}). ¿Qué talles tienen?\n${link}`,
       ),
       '_blank',
       'noopener,noreferrer',
     )
+  }
+
+  const link = `${window.location.origin}${rutaProducto(p)}`
+
+  // Compartir: el menú del celular (WhatsApp, Instagram…) o, en la compu, copiar el link.
+  const compartir = async () => {
+    const texto = `${p.nombre} · ${formatARS(p.precio)} en Boom Zapas`
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: p.nombre, text: texto, url: link })
+      } catch {
+        /* la persona cerró el menú de compartir */
+      }
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(link)
+      toast('Link copiado. Pegalo donde quieras')
+    } catch {
+      window.open(`https://wa.me/?text=${encodeURIComponent(`${texto}\n${link}`)}`, '_blank', 'noopener,noreferrer')
+    }
   }
 
   const openRelated = (o: Producto) => {
@@ -163,6 +185,14 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
                 {status}
               </span>
             )}
+            <button
+              type="button"
+              onClick={compartir}
+              className="label absolute bottom-4 right-4 z-10 flex h-10 items-center gap-2 rounded-full bg-white/90 px-4 text-[11px] font-semibold text-black shadow-card backdrop-blur transition-colors hover:bg-black hover:text-white"
+            >
+              <Icon name="share" size={15} />
+              Compartir
+            </button>
             <span className="label pointer-events-none absolute bottom-4 left-4 hidden rounded-full bg-black/55 px-3 py-1.5 text-[10px] text-white backdrop-blur lg:group-hover:hidden lg:block">
               Pasá el mouse para ampliar
             </span>

@@ -1,6 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /pago/
-
-Sitemap: https://boomzapass.vercel.app/sitemap.xml

@@ -1,8 +1,7 @@
-import { useState } from 'react'
 import { ProductCard } from './ProductCard'
-import { ProductDialog } from './ProductDialog'
 import { Button } from '@/components/ui/Button'
 import { useProductos } from '@/context/ProductsContext'
+import { useAbrirProducto } from '@/hooks/useAbrirProducto'
 import { cn } from '@/lib/format'
 import type { Producto } from '@/types'
 
@@ -16,8 +15,15 @@ interface ProductGridProps {
   cols?: 3 | 4
 }
 
-export function ProductGrid({ productos, status, skeletons = 8, emptyMessage, onResetFilters, cols = 4 }: ProductGridProps) {
-  const [selected, setSelected] = useState<Producto | null>(null)
+export function ProductGrid({
+  productos,
+  status,
+  skeletons = 8,
+  emptyMessage,
+  onResetFilters,
+  cols = 4,
+}: ProductGridProps) {
+  const abrir = useAbrirProducto()
   const { error, reload } = useProductos()
 
   const grid = cn(
@@ -70,10 +76,9 @@ export function ProductGrid({ productos, status, skeletons = 8, emptyMessage, on
       <div className={grid}>
         {productos.map((p, i) => (
           // la primera fila se pide ya (es lo primero que se ve); el resto, a medida que se scrollea
-          <ProductCard key={p.id} producto={p} onOpen={setSelected} eager={i < 4} />
+          <ProductCard key={p.id} producto={p} onOpen={abrir} eager={i < 4} />
         ))}
       </div>
-      <ProductDialog producto={selected} onClose={() => setSelected(null)} onSelect={setSelected} />
     </>
   )
 }

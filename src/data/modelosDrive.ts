@@ -85,3 +85,14 @@ export const MODELOS_DRIVE: ModeloDrive[] = [
 
 export const fotosDeModelo = (m: ModeloDrive): string[] =>
   Array.from({ length: m.fotos }, (_, i) => `/fotos/modelos/${m.carpeta}/${i + 1}.jpg`)
+
+/** Modelos con fotos de estudio que no están en la carpeta de Drive (primeras fotos del negocio). */
+export const OTROS_MODELOS = [
+  {
+    nombre: 'New Balance 740 Bordó',
+    marca: 'New Balance',
+    categoria: 'running' as const,
+    precio: 66900,
+    imagenes: ['nb740', 'nb740-detalle', 'nb740-suela'].map((f) => `/fotos/negocio/${f}.jpg`),
+  },
+]

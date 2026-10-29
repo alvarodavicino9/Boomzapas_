@@ -1,6 +1,6 @@
 import type { Producto, StockTalle } from '@/types'
 import { fotoDeModelo, MODELOS_ORIGINALES } from '@/data/fotosCatalogo'
-import { fotosDeModelo, MODELOS_DRIVE } from '@/data/modelosDrive'
+import { fotosDeModelo, MODELOS_DRIVE, OTROS_MODELOS } from '@/data/modelosDrive'
 
 const TALLES = ['38', '39', '40', '41', '42', '43', '44']
 
@@ -58,17 +58,7 @@ const conFotosDeEstudio: Producto[] = MODELOS_DRIVE.map((m) => {
  */
 export const MOCK_PRODUCTOS: Producto[] = [
   ...conFotosDeEstudio,
-  {
-    id: 35,
-    nombre: 'New Balance 740 Bordó',
-    marca: 'New Balance',
-    categoria: 'running',
-    precio: 66900,
-    imagenes: ['nb740', 'nb740-detalle', 'nb740-suela'].map((f) => `/fotos/negocio/${f}.jpg`),
-    descripcion: '',
-    stock: stockDe(35),
-    nuevo: true,
-  },
+  { ...OTROS_MODELOS[0], id: 35, descripcion: '', stock: stockDe(35), nuevo: true },
   ...MODELOS_ORIGINALES.map<Producto>((m, i) => ({
     id: i + 1,
     nombre: m.nombre,
