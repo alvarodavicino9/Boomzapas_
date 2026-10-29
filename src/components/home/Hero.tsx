@@ -3,6 +3,7 @@ import { Icon } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
 import { SITE } from '@/config/site'
 import { cn, formatARS } from '@/lib/format'
+import { srcsetWebp } from '@/lib/imagenes'
 
 interface Slide {
   tag: string
@@ -23,7 +24,7 @@ const SLIDES: Slide[] = [
     l2: 'Ingresos',
     text: 'Los pares que están entrando ahora.',
     cta: 'Ver nuevos ingresos',
-    to: '/catalogo',
+    to: '/catalogo?nuevos=1',
     src: '/fotos/negocio/nb740.jpg',
     alt: 'New Balance 740 blanca, beige y bordó',
   },
@@ -154,8 +155,13 @@ export function Hero() {
               >
                 <img
                   src={s.src}
+                  srcSet={srcsetWebp(s.src)}
+                  sizes="(min-width: 1024px) 46vw, 100vw"
                   alt={s.alt}
+                  width={1100}
+                  height={1467}
                   loading={i === 0 ? 'eager' : 'lazy'}
+                  {...(i === 0 ? { fetchpriority: 'high' } : {})}
                   decoding="async"
                   className="absolute inset-0 size-full object-cover object-center max-lg:[-webkit-mask-image:linear-gradient(to_bottom,transparent_0%,#000_20%,#000_82%,transparent_100%)] max-lg:[mask-image:linear-gradient(to_bottom,transparent_0%,#000_20%,#000_82%,transparent_100%)]"
                 />
@@ -183,21 +189,25 @@ export function Hero() {
 
       {/* puntos y pausa */}
       <div className="relative z-20 flex items-center justify-center gap-4 pb-5 pt-1 lg:absolute lg:inset-x-0 lg:bottom-5 lg:p-0">
-        <div className="flex items-center gap-2" role="group" aria-label="Elegir diapositiva">
+        <div className="flex items-center gap-0.5" role="group" aria-label="Elegir diapositiva">
           {SLIDES.map((s, i) => (
             <button
               key={s.l2}
               onClick={() => setIndex(i)}
               aria-label={`Diapositiva ${i + 1} de ${SLIDES.length}: ${s.tag}`}
               aria-current={i === index}
-              className={cn('h-2.5 rounded-full transition-all', i === index ? 'w-8 bg-black' : 'w-2.5 bg-black/30 hover:bg-black/60')}
-            />
+              className="group/dot grid h-6 min-w-6 place-items-center"
+            >
+              <span
+                className={cn('block h-2.5 rounded-full transition-all', i === index ? 'w-8 bg-black' : 'w-2.5 bg-black/30 group-hover/dot:bg-black/60')}
+              />
+            </button>
           ))}
         </div>
         <button
           onClick={() => setPlaying((p) => !p)}
           aria-pressed={!playing}
-          className="text-[10px] font-semibold uppercase tracking-[0.2em] hover:underline hover:underline-offset-4"
+          className="min-h-6 px-1 text-[10px] font-semibold uppercase tracking-[0.2em] hover:underline hover:underline-offset-4"
         >
           {playing ? 'Pausa' : 'Reanudar'}
         </button>

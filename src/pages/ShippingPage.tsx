@@ -7,6 +7,7 @@ import { ContactSection } from '@/components/sections/ContactSection'
 import { FOTOS } from '@/config/fotos'
 import { SITE } from '@/config/site'
 import { waLink } from '@/lib/whatsapp'
+import { srcsetWebp } from '@/lib/imagenes'
 
 const DATOS: { icon: IconName; title: string; text: string }[] = [
   { icon: 'truck', title: 'Todo el país', text: 'Por Correo Argentino' },
@@ -106,6 +107,8 @@ export default function ShippingPage() {
             <div className="on-light relative min-h-[320px]">
               <img
                 src={FOTOS.nb740Suela.src}
+                srcSet={srcsetWebp(FOTOS.nb740Suela.src)}
+                sizes="(min-width: 1024px) 40vw, 100vw"
                 alt={FOTOS.nb740Suela.alt}
                 loading="lazy"
                 decoding="async"

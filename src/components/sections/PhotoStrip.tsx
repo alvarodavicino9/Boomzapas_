@@ -3,6 +3,7 @@ import { Reveal } from '@/components/ui/Reveal'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import type { Foto } from '@/config/fotos'
+import { srcsetWebp } from '@/lib/imagenes'
 
 interface PhotoStripProps {
   eyebrow: string
@@ -39,6 +40,8 @@ export function PhotoStrip({ eyebrow, title, text, fotos, cta, flush }: PhotoStr
               <figure className="on-light group relative overflow-hidden rounded-2xl ring-1 ring-black/10">
                 <img
                   src={foto.src}
+                  srcSet={srcsetWebp(foto.src)}
+                  sizes="(min-width: 1024px) 25vw, 50vw"
                   alt={foto.alt}
                   loading="lazy"
                   decoding="async"

@@ -24,6 +24,8 @@ function BrandCard({ brand, hidden }: { brand: string; hidden: boolean }) {
       ) : (
         <img
           src={`/marcas/${slug(brand)}.svg`}
+          width={ANCHO[slug(brand)] ?? 110}
+          height={60}
           alt=""
           loading="lazy"
           decoding="async"
@@ -46,7 +48,11 @@ export function BrandTicker() {
     <ul className="ticker-track flex shrink-0 items-center" aria-hidden={hidden || undefined}>
       {[0, 1].flatMap((rep) =>
         BRANDS.map((b) => (
-          <li key={`${rep}-${b}`} className={rep === 1 ? 'ticker-repeat flex items-center' : 'flex items-center'}>
+          <li
+            key={`${rep}-${b}`}
+            className={rep === 1 ? 'ticker-repeat flex items-center' : 'flex items-center'}
+            aria-hidden={rep === 1 || undefined}
+          >
             <BrandCard brand={b} hidden={hidden || rep === 1} />
           </li>
         )),

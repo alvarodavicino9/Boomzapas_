@@ -78,7 +78,7 @@ export function CartDrawer() {
                         exit={{ opacity: 0, height: 0 }}
                         className="flex gap-4 overflow-hidden border-b border-line py-5"
                       >
-                        <ProductImage src={i.imagen} alt={i.nombre} className="size-24 shrink-0 rounded-xl" />
+                        <ProductImage src={i.imagen} alt={i.nombre} sizes="96px" className="size-24 shrink-0 rounded-xl" />
                         <div className="flex min-w-0 flex-1 flex-col">
                           <p className="label text-index">{i.marca}</p>
                           <p className="mt-1 truncate text-[15px]">{i.nombre}</p>

@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import type { Foto } from '@/config/fotos'
+import { srcsetWebp } from '@/lib/imagenes'
 
 interface PageHeroProps {
   eyebrow: string
@@ -30,6 +31,8 @@ export function PageHero({ eyebrow, title, subtitle, foto, actions, position = '
         <div className="on-light relative overflow-hidden rounded-3xl shadow-[0_30px_70px_-30px_rgb(0_0_0/0.55)] ring-1 ring-black/10">
           <img
             src={foto.src}
+            srcSet={srcsetWebp(foto.src)}
+            sizes="(min-width: 1024px) 40vw, 100vw"
             alt={foto.alt}
             decoding="async"
             className="aspect-[5/4] w-full object-cover sm:aspect-[16/11]"

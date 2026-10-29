@@ -1,77 +1,58 @@
 @import "tailwindcss";
 
 /*
- * Sistema visual claro, de tienda de zapatillas: fondo hueso, tarjetas blancas con
- * esquinas redondeadas, títulos en Lexend Exa, texto en Lexend y un color de acento.
+ * Sistema visual de la tienda: títulos en Lexend Exa, texto en Lexend y el rojo de la marca.
  *
- * El color se cambia por tema (data-theme en <html>). Por defecto: "claro" con acento azul
- * (el de tu logo). Probalos con ?tema=claro | verde | oscuro (se recuerda en el navegador),
- * o cambiá el valor por defecto en el bloque ":root" de abajo y en el script de index.html.
+ * Dos modos (data-theme en <html>), que el cliente elige desde el pie o el encabezado:
+ *  - "oscuro" (por defecto): negro cálido con luces granate.
+ *  - "claro": fondo hueso y tarjetas blancas.
+ * En los dos el rojo, el granate y los bloques de marca (franja de marcas, pie, contacto)
+ * son iguales: sólo cambian el fondo, las tarjetas y el texto.
  */
 :root,
-:root[data-theme="claro"] {
-  --bz-gallery: #fafaf9;
-  --bz-card: #ffffff;
-  --bz-stage: #f0f0ee;
-  --bz-line: #e6e6e2;
-  --bz-control: #c3c3bd;
-  --bz-ink: #0a0a0a;
-  --bz-index: #66665f;
-  --bz-danger: #c0392b;
-  --bz-scrim: rgb(0 0 0 / 0.55);
-  --bz-accent: #1f3fe0;
-  --bz-accent-soft: #5b78ff;
-  --bz-on-accent: #ffffff;
-  --bz-bar: #2b2f33;
-  --bz-hero-a: #ecece9;
-  --bz-hero-b: #f7f7f5;
-  --bz-sil-sole: #d6d6d1;
-  --bz-sil-body: #e4e4e0;
-  --bz-sil-line: #c6c6bf;
-  --bz-sil-lace: #a9a9a2;
-}
-:root[data-theme="verde"] {
-  --bz-accent: #15803d;
-  --bz-accent-soft: #2ecc71;
-}
-:root[data-theme="oscuro"],
-:root[data-theme="rojo"] {
-  --bz-glow: 59 91 255;
-  --bz-gallery: #060608;
-  --bz-card: #0b0b0c;
-  --bz-stage: #161618;
-  --bz-line: #242427;
-  --bz-control: #4a4f55;
-  --bz-ink: #f5f5f4;
-  --bz-index: #a3a3a0;
-  --bz-danger: #ff8f8f;
-  --bz-scrim: rgb(0 0 0 / 0.7);
-  --bz-accent: #3b5bff;
-  --bz-accent-soft: #7088ff;
-  --bz-on-accent: #ffffff;
-  --bz-bar: #151517;
-  --bz-hero-a: #0b0b0c;
-  --bz-hero-b: #000000;
-  --bz-sil-sole: #2c3034;
-  --bz-sil-body: #25282b;
-  --bz-sil-line: #3a3f44;
-  --bz-sil-lace: #4d535a;
-}
-
-/* Rojo: negro cálido con acento rojo y luces suaves (sutil, sin saturar) */
-:root[data-theme="rojo"] {
+:root[data-theme="oscuro"] {
   --bz-glow: 150 12 20; /* granate del logo */
   --bz-gallery: #070506;
   --bz-card: #0e0b0c;
   --bz-stage: #181314;
   --bz-line: #271f21;
   --bz-control: #54474a;
+  --bz-ink: #f5f5f4;
   --bz-index: #aa9fa1;
+  --bz-danger: #ff8f8f;
+  --bz-scrim: rgb(0 0 0 / 0.7);
   --bz-accent: #d92c37;
   --bz-accent-soft: #ff6b73;
+  --bz-accent-text: #f0444e; /* rojo para texto chico: el mismo tono, apenas más claro para leerse sobre negro */
+  --bz-on-accent: #ffffff;
   --bz-bar: #1a0f10;
-  --bz-hero-a: #0e0b0c;
-  --bz-hero-b: #070506;
+  --bz-sil-sole: #2c3034;
+  --bz-sil-body: #25282b;
+  --bz-sil-line: #3a3f44;
+  --bz-sil-lace: #4d535a;
+  color-scheme: dark;
+}
+:root[data-theme="claro"] {
+  --bz-glow: 150 12 20;
+  --bz-gallery: #f7f4f3;
+  --bz-card: #ffffff;
+  --bz-stage: #efebea;
+  --bz-line: #e6dfde;
+  --bz-control: #c2b8b7;
+  --bz-ink: #140d0e;
+  --bz-index: #685e60;
+  --bz-danger: #b42318;
+  --bz-scrim: rgb(20 8 10 / 0.55);
+  --bz-accent: #d92c37;
+  --bz-accent-soft: #e5484f;
+  --bz-accent-text: #c41f2b; /* apenas más oscuro para leerse sobre fondo claro */
+  --bz-on-accent: #ffffff;
+  --bz-bar: #1a0f10;
+  --bz-sil-sole: #d9d3d2;
+  --bz-sil-body: #e7e2e1;
+  --bz-sil-line: #c9c1c0;
+  --bz-sil-lace: #aca3a2;
+  color-scheme: light;
 }
 
 @theme inline {
@@ -396,19 +377,45 @@
   to { transform: scaleX(1); }
 }
 
-/* ---------- fondo del tema oscuro: negro con profundidad (luces de color + grano + tarjetas con borde) ---------- */
-:root[data-theme="oscuro"] body,
-:root[data-theme="rojo"] body {
+/* ── Cambio de modo: transición suave sólo mientras se cambia ─────────────────── */
+html.cambiando-modo,
+html.cambiando-modo *,
+html.cambiando-modo *::before,
+html.cambiando-modo *::after {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, fill 0.3s ease !important;
+}
+
+/* Textos chicos en rojo (etiquetas): tono legible según el fondo.
+   Los títulos, el logo, los botones y las etiquetas rojas mantienen el rojo de la marca. */
+.label.text-accent { color: var(--bz-accent-text); }
+.on-light { --bz-accent-text: #c41f2b; }
+
+/* ── Bloques de marca: iguales en los dos modos ───────────────────────────────── */
+.on-bar,
+.on-accent { --bz-accent-text: #f0444e; }
+.on-bar {
+  background: linear-gradient(135deg, #1f1012 0%, #130b0c 60%, #0d0809 100%);
+  box-shadow: 0 0 0 1px rgb(var(--bz-glow) / 0.35) inset;
+}
+/* el bloque "de acento" no es rojo pleno: oscuro con filo y luz granate */
+.on-accent {
+  --bz-gallery: #130b0c;
+  background: radial-gradient(600px 260px at 12% 0, rgb(var(--bz-glow) / 0.45), transparent 70%), linear-gradient(180deg, #1c0e11 0%, #120a0b 100%);
+  border: 1px solid rgb(var(--bz-glow) / 0.5);
+  box-shadow: 0 30px 70px -40px rgb(var(--bz-glow) / 0.8);
+}
+
+/* ── Modo oscuro: negro con profundidad (luces granate + grano + tarjetas con borde) ── */
+:root[data-theme="oscuro"] body {
   background-color: var(--bz-gallery);
   background-image:
-    radial-gradient(1000px 560px at 90% 0, rgb(var(--bz-glow) / 0.2), transparent 70%),
-    radial-gradient(820px 640px at -10% 1250px, rgb(var(--bz-glow) / 0.12), transparent 70%),
-    radial-gradient(900px 620px at 108% 2500px, rgb(var(--bz-glow) / 0.1), transparent 70%),
-    radial-gradient(800px 600px at -8% 3700px, rgb(var(--bz-glow) / 0.1), transparent 70%);
+    radial-gradient(1100px 620px at 92% 0, rgb(var(--bz-glow) / 0.42), transparent 70%),
+    radial-gradient(900px 700px at -10% 1250px, rgb(var(--bz-glow) / 0.26), transparent 70%),
+    radial-gradient(980px 680px at 108% 2500px, rgb(var(--bz-glow) / 0.22), transparent 70%),
+    radial-gradient(860px 640px at -8% 3700px, rgb(var(--bz-glow) / 0.22), transparent 70%);
   background-repeat: no-repeat;
 }
-:root[data-theme="oscuro"] body::after,
-:root[data-theme="rojo"] body::after {
+:root[data-theme="oscuro"] body::after {
   content: '';
   position: fixed;
   inset: 0;
@@ -418,42 +425,27 @@
   mix-blend-mode: overlay;
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .55 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
 }
-:root[data-theme="oscuro"] .surface,
-:root[data-theme="rojo"] .surface {
-  background: linear-gradient(180deg, #131318 0%, #0b0b0f 100%);
-  border: 1px solid #1f2027;
-  box-shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 18px 40px -24px rgb(0 0 0 / 0.9);
-}
-:root[data-theme="oscuro"] .surface:hover,
-:root[data-theme="rojo"] .surface:hover {
-  border-color: rgb(var(--bz-glow) / 0.5);
-}
-
-/* en el tema rojo el pie no es un bloque rojo pleno: queda oscuro con filo y acentos rojos */
-:root[data-theme="rojo"] .on-accent {
-  --bz-gallery: #130b0c;
-  background: radial-gradient(600px 260px at 12% 0, rgb(var(--bz-glow) / 0.45), transparent 70%), linear-gradient(180deg, #1c0e11 0%, #120a0b 100%);
-  border: 1px solid rgb(var(--bz-glow) / 0.5);
-  box-shadow: 0 30px 70px -40px rgb(var(--bz-glow) / 0.8);
-}
-
-/* ── Tema rojo: ambientado con el logo (granate profundo sobre negro) ─────────── */
-:root[data-theme="rojo"] body {
-  background-image:
-    radial-gradient(1100px 620px at 92% 0, rgb(var(--bz-glow) / 0.42), transparent 70%),
-    radial-gradient(900px 700px at -10% 1250px, rgb(var(--bz-glow) / 0.26), transparent 70%),
-    radial-gradient(980px 680px at 108% 2500px, rgb(var(--bz-glow) / 0.22), transparent 70%),
-    radial-gradient(860px 640px at -8% 3700px, rgb(var(--bz-glow) / 0.22), transparent 70%);
-}
-:root[data-theme="rojo"] .surface {
+:root[data-theme="oscuro"] .surface {
   background: linear-gradient(180deg, #1a1011 0%, #0e0909 100%);
   border: 1px solid #2c1c1f;
   box-shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 18px 40px -24px rgb(0 0 0 / 0.9);
 }
-:root[data-theme="rojo"] .surface:hover {
+:root[data-theme="oscuro"] .surface:hover {
   border-color: rgb(var(--bz-glow) / 0.85);
 }
-:root[data-theme="rojo"] .on-bar {
-  background: linear-gradient(135deg, #1f1012 0%, #130b0c 60%, #0d0809 100%);
-  box-shadow: 0 0 0 1px rgb(var(--bz-glow) / 0.35) inset;
+
+/* ── Modo claro: fondo hueso con la misma luz granate, muy suave ──────────────── */
+:root[data-theme="claro"] body {
+  background-color: var(--bz-gallery);
+  background-image:
+    radial-gradient(1100px 620px at 92% 0, rgb(var(--bz-glow) / 0.09), transparent 70%),
+    radial-gradient(900px 700px at -10% 1250px, rgb(var(--bz-glow) / 0.06), transparent 70%),
+    radial-gradient(980px 680px at 108% 2500px, rgb(var(--bz-glow) / 0.05), transparent 70%);
+  background-repeat: no-repeat;
+}
+:root[data-theme="claro"] .surface {
+  border: 1px solid var(--bz-line);
+}
+:root[data-theme="claro"] .surface:hover {
+  border-color: rgb(var(--bz-glow) / 0.45);
 }

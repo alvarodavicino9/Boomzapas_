@@ -1,36 +1,48 @@
+import { useState } from 'react'
 import { ProductImage } from './ProductImage'
 import { cn, formatARS } from '@/lib/format'
+import { SIZES, srcsetWebp } from '@/lib/imagenes'
 import { getStatus } from '@/lib/status'
 import type { Producto } from '@/types'
 
 interface ProductCardProps {
   producto: Producto
   onOpen: (p: Producto) => void
+  /** Cargar la foto ya (primera fila). */
+  eager?: boolean
 }
 
-export function ProductCard({ producto, onOpen }: ProductCardProps) {
+export function ProductCard({ producto, onOpen, eager }: ProductCardProps) {
   const status = getStatus(producto)
   const soldOut = status === 'AGOTADO'
   const [first, second] = producto.imagenes
+  // La segunda vista se baja recién cuando el mouse se acerca a la tarjeta (no en el celular):
+  // así el catálogo carga una sola foto liviana por par.
+  const [verSegunda, setVerSegunda] = useState(false)
+  const conSegunda = Boolean(second) && !soldOut
 
   return (
-    <article className="group surface overflow-hidden transition-shadow duration-200 hover:shadow-lift">
+    <article
+      className="group surface overflow-hidden transition-shadow duration-200 hover:shadow-lift"
+      onPointerEnter={conSegunda ? (e) => e.pointerType === 'mouse' && setVerSegunda(true) : undefined}
+    >
       <button
         onClick={() => onOpen(producto)}
         className="flex h-full w-full flex-col text-left"
-        aria-label={`${producto.nombre}, ${formatARS(producto.precio)}${status ? `, ${status.toLowerCase()}` : ''}. Ver talles y detalles`}
       >
         <div className="relative aspect-[4/5] w-full overflow-hidden bg-stage">
           <ProductImage
             src={first}
             alt={producto.nombre}
+            eager={eager}
             className={cn('size-full transition-transform duration-500 group-hover:scale-[1.03]', soldOut && 'opacity-40')}
           />
-          {second && !soldOut && (
+          {conSegunda && verSegunda && (
             <img
               src={second}
+              srcSet={srcsetWebp(second)}
+              sizes={SIZES.tarjeta}
               alt=""
-              loading="lazy"
               decoding="async"
               className="absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
             />

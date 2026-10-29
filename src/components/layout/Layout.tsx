@@ -19,7 +19,7 @@ export function Layout() {
       </a>
       <ScrollToTop />
       <Navbar />
-      <main id="contenido" className="min-h-[70vh] pt-[var(--header-h)]">
+      <main id="contenido" className="min-h-[100dvh] pt-[var(--header-h)]">
         <Suspense fallback={<div className="label grid min-h-[60vh] place-items-center text-index">Cargando</div>}>
           <Outlet />
         </Suspense>

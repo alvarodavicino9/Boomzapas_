@@ -68,8 +68,9 @@ export function ProductGrid({ productos, status, skeletons = 8, emptyMessage, on
   return (
     <>
       <div className={grid}>
-        {productos.map((p) => (
-          <ProductCard key={p.id} producto={p} onOpen={setSelected} />
+        {productos.map((p, i) => (
+          // la primera fila se pide ya (es lo primero que se ve); el resto, a medida que se scrollea
+          <ProductCard key={p.id} producto={p} onOpen={setSelected} eager={i < 4} />
         ))}
       </div>
       <ProductDialog producto={selected} onClose={() => setSelected(null)} onSelect={setSelected} />

@@ -4,6 +4,7 @@ import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { ProductImage } from './ProductImage'
+import { precargar, SIZES } from '@/lib/imagenes'
 import { SizeChartDialog } from './SizeChartDialog'
 import { useCart } from '@/context/CartContext'
 import { useProductos } from '@/context/ProductsContext'
@@ -48,6 +49,13 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
   const { add } = useCart()
   const { productos } = useProductos()
   const { toast, openCart } = useUI()
+
+  // Con la ficha abierta, va bajando las otras vistas para que cambien al instante.
+  useEffect(() => {
+    if (!producto || producto.imagenes.length < 2) return
+    const t = window.setTimeout(() => producto.imagenes.slice(1).forEach((src) => precargar(src, SIZES.ficha)), 400)
+    return () => window.clearTimeout(t)
+  }, [producto])
 
   // Mantiene el último producto mientras corre la animación de salida.
   const [shown, setShown] = useState<Producto | null>(producto)
@@ -146,6 +154,7 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
             <ProductImage
               src={p.imagenes[photo]}
               alt={p.nombre}
+              sizes={SIZES.ficha}
               className="aspect-[4/3] size-full transition-transform duration-300 ease-out md:aspect-square lg:aspect-[4/5] [transform-origin:var(--zo)] lg:group-hover:scale-[1.8] motion-reduce:transition-none"
               eager
             />
@@ -168,7 +177,7 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
                     aria-current={i === photo}
                     className={cn('block size-20 bg-stage', i === photo ? 'opacity-100' : 'opacity-50 hover:opacity-100')}
                   >
-                    <img src={src} alt="" className="size-full object-cover" />
+                    <ProductImage src={src} alt="" sizes={SIZES.mini} className="size-full" />
                   </button>
                 </li>
               ))}
@@ -388,6 +397,7 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
                   <ProductImage
                     src={o.imagenes[0]}
                     alt={o.nombre}
+                    sizes={SIZES.sugerido}
                     className="aspect-[4/5] w-full rounded-xl transition-transform duration-300 group-hover:-translate-y-1"
                   />
                   <p className="label mt-3 text-index">{o.marca}</p>

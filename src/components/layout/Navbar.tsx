@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Logo } from '@/components/ui/Logo'
 import { DockNav } from './DockNav'
 import { Icon } from '@/components/ui/Icon'
+import { ModeIconButton, ModeSwitch } from '@/components/ui/ModeToggle'
 import { useCart } from '@/context/CartContext'
 import { useUI } from '@/context/UIContext'
 import { cn } from '@/lib/format'
@@ -74,6 +75,7 @@ export function Navbar() {
 
         <div className="col-start-3 flex items-center justify-end gap-3">
           {searchField('nav-search', 'hidden w-44 xl:block xl:w-56')}
+          <ModeIconButton className="max-sm:hidden" />
           <button
             onClick={openCart}
             aria-label={`Abrir pedido, ${count} ${count === 1 ? 'producto' : 'productos'}`}
@@ -124,6 +126,10 @@ export function Navbar() {
                   </li>
                 ))}
               </ul>
+              <div className="mt-8 flex items-center justify-between gap-4">
+                <span className="label text-index">Modo</span>
+                <ModeSwitch />
+              </div>
             </div>
           </motion.div>
         )}

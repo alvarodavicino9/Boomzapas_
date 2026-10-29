@@ -5,18 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#070506" />
     <script>
-      // Tema de color: ?tema=claro|verde|oscuro|rojo (se recuerda en este navegador).
+      // Modo claro u oscuro (se recuerda en este navegador; también ?modo=claro|oscuro).
+      // Antes había temas de color: los guardados como "claro"/"verde" pasan a claro y el resto a oscuro.
       (function () {
-        var temas = { claro: '#fafaf9', verde: '#fafaf9', oscuro: '#060608', rojo: '#070506' };
-        var t = 'rojo';
+        var barra = { oscuro: '#070506', claro: '#f7f4f3' };
+        var m = 'oscuro';
         try {
-          var q = new URLSearchParams(location.search).get('tema');
-          if (q && temas[q]) localStorage.setItem('bz_tema', q);
-          var g = localStorage.getItem('bz_tema');
-          if (g && temas[g]) t = g;
+          var q = new URLSearchParams(location.search).get('modo');
+          if (q && barra[q]) localStorage.setItem('bz_modo', q);
+          var g = localStorage.getItem('bz_modo');
+          if (!g) {
+            var viejo = localStorage.getItem('bz_tema');
+            if (viejo) g = viejo === 'claro' || viejo === 'verde' ? 'claro' : 'oscuro';
+          }
+          if (g && barra[g]) m = g;
         } catch (e) {}
-        document.documentElement.setAttribute('data-theme', t);
-        document.querySelector('meta[name="theme-color"]').setAttribute('content', temas[t]);
+        document.documentElement.setAttribute('data-theme', m);
+        document.querySelector('meta[name="theme-color"]').setAttribute('content', barra[m]);
+        // En el inicio, la foto grande de la portada se pide apenas abre (antes de que cargue el resto).
+        if (location.pathname === '/') {
+          var l = document.createElement('link');
+          l.rel = 'preload';
+          l.as = 'image';
+          l.setAttribute('imagesrcset', '/fotos/negocio/nb740-400.webp 400w, /fotos/negocio/nb740-800.webp 800w, /fotos/negocio/nb740-1100.webp 1100w');
+          l.setAttribute('imagesizes', '(min-width: 1024px) 46vw, 100vw');
+          l.setAttribute('fetchpriority', 'high');
+          document.head.appendChild(l);
+        }
       })();
     </script>
     <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
