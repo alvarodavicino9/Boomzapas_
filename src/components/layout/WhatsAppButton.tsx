@@ -73,7 +73,7 @@ export function WhatsAppButton() {
   }
 
   return (
-    <div className="fixed bottom-[calc(76px+env(safe-area-inset-bottom))] right-3 z-[250] flex flex-col items-end gap-2.5 sm:right-6 lg:bottom-6 sm:gap-3">
+    <div className="fixed bottom-[calc(16px+env(safe-area-inset-bottom))] right-3 z-[250] flex flex-col items-end gap-2.5 sm:bottom-6 sm:right-6 sm:gap-3">
       <AnimatePresence>
         {open && (
           <motion.div

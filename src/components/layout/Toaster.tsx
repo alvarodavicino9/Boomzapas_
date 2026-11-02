@@ -5,7 +5,7 @@ export function Toaster() {
   const { toasts, dismissToast } = useUI()
   return (
     <div
-      className="pointer-events-none fixed inset-x-0 bottom-[calc(80px+env(safe-area-inset-bottom))] z-[600] lg:bottom-6 flex flex-col items-center gap-2 px-4"
+      className="pointer-events-none fixed inset-x-0 bottom-6 z-[600] flex flex-col items-center gap-2 px-4"
       role="status"
       aria-live="polite"
     >

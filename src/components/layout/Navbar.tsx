@@ -3,21 +3,21 @@ import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Logo } from '@/components/ui/Logo'
 import { DockNav } from './DockNav'
-import { Icon } from '@/components/ui/Icon'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { ModeIconButton, ModeSwitch } from '@/components/ui/ModeToggle'
 import { useCart } from '@/context/CartContext'
 import { useUI } from '@/context/UIContext'
 import { cn } from '@/lib/format'
 
-const MOBILE_LINKS = [
-  { to: '/', label: 'Inicio' },
-  { to: '/catalogo', label: 'Catálogo' },
-  { to: '/envios', label: 'Envíos' },
-  { to: '/pagos', label: 'Pagos' },
-  { to: '/como-comprar', label: 'Cómo comprar' },
-  { to: '/guia-de-talles', label: 'Tabla de talles' },
-  { to: '/nosotros', label: 'Quiénes somos' },
-  { to: '/contacto', label: 'Contacto' },
+const MOBILE_LINKS: { to: string; label: string; icon: IconName }[] = [
+  { to: '/', label: 'Inicio', icon: 'home' },
+  { to: '/catalogo', label: 'Catálogo', icon: 'grid' },
+  { to: '/envios', label: 'Envíos', icon: 'truck' },
+  { to: '/pagos', label: 'Pagos', icon: 'card' },
+  { to: '/como-comprar', label: 'Cómo comprar', icon: 'receipt' },
+  { to: '/guia-de-talles', label: 'Tabla de talles', icon: 'tag' },
+  { to: '/nosotros', label: 'Quiénes somos', icon: 'users' },
+  { to: '/contacto', label: 'Contacto', icon: 'chat' },
 ]
 
 export function Navbar() {
@@ -29,10 +29,6 @@ export function Navbar() {
   const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
   useEffect(() => setMenuOpen(false), [pathname, setMenuOpen])
-  // Al abrir el menú del celular (por ejemplo desde "Buscar" en la barra de abajo), el buscador queda listo para escribir
-  useEffect(() => {
-    if (menuOpen) window.setTimeout(() => document.getElementById('menu-search')?.focus(), 120)
-  }, [menuOpen])
 
   const search = (e: React.FormEvent) => {
     e.preventDefault()
@@ -92,14 +88,23 @@ export function Navbar() {
               {count}
             </span>
           </button>
+          {/* botón del menú del celular: píldora con las rayitas que se convierten en una cruz */}
           <button
-            className="-mr-2 grid size-10 place-items-center lg:hidden"
+            className={cn(
+              'flex h-10 items-center gap-2 rounded-full border pl-3 pr-3.5 text-[13px] font-semibold transition-colors lg:hidden',
+              menuOpen ? 'border-accent bg-accent text-on-accent' : 'border-control text-ink hover:border-ink',
+            )}
             onClick={() => setMenuOpen((o) => !o)}
             aria-expanded={menuOpen}
             aria-controls="menu-movil"
             aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
           >
-            <Icon name={menuOpen ? 'x' : 'menu'} size={22} />
+            <span aria-hidden="true" className="relative block h-3 w-4">
+              <span className={cn('absolute left-0 top-0 h-[2px] w-4 rounded-full bg-current transition-transform duration-200', menuOpen && 'translate-y-[5px] rotate-45')} />
+              <span className={cn('absolute left-0 top-[5px] h-[2px] w-2.5 rounded-full bg-current transition-opacity duration-150', menuOpen && 'opacity-0')} />
+              <span className={cn('absolute left-0 top-[10px] h-[2px] w-4 rounded-full bg-current transition-transform duration-200', menuOpen && '-translate-y-[5px] -rotate-45')} />
+            </span>
+            <span aria-hidden="true" className="max-[359px]:hidden">{menuOpen ? 'Cerrar' : 'Menú'}</span>
           </button>
         </div>
       </div>
@@ -108,25 +113,38 @@ export function Navbar() {
         {menuOpen && (
           <motion.div
             id="menu-movil"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18 }}
             className="fixed inset-x-0 bottom-0 top-[var(--header-h)] overflow-y-auto bg-gallery lg:hidden"
           >
-            <div className="page-x pb-28 pt-6">
+            <div className="page-x pb-10 pt-6">
               {searchField('menu-search')}
-              <ul className="mt-6">
-                {MOBILE_LINKS.map((l) => (
-                  <li key={l.to} className="border-b border-line">
+              <ul className="mt-5 grid grid-cols-2 gap-2.5">
+                {MOBILE_LINKS.map((l, i) => (
+                  <motion.li
+                    key={l.to}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.03 * i, duration: 0.2 }}
+                  >
                     <NavLink
                       to={l.to}
                       end={l.to === '/'}
-                      className={({ isActive }) => cn('block py-4 text-[17px] font-medium', isActive && 'text-accent')}
+                      className={({ isActive }) =>
+                        cn(
+                          'flex h-full flex-col gap-3 rounded-2xl border p-4 text-[15px] font-semibold transition-colors',
+                          isActive ? 'border-accent bg-accent/10 text-[color:var(--bz-accent-text)]' : 'border-line bg-card hover:border-control',
+                        )
+                      }
                     >
+                      <span className="grid size-9 place-items-center rounded-xl bg-stage text-ink">
+                        <Icon name={l.icon} size={19} />
+                      </span>
                       {l.label}
                     </NavLink>
-                  </li>
+                  </motion.li>
                 ))}
               </ul>
               <div className="mt-8 flex items-center justify-between gap-4">

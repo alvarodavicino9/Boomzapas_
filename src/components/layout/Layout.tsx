@@ -5,7 +5,6 @@ import { Footer } from './Footer'
 import { ScrollToTop } from './ScrollToTop'
 import { Toaster } from './Toaster'
 import { WhatsAppButton } from './WhatsAppButton'
-import { BottomNav } from './BottomNav'
 import { CartDrawer } from '@/components/cart/CartDrawer'
 import { CheckoutModal } from '@/components/checkout/CheckoutModal'
 
@@ -27,8 +26,6 @@ export function Layout() {
       </main>
       <Footer />
       {/* lugar para la barra de abajo del celular */}
-      <div aria-hidden="true" className="h-[calc(64px+env(safe-area-inset-bottom))] lg:hidden" />
-      <BottomNav />
       <CartDrawer />
       <CheckoutModal />
       <WhatsAppButton />
