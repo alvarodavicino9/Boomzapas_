@@ -34,7 +34,7 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 
 const GARANTIAS: { icon: IconName; title: string; text: string }[] = [
-  { icon: 'truck', title: 'Envío a todo el país', text: 'Correo Argentino, con seguimiento' },
+  { icon: 'truck', title: 'Envío gratis a todo el país', text: 'Correo Argentino, con seguimiento' },
   { icon: 'store', title: 'Retiro sin costo', text: SITE.address },
   { icon: 'shield', title: 'Fotos reales', text: 'Pedinos las del par exacto' },
 ]
@@ -385,8 +385,8 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
               {[
                 {
                   icon: 'truck' as const,
-                  title: 'Envío',
-                  text: 'A todo el país por Correo Argentino, con código de seguimiento. Despachamos dentro de las 24 a 48 hs hábiles posteriores al pago y llega en 3 a 7 días.',
+                  title: 'Envío gratis',
+                  text: 'Gratis a todo el país por Correo Argentino, con código de seguimiento. Despachamos dentro de las 24 a 48 hs hábiles posteriores al pago y llega en 3 a 7 días.',
                   to: '/envios',
                 },
                 {

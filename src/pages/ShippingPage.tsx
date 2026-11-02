@@ -10,7 +10,7 @@ import { waLink } from '@/lib/whatsapp'
 import { srcsetWebp } from '@/lib/imagenes'
 
 const DATOS: { icon: IconName; title: string; text: string }[] = [
-  { icon: 'truck', title: 'Todo el país', text: 'Por Correo Argentino' },
+  { icon: 'truck', title: 'Envío gratis', text: 'A todo el país, por Correo Argentino' },
   { icon: 'clock', title: '3 a 7 días', text: 'De entrega estimada' },
   { icon: 'box', title: '24 a 48 hs', text: 'Hábiles para despachar' },
   { icon: 'shield', title: 'Con seguimiento', text: 'Código para seguir tu pedido' },
@@ -24,6 +24,7 @@ const PASOS = [
 ]
 
 const PREGUNTAS = [
+  { q: '¿Cuánto cuesta el envío?', a: 'Nada: el envío es gratis a todo el país, siempre.' },
   { q: '¿A qué zonas envían?', a: 'A todo el país, por Correo Argentino.' },
   { q: '¿Puedo seguir mi pedido?', a: 'Sí. Te pasamos el código de seguimiento apenas despachamos.' },
   { q: '¿Y si estoy en Córdoba?', a: `Podés retirar sin costo en ${SITE.address}. Coordinamos el horario por WhatsApp.` },
@@ -40,7 +41,7 @@ export default function ShippingPage() {
             Envíos y <span className="text-accent">retiro</span>
           </>
         }
-        subtitle="Llegamos a todo el país por Correo Argentino, con seguimiento. Y si estás en Córdoba, podés pasar a retirar sin costo."
+        subtitle="El envío es gratis a todo el país, por Correo Argentino y con seguimiento. Y si estás en Córdoba, podés pasar a retirar sin costo."
         foto={FOTOS.sambaLateral}
         position="50% 60%"
         actions={

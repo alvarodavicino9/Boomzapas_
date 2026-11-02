@@ -41,7 +41,7 @@ function paginasDeProducto(): Plugin {
         const url = `${SITE}${ruta}`
         const titulo = esc(`${m.nombre} · Boom Zapas`)
         const desc = esc(
-          `${m.nombre} en Boom Zapas. Fotos reales, envíos a todo el país y retiro en Córdoba. Consultá talles por WhatsApp.`,
+          `${m.nombre} en Boom Zapas. Fotos reales, envío gratis a todo el país y retiro en Córdoba. Consultá talles por WhatsApp.`,
         )
         // reemplaza el valor de una etiqueta del <head> (el texto nuevo se usa tal cual)
         const poner = (html: string, inicio: string, valor: string) =>

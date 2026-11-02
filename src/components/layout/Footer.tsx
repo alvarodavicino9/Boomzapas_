@@ -51,7 +51,7 @@ export function Footer() {
               <Logo size={64} wordmark wordmarkClassName="text-[26px]" />
             </Link>
             <p className="body-text mt-4 max-w-[17rem]">
-              Zapatillas desde {SITE.city.split(',')[0]}, con envíos a todo el país. Desde {SITE.since}.
+              Zapatillas desde {SITE.city.split(',')[0]}, con envío gratis a todo el país. Desde {SITE.since}.
             </p>
             <ul className="mt-5 flex gap-2" aria-label="Redes y contacto">
               {REDES.map((r) => (
@@ -115,7 +115,7 @@ export function Footer() {
         {/* ── Pagos y envíos ──────────────────────────────────── */}
         <div className="grid gap-4 border-t border-line px-5 py-6 sm:px-10 md:grid-cols-2">
           <Sello titulo="Pagás con" items={['Mercado Pago', `Transferencia (−${formatARS(SITE.transferDiscount).replace(' ', '\u00a0')})`, 'Efectivo']} icon="card" to="/pagos" />
-          <Sello titulo="Recibís con" items={['Correo Argentino a todo el país', 'Retiro sin costo en el local']} icon="truck" to="/envios" />
+          <Sello titulo="Recibís con" items={['Envío gratis a todo el país', 'Retiro sin costo en el local']} icon="truck" to="/envios" />
         </div>
 
         {/* ── Marcas ──────────────────────────────────────────── */}

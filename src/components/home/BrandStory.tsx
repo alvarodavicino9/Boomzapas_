@@ -4,7 +4,7 @@ import { Icon, type IconName } from '@/components/ui/Icon'
 import { SITE } from '@/config/site'
 
 const PUNTOS: { icon: IconName; text: string }[] = [
-  { icon: 'truck', text: 'Envíos a todo el país' },
+  { icon: 'truck', text: 'Envío gratis a todo el país' },
   { icon: 'store', text: 'Retiro en Córdoba' },
   { icon: 'card', text: 'Pagá como quieras' },
 ]

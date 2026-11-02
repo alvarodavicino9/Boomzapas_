@@ -84,7 +84,7 @@ export function Hero() {
         if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1)
       }}
     >
-      <h1 className="sr-only">Boom Zapas: zapatillas en Córdoba con envíos a todo el país</h1>
+      <h1 className="sr-only">Boom Zapas: zapatillas en Córdoba con envío gratis a todo el país</h1>
       <div className="relative mx-auto max-w-[1600px] overflow-hidden rounded-[22px] bg-[#e9e9e7] shadow-[0_30px_70px_-40px_rgb(0_0_0/0.8)] ring-1 ring-black/10 sm:rounded-[28px]">
         <div className="grid">
           {SLIDES.map((s, i) => {

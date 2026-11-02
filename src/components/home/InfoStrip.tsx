@@ -3,7 +3,7 @@ import { Icon, type IconName } from '@/components/ui/Icon'
 import { SITE } from '@/config/site'
 
 const ITEMS: { icon: IconName; title: string; text: string; to: string }[] = [
-  { icon: 'truck', title: 'Envíos a todo el país', text: 'Por Correo Argentino, con seguimiento.', to: '/envios' },
+  { icon: 'truck', title: 'Envío gratis a todo el país', text: 'Por Correo Argentino, con seguimiento.', to: '/envios' },
   { icon: 'store', title: 'Retiro en tienda', text: SITE.address, to: '/envios' },
   { icon: 'card', title: 'Medios de pago', text: 'Mercado Pago, transferencia y efectivo.', to: '/pagos' },
   { icon: 'chat', title: 'Atención por WhatsApp', text: 'Respondemos todos los días.', to: '/contacto' },

@@ -44,7 +44,7 @@ export function CustomerStep({ form, errors, onChange, onNext }: CustomerStepPro
       <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-label="Tipo de entrega">
         {(
           [
-            { id: 'envio', title: 'Envío', sub: 'Correo Argentino' },
+            { id: 'envio', title: 'Envío gratis', sub: 'Correo Argentino' },
             { id: 'retiro', title: 'Retiro', sub: 'En Córdoba · sin costo' },
           ] as const
         ).map((o) => {

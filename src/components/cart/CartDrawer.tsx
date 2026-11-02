@@ -132,7 +132,7 @@ export function CartDrawer() {
                     Continuar pedido
                   </Button>
                   <p className="body-text text-center !text-[13px]">
-                    Envío a todo el país o retiro en {SITE.address}.{' '}
+                    Envío gratis a todo el país o retiro en {SITE.address}.{' '}
                     <Link to="/envios" onClick={closeCart} className="underline underline-offset-[5px] hover:text-ink">
                       Ver envíos
                     </Link>

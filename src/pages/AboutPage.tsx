@@ -7,10 +7,10 @@ import { useProductos } from '@/context/ProductsContext'
 export default function AboutPage() {
   const { productos, status } = useProductos()
   const stats = [
-    { value: '500+', label: 'Clientes' },
-    { value: status === 'ready' ? String(productos.length) : '40+', label: 'Modelos en stock' },
-    { value: '24 h', label: 'Respuesta' },
-    { value: '4,9', label: 'Calificación' },
+    { value: '+500', label: 'Ventas' },
+    { value: '+450', label: 'Clientes' },
+    { value: status === 'ready' ? String(productos.length) : '50+', label: 'Modelos en stock' },
+    { value: '$0', label: 'Envío a todo el país' },
   ]
 
   return (

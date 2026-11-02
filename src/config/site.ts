@@ -31,7 +31,8 @@ export const SITE = {
   transferDiscount: 5000,
 
   stats: [
-    { value: '500+', label: 'Clientes felices' },
+    { value: '+500', label: 'Ventas' },
+    { value: '+450', label: 'Clientes' },
     { value: '24h', label: 'Respuesta rápida' },
     { value: '4.9★', label: 'Calificación' },
   ],

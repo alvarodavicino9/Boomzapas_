@@ -19,12 +19,16 @@ const PASOS: { icon: IconName; title: string; text: string }[] = [
 
 const VENTAJAS: { icon: IconName; title: string; text: string }[] = [
   { icon: 'shield', title: 'Pares reales', text: 'Fotos reales de lo que vas a recibir.' },
-  { icon: 'truck', title: 'Envío a todo el país', text: 'Correo Argentino, con seguimiento.' },
+  { icon: 'truck', title: 'Envío gratis a todo el país', text: 'Correo Argentino, con seguimiento.' },
   { icon: 'store', title: 'Retiro sin costo', text: `En ${SITE.address}.` },
   { icon: 'chat', title: 'Atención personal', text: 'Te asesoramos con el talle por WhatsApp.' },
 ]
 
 const FAQ = [
+  {
+    q: '¿Cuánto cuesta el envío?',
+    a: 'Nada: el envío es gratis a todo el país, siempre.',
+  },
   {
     q: '¿Cuánto tarda el envío?',
     a: 'Despachamos dentro de las 24 a 48 hs hábiles posteriores al pago y llega en 3 a 7 días, por Correo Argentino, con código de seguimiento.',

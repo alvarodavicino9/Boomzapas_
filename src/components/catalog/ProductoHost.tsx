@@ -51,7 +51,7 @@ export function ProductoHost() {
     document.title = `${producto.nombre} · ${formatARS(producto.precio)} · Boom Zapas`
     meta?.setAttribute(
       'content',
-      `${producto.nombre} a ${formatARS(producto.precio)} en Boom Zapas. Envíos a todo el país y retiro en Córdoba.`,
+      `${producto.nombre} a ${formatARS(producto.precio)} en Boom Zapas. Envío gratis a todo el país y retiro en Córdoba.`,
     )
     return () => {
       document.title = titulo
