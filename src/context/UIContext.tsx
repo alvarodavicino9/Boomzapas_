@@ -6,6 +6,9 @@ export interface Toast {
 }
 
 interface UIContextValue {
+  /** Menú del celular (lo abren el botón del encabezado y la barra de abajo). */
+  menuOpen: boolean
+  setMenuOpen: (open: boolean | ((o: boolean) => boolean)) => void
   cartOpen: boolean
   checkoutOpen: boolean
   toasts: Toast[]
@@ -22,6 +25,7 @@ const UIContext = createContext<UIContextValue | null>(null)
 let toastId = 0
 
 export function UIProvider({ children }: { children: ReactNode }) {
+  const [menuOpen, setMenuOpen] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [toasts, setToasts] = useState<Toast[]>([])
@@ -39,10 +43,15 @@ export function UIProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<UIContextValue>(
     () => ({
+      menuOpen,
+      setMenuOpen,
       cartOpen,
       checkoutOpen,
       toasts,
-      openCart: () => setCartOpen(true),
+      openCart: () => {
+        setMenuOpen(false)
+        setCartOpen(true)
+      },
       closeCart: () => setCartOpen(false),
       openCheckout: () => {
         setCartOpen(false)
@@ -52,7 +61,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
       toast,
       dismissToast,
     }),
-    [cartOpen, checkoutOpen, toasts, toast, dismissToast],
+    [menuOpen, cartOpen, checkoutOpen, toasts, toast, dismissToast],
   )
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>

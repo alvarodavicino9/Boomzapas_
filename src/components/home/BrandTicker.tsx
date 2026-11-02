@@ -61,7 +61,7 @@ export function BrandTicker() {
   )
 
   return (
-    <section className="on-bar relative mt-10 overflow-hidden py-9" aria-labelledby="marcas-titulo">
+    <section className="on-bar relative mt-12 overflow-hidden py-8 sm:mt-16 sm:py-9" aria-labelledby="marcas-titulo">
       <h2 id="marcas-titulo" className="display-section mb-6 px-4 text-center text-[1.05rem] tracking-[0.04em] sm:text-[1.3rem]">
         Nuestras marcas destacadas
       </h2>

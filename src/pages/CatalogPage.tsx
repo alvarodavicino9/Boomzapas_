@@ -1,11 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { PageHeader } from '@/components/ui/PageHeader'
+import { AnimatePresence, motion } from 'framer-motion'
 import { Icon } from '@/components/ui/Icon'
+import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
 import { CatalogFilters } from '@/components/catalog/CatalogFilters'
 import { ProductGrid } from '@/components/catalog/ProductGrid'
 import { useProductos } from '@/context/ProductsContext'
-import { CATEGORIAS } from '@/config/site'
+import { CATEGORIAS, SITE } from '@/config/site'
 import {
   NUEVOS_RECIENTES,
   ORDENES,
@@ -153,45 +154,123 @@ export default function CatalogPage() {
   const activeCount = chips.length
   const reset = () => setParams(orden !== 'novedad' || cols !== 4 ? { ...(orden !== 'novedad' && { orden }), ...(cols !== 4 && { cols: String(cols) }) } : {}, { replace: true })
 
+  // Panel de filtros del celular: Escape lo cierra y no deja scrollear el fondo
+  useLockBodyScroll(filtersOpen)
+  useEffect(() => {
+    if (!filtersOpen) return
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setFiltersOpen(false)
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [filtersOpen])
+
+  const filtros = (
+    <CatalogFilters
+      value={state}
+      onChange={patch}
+      query={query}
+      onQuery={(q) => setMany({ q })}
+      counts={counts}
+      marcas={marcas}
+      talles={talles}
+      rango={rango}
+      onReset={reset}
+      activeCount={activeCount}
+    />
+  )
+
+  const ordenSelect = (className?: string) => (
+    <select
+      value={orden}
+      onChange={(e) => setMany({ orden: e.target.value })}
+      className={cn('field-line !w-auto !py-2.5 !text-[12px]', className)}
+      aria-label="Ordenar por"
+    >
+      {ORDENES.map((o) => (
+        <option key={o.id} value={o.id}>
+          {o.label}
+        </option>
+      ))}
+    </select>
+  )
+
   return (
     <>
-      <PageHeader
-        eyebrow="Nuestros productos"
-        title="Catálogo"
-        subtitle={query ? `Resultados para “${query}”.` : 'Filtrá por marca, talle, precio o disponibilidad y tocá un modelo para ver los detalles.'}
-      />
+      <header className="page-x border-b border-line bg-card pb-5 pt-7 sm:pb-7 sm:pt-10">
+        <p className="label mb-2 text-accent">Nuestros productos</p>
+        <h1 className="display-section !text-[clamp(1.6rem,4vw,2.5rem)]">
+          {query ? <>Resultados para “{query}”</> : 'Catálogo'}
+        </h1>
+        <p className="body-text mt-2 max-w-2xl text-[13.5px] leading-6 sm:text-[15px]">
+          Fotos reales de cada par · envío gratis a todo el país · {formatARS(SITE.transferDiscount)} menos por par con transferencia.
+        </p>
+        {/* categorías rápidas: se deslizan en el celular */}
+        <div className="-mx-1 mt-5 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]" role="group" aria-label="Categorías">
+          {CATEGORIAS.map((c) => {
+            const on = state.categoria === c.id
+            return (
+              <button
+                key={c.id}
+                type="button"
+                aria-pressed={on}
+                onClick={() => patch({ categoria: c.id })}
+                className={cn(
+                  'flex h-10 shrink-0 items-center gap-2 rounded-full border px-4 text-[13px] font-semibold transition-colors',
+                  on ? 'border-accent bg-accent text-on-accent' : 'border-line bg-gallery text-ink hover:border-ink',
+                )}
+              >
+                {c.label}
+                <span className={cn('text-[12px] font-medium', on ? 'text-on-accent' : 'text-index')}>{counts[c.id] ?? 0}</span>
+              </button>
+            )
+          })}
+          <span aria-hidden="true" className="mx-1 w-px shrink-0 self-stretch bg-line" />
+          {marcas.map((m) => {
+            const on = state.marcas.includes(m.nombre)
+            return (
+              <button
+                key={m.nombre}
+                type="button"
+                aria-pressed={on}
+                onClick={() => patch({ marcas: on ? state.marcas.filter((x) => x !== m.nombre) : [...state.marcas, m.nombre] })}
+                className={cn(
+                  'h-10 shrink-0 rounded-full border px-4 text-[13px] font-semibold transition-colors',
+                  on ? 'border-ink bg-ink text-gallery' : 'border-line bg-gallery text-ink hover:border-ink',
+                )}
+              >
+                {m.nombre}
+              </button>
+            )
+          })}
+        </div>
+      </header>
 
-      <div className="page-x grid gap-8 py-10 lg:grid-cols-[290px_1fr] lg:gap-12">
-        {/* Filtros: columna fija en escritorio, panel desplegable en celular */}
-        <aside aria-label="Filtros" className="lg:sticky lg:top-[calc(var(--header-h)+28px)] lg:self-start">
-          <button
-            className="surface label flex w-full items-center justify-between px-5 py-4 lg:hidden"
-            aria-expanded={filtersOpen}
-            aria-controls="panel-filtros"
-            onClick={() => setFiltersOpen((o) => !o)}
-          >
-            <span>Filtros{activeCount > 0 && ` (${activeCount})`}</span>
-            <span className="text-accent">{filtersOpen ? 'Cerrar' : 'Abrir'}</span>
-          </button>
-          <div id="panel-filtros" className={filtersOpen ? 'block pt-4 lg:pt-0' : 'hidden lg:block'}>
-            <CatalogFilters
-              value={state}
-              onChange={patch}
-              query={query}
-              onQuery={(q) => setMany({ q })}
-              counts={counts}
-              marcas={marcas}
-              talles={talles}
-              rango={rango}
-              onReset={reset}
-              activeCount={activeCount}
-            />
-          </div>
+      {/* barra fija del celular: filtros y orden siempre a mano */}
+      <div className="page-x sticky top-[var(--header-h)] z-30 flex items-center gap-2 border-b border-line bg-gallery/90 py-2.5 backdrop-blur-md lg:hidden">
+        <button
+          type="button"
+          onClick={() => setFiltersOpen(true)}
+          aria-haspopup="dialog"
+          className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full border border-line bg-card text-[13px] font-semibold"
+        >
+          <Icon name="filter" size={17} />
+          Filtros
+          {activeCount > 0 && (
+            <span className="grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1.5 text-[11px] font-bold text-on-accent">{activeCount}</span>
+          )}
+        </button>
+        {ordenSelect('!h-11 flex-1 !rounded-full !text-[13px] !font-semibold')}
+      </div>
+
+      <div className="page-x grid gap-8 pb-10 pt-5 sm:pt-8 lg:grid-cols-[290px_1fr] lg:gap-12 lg:pt-10">
+        {/* Filtros: columna fija en la compu */}
+        <aside aria-label="Filtros" className="hidden lg:sticky lg:top-[calc(var(--header-h)+28px)] lg:block lg:self-start">
+          {filtros}
         </aside>
 
-        <section aria-label="Productos" className="min-w-0">
+        <section aria-labelledby="titulo-resultados" className="min-w-0">
+          <h2 id="titulo-resultados" className="sr-only">Modelos</h2>
           {/* barra de resultados: cantidad, orden y columnas */}
-          <div className="mb-5 flex flex-wrap items-center justify-between gap-x-6 gap-y-3">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 sm:mb-5">
             <p className="label text-index" aria-live="polite">
               {status === 'ready' && (
                 <>
@@ -201,20 +280,9 @@ export default function CatalogPage() {
               )}
             </p>
             <div className="flex items-center gap-3">
-              <label className="flex items-center gap-3">
-                <span className="label hidden text-index sm:block">Ordenar</span>
-                <select
-                  value={orden}
-                  onChange={(e) => setMany({ orden: e.target.value })}
-                  className="field-line !w-auto !py-2.5 !text-[12px]"
-                  aria-label="Ordenar por"
-                >
-                  {ORDENES.map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
+              <label className="hidden items-center gap-3 lg:flex">
+                <span className="label text-index">Ordenar</span>
+                {ordenSelect()}
               </label>
               <div className="hidden items-center gap-1 rounded-xl border border-line p-1 xl:flex" role="group" aria-label="Columnas">
                 {([3, 4] as const).map((n) => (
@@ -267,6 +335,54 @@ export default function CatalogPage() {
           />
         </section>
       </div>
+
+      {/* Panel de filtros del celular: sube desde abajo */}
+      <AnimatePresence>
+        {filtersOpen && (
+          <motion.div
+            className="fixed inset-0 z-[450] lg:hidden"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <div className="absolute inset-0 bg-scrim" onClick={() => setFiltersOpen(false)} aria-hidden="true" />
+            <motion.div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Filtros"
+              className="absolute inset-x-0 bottom-0 flex max-h-[88dvh] flex-col rounded-t-3xl bg-gallery shadow-lift"
+              initial={{ y: '100%' }}
+              animate={{ y: 0 }}
+              exit={{ y: '100%' }}
+              transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <div className="flex items-center justify-between border-b border-line px-5 py-3">
+                <span aria-hidden="true" className="absolute left-1/2 top-2 h-1 w-10 -translate-x-1/2 rounded-full bg-control" />
+                <p className="display-product !text-[1.1rem]">Filtrar</p>
+                <button
+                  type="button"
+                  autoFocus
+                  onClick={() => setFiltersOpen(false)}
+                  aria-label="Cerrar filtros"
+                  className="grid size-11 place-items-center rounded-full hover:bg-stage"
+                >
+                  <Icon name="x" size={20} />
+                </button>
+              </div>
+              <div className="overflow-y-auto overscroll-contain p-4">{filtros}</div>
+              <div className="flex gap-3 border-t border-line p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+                <button type="button" onClick={reset} className="btn btn-outline flex-1 !px-4" disabled={activeCount === 0}>
+                  Limpiar
+                </button>
+                <button type="button" onClick={() => setFiltersOpen(false)} className="btn btn-accent flex-[2] !px-4">
+                  Ver {filtered.length} {filtered.length === 1 ? 'modelo' : 'modelos'}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

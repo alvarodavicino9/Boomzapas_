@@ -12,7 +12,7 @@ const PUNTOS: { icon: IconName; text: string }[] = [
 /** Sello de la marca: el logo grande sobre granate y una presentación corta del local. */
 export function BrandStory() {
   return (
-    <section className="page-x pb-2 pt-6" aria-labelledby="marca">
+    <section className="page-x pb-2 pt-10 sm:pt-12" aria-labelledby="marca">
       <Reveal>
         <div className="on-bar relative overflow-hidden rounded-3xl">
           <div

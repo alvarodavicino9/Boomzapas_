@@ -35,7 +35,7 @@ export function Logo({ className, size = 48, wordmark = false, wordmarkClassName
           wordmarkClassName ?? 'text-[22px]',
         )}
       >
-        Boom
+        Boom{' '}
         <span className="block text-accent">Zapas</span>
       </span>
     </span>

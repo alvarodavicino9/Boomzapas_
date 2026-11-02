@@ -2,6 +2,7 @@ import { ProductCard } from './ProductCard'
 import { Button } from '@/components/ui/Button'
 import { useProductos } from '@/context/ProductsContext'
 import { useAbrirProducto } from '@/hooks/useAbrirProducto'
+import { rail as railClases } from '@/components/home/SectionHead'
 import { cn } from '@/lib/format'
 import type { Producto } from '@/types'
 
@@ -13,6 +14,8 @@ interface ProductGridProps {
   onResetFilters?: () => void
   /** Columnas en pantallas grandes. */
   cols?: 3 | 4
+  /** En el celular, una fila que se desliza con el dedo (para el inicio). */
+  rail?: boolean
 }
 
 export function ProductGrid({
@@ -22,12 +25,13 @@ export function ProductGrid({
   emptyMessage,
   onResetFilters,
   cols = 4,
+  rail = false,
 }: ProductGridProps) {
   const abrir = useAbrirProducto()
   const { error, reload } = useProductos()
 
   const grid = cn(
-    'grid grid-cols-2 gap-x-4 gap-y-12 md:gap-x-5',
+    'grid grid-cols-2 gap-3 sm:gap-4 md:gap-5',
     cols === 4 ? 'md:grid-cols-3 xl:grid-cols-4' : 'md:grid-cols-3',
   )
 
@@ -36,9 +40,10 @@ export function ProductGrid({
       <div className={grid} aria-busy="true">
         {Array.from({ length: skeletons }).map((_, i) => (
           <div key={i}>
-            <div className="skeleton aspect-[4/5]" />
-            <div className="skeleton mt-4 h-4 w-2/3" />
-            <div className="skeleton mt-2 h-4 w-1/3" />
+            <div className="skeleton aspect-square sm:aspect-[4/5]" />
+            <div className="skeleton mt-3 h-3 w-1/3" />
+            <div className="skeleton mt-2 h-4 w-2/3" />
+            <div className="skeleton mt-3 h-4 w-1/2" />
           </div>
         ))}
       </div>
@@ -71,14 +76,24 @@ export function ProductGrid({
     )
   }
 
-  return (
-    <>
-      <div className={grid}>
-        {productos.map((p, i) => (
-          // la primera fila se pide ya (es lo primero que se ve); el resto, a medida que se scrollea
-          <ProductCard key={p.id} producto={p} onOpen={abrir} eager={i < 4} />
+  if (rail) {
+    return (
+      <div className={railClases(cols === 4 ? 'sm:grid-cols-3 xl:grid-cols-4' : 'sm:grid-cols-3')}>
+        {productos.map((p) => (
+          <div key={p.id} className="w-[64%] shrink-0 snap-start sm:w-auto">
+            <ProductCard producto={p} onOpen={abrir} />
+          </div>
         ))}
       </div>
-    </>
+    )
+  }
+
+  return (
+    <div className={grid}>
+      {productos.map((p, i) => (
+        // la primera fila se pide ya (es lo primero que se ve); el resto, a medida que se scrollea
+        <ProductCard key={p.id} producto={p} onOpen={abrir} eager={i < 4} />
+      ))}
+    </div>
   )
 }

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { Stars } from '@/components/ui/Stars'
 import { ReviewDialog } from './ReviewDialog'
+import { SectionHead } from './SectionHead'
 import { TESTIMONIALS } from '@/data/testimonials'
 import { quitarResena, useResenasLocales, type Resena } from '@/lib/resenas'
 
@@ -24,20 +25,8 @@ export function Testimonials() {
   )
 
   return (
-    <section className="page-x section-y" aria-labelledby="clientes">
-      <div className="mb-10 flex flex-wrap items-end justify-between gap-6">
-        <div>
-          <p className="label mb-4 text-accent">Reseñas</p>
-          <h2 id="clientes" className="display-section">
-            Lo que dicen nuestros clientes
-          </h2>
-        </div>
-        <Button size="lg" onClick={() => setOpen(true)}>
-          <Icon name="star" size={18} />
-          Dejar una reseña
-        </Button>
-      </div>
-
+    <section className="page-x pb-4 pt-12 sm:pt-16" aria-labelledby="clientes">
+      <SectionHead id="clientes" eyebrow="Reseñas" title="Lo que dicen nuestros clientes" />
       <ul className="-mx-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-2 md:gap-4 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden">
         {todas.map((t, i) => (
           <li key={t.id} className={cn('w-[84%] shrink-0 snap-center md:w-auto', i >= visibles && 'md:hidden')}>

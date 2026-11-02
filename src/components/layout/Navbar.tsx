@@ -21,15 +21,18 @@ const MOBILE_LINKS = [
 ]
 
 export function Navbar() {
-  const [menuOpen, setMenuOpen] = useState(false)
   const [q, setQ] = useState('')
   const { count } = useCart()
-  const { openCart } = useUI()
+  const { openCart, menuOpen, setMenuOpen } = useUI()
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-  useEffect(() => setMenuOpen(false), [pathname])
+  useEffect(() => setMenuOpen(false), [pathname, setMenuOpen])
+  // Al abrir el menú del celular (por ejemplo desde "Buscar" en la barra de abajo), el buscador queda listo para escribir
+  useEffect(() => {
+    if (menuOpen) window.setTimeout(() => document.getElementById('menu-search')?.focus(), 120)
+  }, [menuOpen])
 
   const search = (e: React.FormEvent) => {
     e.preventDefault()
@@ -65,7 +68,7 @@ export function Navbar() {
         {/* logo al costado: se agranda al acercar el mouse */}
         <div className="flex items-center">
           <motion.div whileHover={reduced ? undefined : { scale: 1.18 }} transition={{ type: 'spring', stiffness: 260, damping: 18 }} style={{ originX: 0 }}>
-            <Link to="/" aria-label="Boom Zapas, inicio" className="block">
+            <Link to="/" className="block">
               <Logo size={64} wordmark wordmarkClassName="text-[24px] sm:text-[28px]" className="gap-2.5 sm:gap-3.5" />
             </Link>
           </motion.div>
@@ -111,7 +114,7 @@ export function Navbar() {
             transition={{ duration: 0.15 }}
             className="fixed inset-x-0 bottom-0 top-[var(--header-h)] overflow-y-auto bg-gallery lg:hidden"
           >
-            <div className="page-x py-6">
+            <div className="page-x pb-28 pt-6">
               {searchField('menu-search')}
               <ul className="mt-6">
                 {MOBILE_LINKS.map((l) => (

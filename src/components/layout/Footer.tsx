@@ -18,7 +18,7 @@ export function Footer() {
   const arriba = () => window.scrollTo({ top: 0, behavior: 'smooth' })
 
   return (
-    <footer className="page-x mt-20 pb-24 sm:pb-6">
+    <footer className="page-x mt-16 pb-20 sm:mt-20 lg:pb-6">
       <div className="on-accent mx-auto max-w-[1180px] overflow-hidden rounded-3xl">
         {/* ── Llamado a la acción ─────────────────────────────── */}
         <div className="flex flex-col gap-6 border-b border-line px-5 py-8 sm:px-10 md:flex-row md:items-center md:justify-between">
@@ -47,7 +47,7 @@ export function Footer() {
         {/* ── Columnas ────────────────────────────────────────── */}
         <div className="grid grid-cols-2 gap-x-6 gap-y-9 px-5 py-9 sm:px-10 md:grid-cols-[1.35fr_1fr_1fr_1.15fr] md:gap-10">
           <div className="col-span-2 md:col-span-1">
-            <Link to="/" aria-label="Boom Zapas, inicio" className="inline-block">
+            <Link to="/" className="inline-block">
               <Logo size={64} wordmark wordmarkClassName="text-[26px]" />
             </Link>
             <p className="body-text mt-4 max-w-[17rem]">
