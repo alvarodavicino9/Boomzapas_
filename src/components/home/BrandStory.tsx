@@ -21,7 +21,9 @@ export function BrandStory() {
           />
           <div className="relative grid items-center gap-10 px-6 py-12 sm:px-12 lg:grid-cols-[auto_1fr] lg:gap-16 lg:py-14">
             <img
-              src="/logo.png"
+              src="/logo-560.webp"
+              srcSet="/logo-320.webp 320w, /logo-560.webp 560w"
+              sizes="(min-width: 640px) 260px, 200px"
               alt="Boom Zapas Shoes Shop, since 2024"
               width={260}
               height={260}

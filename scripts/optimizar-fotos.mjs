@@ -7,6 +7,7 @@
  *   nombre-400.webp  → tarjetas del catálogo y miniaturas
  *   nombre-800.webp  → ficha del producto en el celular y tarjetas en pantallas nítidas
  *   nombre-1100.webp → ficha del producto en la compu (y el zoom)
+ * Los banners de la portada (public/fotos/banners) llevan 800, 1400 y 2000 px.
  * La página las usa sola (ver src/lib/imagenes.ts). Si una foto ya tiene sus versiones
  * y no cambió, la saltea; así que se puede correr cada vez que se suman fotos.
  * También corre antes de cada build (en Vercel), así que si te olvidás de correrlo,
@@ -20,6 +21,8 @@ import sharp from 'sharp'
 
 const RAIZ = fileURLToPath(new URL('../public/fotos/', import.meta.url))
 const ANCHOS = [400, 800, 1100]
+// Los banners de la portada van a todo el ancho: necesitan versiones más grandes.
+const ANCHOS_BANNER = [800, 1400, 2000]
 const CALIDAD = 72
 
 async function* fotos(dir) {
@@ -49,7 +52,8 @@ let creadas = 0
 let salteadas = 0
 for await (const foto of fotos(RAIZ)) {
   const base = foto.slice(0, -extname(foto).length)
-  for (const ancho of ANCHOS) {
+  const anchos = /[\\/]banners[\\/]/.test(foto) ? ANCHOS_BANNER : ANCHOS
+  for (const ancho of anchos) {
     const destino = `${base}-${ancho}.webp`
     if (await alDia(destino, foto)) {
       salteadas++

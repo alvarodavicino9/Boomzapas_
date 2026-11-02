@@ -24,10 +24,10 @@ const MISMO_ID: Record<string, number> = {
   'Nike SB Dunk Grises': 23,
   'Nike SB Dunk Total Black': 24,
   'Nike SB Dunk Chocolate': 25,
-  // Los tres primeros con fotos reales (antes "530 Silver", "Dunk Low Crema" y "Samba Verde")
+  // Los tres primeros con fotos reales (antes "530 Silver", "Dunk Low Crema" y "Samba Verde/Verdes")
   'New Balance 530 Platino': 32,
   'Nike SB Dunk Total White': 33,
-  'Adidas Samba Verdes': 34,
+  'Adidas Samba White Green': 34,
 }
 const REEMPLAZADOS = new Set(Object.values(MISMO_ID))
 const NUEVOS = new Set([32, 33, 34, 35])

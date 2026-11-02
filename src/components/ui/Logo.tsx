@@ -10,11 +10,13 @@ interface LogoProps {
   wordmarkClassName?: string
 }
 
-/** Sello circular de Boom Zapas (public/logo.png), con el nombre opcional al lado. */
+/** Sello circular de Boom Zapas (public/logo-*.webp; el original en alta es public/logo.png), con el nombre opcional al lado. */
 export function Logo({ className, size = 48, wordmark = false, wordmarkClassName }: LogoProps) {
   const seal = (
     <img
-      src="/logo.png"
+      src="/logo-160.webp"
+      srcSet="/logo-160.webp 160w, /logo-320.webp 320w"
+      sizes={`${size}px`}
       alt={wordmark ? '' : 'Boom Zapas'}
       width={size}
       height={size}

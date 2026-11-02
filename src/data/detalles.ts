@@ -113,7 +113,7 @@ const FAMILIAS: Familia[] = [
     destacados: ['Silueta voluminosa', 'Lengüeta acolchada', 'Suela gruesa'],
   },
   {
-    match: ['hyline'],
+    match: ['hylane', 'hyline'],
     estilo: 'Skate',
     corte: 'Bajo',
     cierre: 'Cordones',
@@ -311,6 +311,13 @@ const MODELOS: Record<string, Partial<Pick<Detalles, 'descripcion'>> & { color?:
 
 const COLORES: [string[], string][] = [
   [['grey panda'], 'Gris, blanco y negro'],
+  [['samba caramel'], 'Blanco, marrón y suela caramelo'],
+  [['cream black gum'], 'Crema y negro, suela de goma'],
+  [['graphite gum'], 'Blanco y marrón oscuro, suela de goma'],
+  [['grafito brown'], 'Marrón y gris grafito'],
+  [['celeste y rosa'], 'Celeste y rosa'],
+  [['negras clasicas', 'white and black', 'speed 2 clasica'], 'Negro y blanco'],
+  [['white green'], 'Blanco y verde'],
   [['semi total black'], 'Negro con suela en contraste'],
   [['air force one'], 'Blanco'],
   [['total white'], 'Blanco total'],

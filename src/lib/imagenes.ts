@@ -9,6 +9,7 @@ const LOCAL = /^\/fotos\/.+\.(jpe?g|png)$/i
 export function srcsetWebp(src?: string): string | undefined {
   if (!src || !LOCAL.test(src)) return undefined
   const base = src.replace(/\.(jpe?g|png)$/i, '')
+  if (src.startsWith('/fotos/banners/')) return `${base}-800.webp 800w, ${base}-1400.webp 1400w, ${base}-2000.webp 2000w`
   return `${base}-400.webp 400w, ${base}-800.webp 800w, ${base}-1100.webp 1100w`
 }
 
