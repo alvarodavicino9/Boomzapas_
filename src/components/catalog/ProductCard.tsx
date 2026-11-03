@@ -46,7 +46,7 @@ export function ProductCard({ producto, onOpen, eager }: ProductCardProps) {
 
   return (
     <article
-      className="group surface overflow-hidden !rounded-[20px] transition-[box-shadow,transform,border-color] duration-300 [contain-intrinsic-size:auto_380px] [content-visibility:auto] hover:-translate-y-1 hover:shadow-[0_24px_50px_-28px_rgb(var(--bz-glow)/0.9)]"
+      className="group surface overflow-hidden !rounded-[20px] transition-[box-shadow,transform,border-color] duration-300 [contain-intrinsic-size:auto_380px] [content-visibility:auto] hover:-translate-y-1"
       onPointerEnter={conSegunda ? (e) => e.pointerType === 'mouse' && setVerSegunda(true) : undefined}
     >
       <button onClick={() => onOpen(producto)} className="flex h-full w-full flex-col text-left">

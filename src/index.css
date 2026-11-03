@@ -488,8 +488,25 @@ html.cambiando-modo *::after {
 }
 
 :root[data-theme="claro"] .wm-boom { background-image: linear-gradient(180deg, #2a1d1f 0%, #140d0e 100%); }
-.on-bar .wm-boom,
-.on-accent .wm-boom { background-image: linear-gradient(180deg, #ffffff 0%, #e9e6e6 45%, #a9a3a4 100%); }
+/* dentro de los bloques oscuros de marca (pie, contacto) "BOOM" vuelve a plateado, también en modo claro */
+:root .on-bar .wm-boom,
+:root .on-accent .wm-boom { background-image: linear-gradient(180deg, #ffffff 0%, #e9e6e6 45%, #a9a3a4 100%); }
+
+/* ── Detalles de los dos modos ─────────────────────────────────────────────── */
+::selection { background: rgb(217 44 55 / 0.85); color: #fff; }
+html { scrollbar-color: var(--bz-control) var(--bz-gallery); }
+:focus-visible { outline: 2px solid var(--bz-accent-soft); outline-offset: 2px; }
+
+/* modo claro: tarjetas con sombra suave para que no se vean planas sobre el fondo hueso */
+:root[data-theme="claro"] .surface {
+  box-shadow: 0 1px 2px rgb(20 13 14 / 0.04), 0 14px 32px -22px rgb(20 13 14 / 0.28);
+}
+:root[data-theme="claro"] article.surface:hover {
+  box-shadow: 0 2px 4px rgb(20 13 14 / 0.05), 0 26px 50px -26px rgb(150 12 20 / 0.45);
+}
+/* modo oscuro: filo de luz arriba de las tarjetas */
+:root[data-theme="oscuro"] article.surface { box-shadow: 0 1px 0 rgb(255 255 255 / 0.05) inset, 0 18px 40px -24px rgb(0 0 0 / 0.9); }
+:root[data-theme="oscuro"] article.surface:hover { box-shadow: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 24px 50px -28px rgb(var(--bz-glow) / 0.95); }
 
 /* tira de beneficios: en el celular se desliza sola */
 @keyframes bz-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
