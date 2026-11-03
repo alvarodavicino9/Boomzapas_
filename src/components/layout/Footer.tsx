@@ -2,9 +2,8 @@ import { Link } from 'react-router-dom'
 import { Logo } from '@/components/ui/Logo'
 import { Icon } from '@/components/ui/Icon'
 import { ModeSwitch } from '@/components/ui/ModeToggle'
-import { BRANDS, SITE } from '@/config/site'
+import { SITE } from '@/config/site'
 import { waLink, waLinkGeneric } from '@/lib/whatsapp'
-import { formatARS } from '@/lib/format'
 
 const MAPA = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SITE.address)}`
 
@@ -21,7 +20,7 @@ export function Footer() {
     <footer className="page-x mt-16 pb-20 sm:mt-20 lg:pb-6">
       <div className="on-accent mx-auto max-w-[1180px] overflow-hidden rounded-3xl">
         {/* ── Llamado a la acción ─────────────────────────────── */}
-        <div className="flex flex-col gap-6 border-b border-line px-5 py-8 sm:px-10 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-6 border-b border-line px-5 py-7 sm:px-10 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="label text-accent-soft">¿Dudas con tu talle o tu pedido?</p>
             <p className="display-section mt-2 !text-[clamp(1.25rem,2.6vw,1.75rem)]">Te asesoramos por WhatsApp</p>
@@ -45,7 +44,7 @@ export function Footer() {
         </div>
 
         {/* ── Columnas ────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 gap-x-6 gap-y-9 px-5 py-9 sm:px-10 md:grid-cols-[1.35fr_1fr_1fr_1.15fr] md:gap-10">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-9 px-5 py-8 sm:px-10 md:grid-cols-[1.35fr_1fr_1fr_1.15fr] md:gap-10">
           <div className="col-span-2 md:col-span-1">
             <Link to="/" className="inline-block">
               <Logo size={64} wordmark wordmarkClassName="text-[26px]" />
@@ -112,25 +111,6 @@ export function Footer() {
           </div>
         </div>
 
-        {/* ── Pagos y envíos ──────────────────────────────────── */}
-        <div className="grid gap-4 border-t border-line px-5 py-6 sm:px-10 md:grid-cols-2">
-          <Sello titulo="Pagás con" items={['Mercado Pago', `Transferencia (−${formatARS(SITE.transferDiscount).replace(' ', '\u00a0')})`, 'Efectivo']} icon="card" to="/pagos" />
-          <Sello titulo="Recibís con" items={['Envío gratis a todo el país', 'Retiro sin costo en el local']} icon="truck" to="/envios" />
-        </div>
-
-        {/* ── Marcas ──────────────────────────────────────────── */}
-        <div className="border-t border-line px-5 py-5 sm:px-10">
-          <ul className="label flex flex-wrap gap-x-5 gap-y-2 text-index" aria-label="Marcas">
-            {BRANDS.map((b) => (
-              <li key={b}>
-                <Link to={`/catalogo?marca=${encodeURIComponent(b)}`} className="hover:text-ink hover:underline hover:underline-offset-[5px]">
-                  {b}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-
         {/* ── Cierre: copyright, modo y volver arriba ─────────── */}
         <div className="flex flex-col-reverse gap-4 border-t border-line px-5 py-5 text-index sm:flex-row sm:items-center sm:justify-between sm:px-10">
           <p className="label">
@@ -159,19 +139,5 @@ function FooterCol({ title, children }: { title: string; children: React.ReactNo
       <h3 className="label mb-4 text-index">{title}</h3>
       <div className="flex flex-col gap-2.5 text-[14px] [&_a:hover]:text-accent-soft">{children}</div>
     </nav>
-  )
-}
-
-function Sello({ titulo, items, icon, to }: { titulo: string; items: string[]; icon: 'card' | 'truck'; to: string }) {
-  return (
-    <Link to={to} className="group flex items-center gap-4 rounded-2xl border border-line p-4 transition-colors hover:border-accent">
-      <span className="grid size-11 shrink-0 place-items-center rounded-xl bg-stage text-accent-soft">
-        <Icon name={icon} size={20} />
-      </span>
-      <span className="min-w-0">
-        <span className="label block text-index">{titulo}</span>
-        <span className="mt-1 block text-[13.5px] leading-5">{items.join(' · ')}</span>
-      </span>
-    </Link>
   )
 }
