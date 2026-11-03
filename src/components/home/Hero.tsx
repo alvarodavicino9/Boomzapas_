@@ -12,8 +12,6 @@ interface Slide {
   /** Lo que dice el banner, para lectores de pantalla y Google. */
   alt: string
   to: string
-  /** En el celular el banner se recorta: qué parte mostrar (el texto está a la izquierda). */
-  focoCelular: string
 }
 
 /** Banners de la portada (carpeta BANNERS WEB de Drive). Para cambiarlos: reemplazá el .jpg y corré `npm run fotos`. */
@@ -23,21 +21,18 @@ const SLIDES: Slide[] = [
     src: '/fotos/banners/zapatillas.jpg',
     alt: 'Tus próximas zapatillas están acá. Ver todos los modelos.',
     to: '/catalogo',
-    focoCelular: '0% 50%',
   },
   {
     tag: 'Envíos',
     src: '/fotos/banners/envios.jpg',
     alt: 'No son solo zapatillas: más de 500 ventas y 450 clientes, venta mayorista por WhatsApp y envíos gratis a todo el país.',
     to: '/envios',
-    focoCelular: '0% 50%',
   },
   {
     tag: 'Ofertas',
     src: '/fotos/banners/ofertas.jpg',
     alt: 'Ofertas: increíbles descuentos llevando 2 pares o más. Ver ofertas.',
     to: '/catalogo',
-    focoCelular: '0% 50%',
   },
 ]
 
@@ -117,8 +112,7 @@ export function Hero() {
                     loading={i === 0 ? 'eager' : 'lazy'}
                     {...(i === 0 ? { fetchpriority: 'high' } : {})}
                     decoding="async"
-                    className="block aspect-[2048/768] w-full object-cover"
-                    style={{ objectPosition: s.focoCelular }}
+                    className="block aspect-[2.3/1] w-full object-cover object-left sm:aspect-[2048/768]"
                   />
                 </Link>
               )
