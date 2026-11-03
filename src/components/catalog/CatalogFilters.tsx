@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { Icon } from '@/components/ui/Icon'
+import { Icon, type IconName } from '@/components/ui/Icon'
 import { CATEGORIAS, DEFAULT_TALLES } from '@/config/site'
 import { PRICE_RANGES, type FilterState } from '@/lib/filters'
 import { cn, formatARS } from '@/lib/format'
@@ -21,11 +21,28 @@ interface CatalogFiltersProps {
  * Grupo plegable de filtros: título, contador de elegidos y flecha.
  * Arranca cerrado (así el panel es corto) salvo que ya tenga un filtro elegido.
  */
-function Group({ id, title, badge = 0, defaultOpen, children }: { id: string; title: string; badge?: number; defaultOpen?: boolean; children: ReactNode }) {
+function Group({
+  id,
+  title,
+  icon,
+  badge = 0,
+  defaultOpen,
+  children,
+}: {
+  id: string
+  title: string
+  icon: IconName
+  badge?: number
+  defaultOpen?: boolean
+  children: ReactNode
+}) {
   return (
     <details className="group border-b border-line py-1 last:border-b-0" open={defaultOpen ?? badge > 0}>
-      <summary className="-mx-2 flex cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-2 py-3.5 transition-colors hover:bg-ink/[0.04] [&::-webkit-details-marker]:hidden">
-        <h2 id={id} className="label flex items-center gap-2.5 text-ink">
+      <summary className="-mx-2 flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-2 py-2.5 transition-colors hover:bg-accent/[0.07] [&::-webkit-details-marker]:hidden">
+        <h2 id={id} className="label flex items-center gap-3 text-ink">
+          <span className="grid size-8 place-items-center rounded-lg bg-accent/10 text-[color:var(--bz-accent-text)] transition-colors group-open:bg-accent group-open:text-on-accent">
+            <Icon name={icon} size={15} />
+          </span>
           {title}
           {badge > 0 && (
             <span className="grid min-w-[18px] place-items-center rounded-full bg-accent px-1.5 text-[10px] font-bold leading-[18px] text-on-accent">
@@ -64,20 +81,31 @@ export function CatalogFilters({ value, onChange, query, onQuery, counts, marcas
   const money = (v: string) => v.replace(/\D/g, '').slice(0, 7)
 
   return (
-    <div className="surface p-5 sm:p-6 lg:max-h-[calc(100svh-var(--header-h)-56px)] lg:overflow-y-auto">
-      <div className="mb-1 flex items-center justify-between gap-3 border-b border-line pb-4">
-        <p className="display-product !text-[1.1rem]">Filtros</p>
-        {activeCount > 0 ? (
-          <button onClick={onReset} className="label link-u text-accent">
-            Limpiar ({activeCount})
+    <div className="surface overflow-hidden lg:max-h-[calc(100svh-var(--header-h)-56px)] lg:overflow-y-auto">
+      {/* cabecera con los colores de la marca */}
+      <div className="on-bar relative flex items-center justify-between gap-3 overflow-hidden px-5 py-4 sm:px-6">
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-10 -top-16 size-40 rounded-full bg-[radial-gradient(circle,rgb(var(--bz-glow)/0.7),transparent_70%)]"
+        />
+        <div className="relative flex items-center gap-3">
+          <span className="grid size-9 place-items-center rounded-full bg-[linear-gradient(180deg,#ea3a45,#c41f2b)] text-white shadow-[0_8px_18px_-8px_rgb(217_44_55/0.9)]">
+            <Icon name="filter" size={17} />
+          </span>
+          <div>
+            <p className="text-[15px] font-bold leading-5 text-white">Filtros</p>
+            <p className="text-[11.5px] leading-4 text-white/65">{activeCount > 0 ? `${activeCount} ${activeCount === 1 ? 'elegido' : 'elegidos'}` : 'Elegí lo que buscás'}</p>
+          </div>
+        </div>
+        {activeCount > 0 && (
+          <button onClick={onReset} className="relative rounded-full border border-white/25 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-white transition-colors hover:border-white hover:bg-white hover:text-black">
+            Limpiar
           </button>
-        ) : (
-          <span className="label text-index">Sin filtros</span>
         )}
       </div>
 
-      <div>
-        <Group id="f-buscar" title="Buscar" badge={query.trim() ? 1 : 0}>
+      <div className="px-5 py-2 sm:px-6">
+        <Group id="f-buscar" title="Buscar" icon="search" badge={query.trim() ? 1 : 0}>
           <label htmlFor="f-q" className="sr-only">
             Buscar modelo o marca
           </label>
@@ -95,7 +123,7 @@ export function CatalogFilters({ value, onChange, query, onQuery, counts, marcas
           </div>
         </Group>
 
-        <Group id="f-cat" title="Categoría" badge={value.categoria !== 'todos' ? 1 : 0}>
+        <Group id="f-cat" title="Categoría" icon="grid" badge={value.categoria !== 'todos' ? 1 : 0}>
           <ul className="space-y-1" role="radiogroup" aria-labelledby="f-cat">
             {CATEGORIAS.map((c) => {
               const active = value.categoria === c.id
@@ -123,7 +151,7 @@ export function CatalogFilters({ value, onChange, query, onQuery, counts, marcas
         </Group>
 
         {marcas.length > 1 && (
-          <Group id="f-marca" title="Marca" badge={value.marcas.length}>
+          <Group id="f-marca" title="Marca" icon="star" badge={value.marcas.length}>
             <ul className="space-y-1">
               {marcas.map((m) => (
                 <li key={m.nombre}>
@@ -145,7 +173,7 @@ export function CatalogFilters({ value, onChange, query, onQuery, counts, marcas
           </Group>
         )}
 
-        <Group id="f-talle" title="Talle (AR)" badge={value.talle ? 1 : 0}>
+        <Group id="f-talle" title="Talle (AR)" icon="tag" badge={value.talle ? 1 : 0}>
           <div className="grid grid-cols-4 gap-2" role="group" aria-labelledby="f-talle">
             {tallesList.map(({ talle, total }) => (
               <button
@@ -163,7 +191,7 @@ export function CatalogFilters({ value, onChange, query, onQuery, counts, marcas
           <p className="mt-3 text-[12px] leading-4 text-index">Mostramos los modelos con stock en ese talle.</p>
         </Group>
 
-        <Group id="f-precio" title="Precio" badge={value.precios.length + (value.pmin || value.pmax ? 1 : 0)}>
+        <Group id="f-precio" title="Precio" icon="card" badge={value.precios.length + (value.pmin || value.pmax ? 1 : 0)}>
           <ul className="space-y-1">
             {PRICE_RANGES.map((r) => (
               <li key={r.id}>
@@ -204,7 +232,7 @@ export function CatalogFilters({ value, onChange, query, onQuery, counts, marcas
           </div>
         </Group>
 
-        <Group id="f-disp" title="Disponibilidad" badge={(value.stock ? 1 : 0) + (value.nuevos ? 1 : 0)}>
+        <Group id="f-disp" title="Disponibilidad" icon="box" badge={(value.stock ? 1 : 0) + (value.nuevos ? 1 : 0)}>
           <div className="space-y-5">
             <Toggle checked={value.stock} onChange={(v) => onChange({ stock: v })} label="Solo con stock" hint="Oculta los modelos agotados." />
             <Toggle checked={value.nuevos} onChange={(v) => onChange({ nuevos: v })} label="Nuevos ingresos" hint="Los últimos pares que llegaron." />

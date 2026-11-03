@@ -34,10 +34,8 @@ export function Navbar() {
   }, [pathname, setMenuOpen])
 
   return (
-    <header className="fixed inset-x-0 top-0 z-[300] border-b border-line">
-      {/* fondo con desenfoque en una capa aparte: si el desenfoque estuviera en el header,
-          el menú del celular (que es fixed) quedaría atrapado adentro y no se vería */}
-      <span aria-hidden="true" className="absolute inset-0 -z-10 bg-[color-mix(in_srgb,var(--bz-card)_88%,transparent)] backdrop-blur-xl" />
+    <header className="on-bar fixed inset-x-0 top-0 z-[300] border-b border-white/10 !shadow-[0_10px_30px_-18px_rgb(0_0_0/0.8)]">
+      {/* encabezado con los colores del logo (negro y granate) en los dos modos */}
       {/* filo rojo abajo del encabezado, como las líneas del logo */}
       <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-[linear-gradient(90deg,transparent,rgb(217_44_55/0.7)_30%,rgb(217_44_55/0.7)_70%,transparent)]" />
       <div className="page-x grid h-[84px] grid-cols-[1fr_auto_1fr] items-center gap-4">

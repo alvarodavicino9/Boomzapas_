@@ -36,7 +36,6 @@ export default function CatalogPage() {
   const query = params.get('q') ?? ''
   const ordenParam = params.get('orden')
   const orden: Orden = isOrden(ordenParam) ? ordenParam : 'novedad'
-  const cols: 3 | 4 = params.get('cols') === '3' ? 3 : 4
   const state: FilterState = {
     categoria: isCategoria(catParam) ? catParam : 'todos',
     marcas: list(params.get('marca')),
@@ -152,7 +151,7 @@ export default function CatalogPage() {
     ...(state.nuevos ? [{ key: 'n', label: 'Nuevos ingresos', remove: () => patch({ nuevos: false }) }] : []),
   ]
   const activeCount = chips.length
-  const reset = () => setParams(orden !== 'novedad' || cols !== 4 ? { ...(orden !== 'novedad' && { orden }), ...(cols !== 4 && { cols: String(cols) }) } : {}, { replace: true })
+  const reset = () => setParams(orden !== 'novedad' ? { orden } : {}, { replace: true })
 
   // Panel de filtros del celular: Escape lo cierra y no deja scrollear el fondo
   useLockBodyScroll(filtersOpen)
@@ -269,7 +268,7 @@ export default function CatalogPage() {
 
         <section aria-labelledby="titulo-resultados" className="min-w-0">
           <h2 id="titulo-resultados" className="sr-only">Modelos</h2>
-          {/* barra de resultados: cantidad, orden y columnas */}
+          {/* barra de resultados: cantidad y orden */}
           <div className="mb-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 sm:mb-5">
             <p className="label text-index" aria-live="polite">
               {status === 'ready' && (
@@ -284,19 +283,6 @@ export default function CatalogPage() {
                 <span className="label text-index">Ordenar</span>
                 {ordenSelect()}
               </label>
-              <div className="hidden items-center gap-1 rounded-xl border border-line p-1 xl:flex" role="group" aria-label="Columnas">
-                {([3, 4] as const).map((n) => (
-                  <button
-                    key={n}
-                    aria-pressed={cols === n}
-                    aria-label={`${n} columnas`}
-                    onClick={() => setMany({ cols: n === 4 ? '' : String(n) })}
-                    className={cn('grid size-8 place-items-center rounded-lg text-[12px] font-bold', cols === n ? 'bg-accent text-on-accent' : 'text-index hover:text-ink')}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
             </div>
           </div>
 
@@ -325,7 +311,6 @@ export default function CatalogPage() {
           <ProductGrid
             productos={filtered}
             status={status}
-            cols={cols}
             emptyMessage={
               productos.length === 0
                 ? 'El servidor no devolvió productos. Revisá que estén activos (activo = true) en la base de datos.'
