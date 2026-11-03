@@ -7,6 +7,7 @@ import { Productos } from '@/components/admin/Productos'
 import { Clientes } from '@/components/admin/Clientes'
 import { Resenas } from '@/components/admin/Resenas'
 import { Herramientas } from '@/components/admin/Herramientas'
+import { Caja } from '@/components/admin/Caja'
 import type { AdminNav, AdminTab } from '@/components/admin/types'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { Logo } from '@/components/ui/Logo'
@@ -22,10 +23,14 @@ const SECCIONES: { id: AdminTab; label: string; corto: string; icon: IconName }[
   { id: 'resumen', label: 'Resumen', corto: 'Resumen', icon: 'grid' },
   { id: 'pedidos', label: 'Pedidos', corto: 'Pedidos', icon: 'box' },
   { id: 'productos', label: 'Productos y stock', corto: 'Productos', icon: 'tag' },
+  { id: 'caja', label: 'Caja y ganancias', corto: 'Caja', icon: 'card' },
   { id: 'clientes', label: 'Clientes', corto: 'Clientes', icon: 'users' },
   { id: 'resenas', label: 'Reseñas', corto: 'Reseñas', icon: 'star' },
   { id: 'herramientas', label: 'Herramientas', corto: 'Útiles', icon: 'tools' },
 ]
+
+const PRINCIPALES = SECCIONES.filter((s) => ['resumen', 'pedidos', 'productos', 'caja'].includes(s.id))
+const OTRAS = SECCIONES.filter((s) => !PRINCIPALES.includes(s))
 
 interface Destino {
   tab: AdminTab
@@ -37,6 +42,7 @@ interface Destino {
 export default function AdminPage() {
   const { token, setToken, logout } = useAdminToken()
   const [destino, setDestino] = useState<Destino>({ tab: 'resumen', nonce: 0 })
+  const [mas, setMas] = useState(false)
 
   // El panel no debe aparecer en buscadores.
   useEffect(() => {
@@ -55,6 +61,7 @@ export default function AdminPage() {
   const nav: AdminNav = useCallback(
     (tab, filtro, pedidoId) => {
       setDestino((d) => ({ tab, filtro, pedidoId, nonce: d.nonce + 1 }))
+      setMas(false)
       window.scrollTo({ top: 0 })
     },
     [],
@@ -178,7 +185,14 @@ export default function AdminPage() {
             )}
 
             {destino.tab === 'resumen' && (
-              <Resumen pedidos={data.pedidos} productos={data.productos} resenasPendientes={resenasPendientes} nav={nav} />
+              <Resumen
+                pedidos={data.pedidos}
+                productos={data.productos}
+                caja={data.caja}
+                costos={data.costos}
+                resenasPendientes={resenasPendientes}
+                nav={nav}
+              />
             )}
             {destino.tab === 'pedidos' && (
               <Pedidos
@@ -193,6 +207,9 @@ export default function AdminPage() {
             {destino.tab === 'productos' && (
               <Productos key={destino.nonce} productos={data.productos} filtroInicial={destino.filtro} setStock={data.setStock} />
             )}
+            {destino.tab === 'caja' && (
+              <Caja pedidos={data.pedidos} productos={data.productos} caja={data.caja} costos={data.costos} setStock={data.setStock} />
+            )}
             {destino.tab === 'clientes' && <Clientes pedidos={data.pedidos} />}
             {destino.tab === 'resenas' && <Resenas />}
             {destino.tab === 'herramientas' && <Herramientas pedidos={data.pedidos} productos={data.productos} />}
@@ -200,14 +217,14 @@ export default function AdminPage() {
         </main>
       </div>
 
-      {/* Navegación inferior (celular y tablet) */}
+      {/* Navegación inferior (celular y tablet): las 4 secciones de todos los días y "Más" */}
       <nav
-        className="on-bar fixed inset-x-0 bottom-0 z-40 grid grid-cols-6 border-t border-line pb-[env(safe-area-inset-bottom)] lg:hidden"
+        className="on-bar fixed inset-x-0 bottom-0 z-40 grid grid-cols-5 border-t border-line pb-[env(safe-area-inset-bottom)] lg:hidden"
         aria-label="Secciones del panel"
       >
-        {SECCIONES.map((s) => {
+        {PRINCIPALES.map((s) => {
           const n = badge(s.id)
-          const activo = destino.tab === s.id
+          const activo = destino.tab === s.id && !mas
           return (
             <button
               key={s.id}
@@ -228,7 +245,73 @@ export default function AdminPage() {
             </button>
           )
         })}
+        {(() => {
+          const activo = mas || OTRAS.some((s) => s.id === destino.tab)
+          const n = OTRAS.reduce((a, s) => a + badge(s.id), 0)
+          return (
+            <button
+              onClick={() => setMas((m) => !m)}
+              aria-expanded={mas}
+              className={cn('relative flex h-16 flex-col items-center justify-center gap-1 text-[10.5px] font-medium', activo ? 'text-white' : 'text-white/60')}
+            >
+              {activo && <span className="absolute inset-x-4 top-0 h-0.5 rounded-b-full bg-accent-soft" />}
+              <span className="relative">
+                <Icon name={mas ? 'x' : 'menu'} size={20} className={activo ? 'text-accent-soft' : ''} />
+                {n > 0 && !mas && (
+                  <span className="absolute -right-2.5 -top-1.5 grid h-4 min-w-4 place-items-center rounded-full bg-accent px-1 text-[9.5px] font-semibold text-white">
+                    {n}
+                  </span>
+                )}
+              </span>
+              Más
+            </button>
+          )
+        })()}
       </nav>
+
+      {/* Hoja "Más" (celular) */}
+      {mas && (
+        <div className="fixed inset-0 z-30 lg:hidden" onClick={() => setMas(false)}>
+          <div className="absolute inset-0 bg-scrim" aria-hidden="true" />
+          <div
+            className="on-bar absolute inset-x-0 bottom-[calc(64px+env(safe-area-inset-bottom))] rounded-t-3xl border-t border-line p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ul className="grid grid-cols-3 gap-2">
+              {OTRAS.map((s) => {
+                const n = badge(s.id)
+                return (
+                  <li key={s.id}>
+                    <button
+                      onClick={() => nav(s.id)}
+                      className={cn(
+                        'relative flex h-20 w-full flex-col items-center justify-center gap-2 rounded-2xl border text-[12px] font-medium',
+                        destino.tab === s.id ? 'border-accent-soft bg-white/10 text-white' : 'border-white/10 text-white/80',
+                      )}
+                    >
+                      <Icon name={s.icon} size={20} />
+                      {s.label}
+                      {n > 0 && (
+                        <span className="absolute right-2 top-2 grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1.5 text-[10.5px] font-semibold text-white">
+                          {n}
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <Link to="/" className="flex h-11 items-center justify-center gap-2 rounded-xl border border-white/10 text-[13px] text-white/80">
+                <Icon name="store" size={16} /> Ver la tienda
+              </Link>
+              <button onClick={logout} className="flex h-11 items-center justify-center gap-2 rounded-xl border border-white/10 text-[13px] text-white/80">
+                <Icon name="logout" size={16} /> Salir
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <Toaster />
     </div>
   )

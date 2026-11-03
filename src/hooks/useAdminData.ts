@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ApiError, MODO_DEMO, adminPedidos, adminSetEstado, adminSetStock, adminStats } from '@/lib/api'
 import {
-  actualizarPedido,
+  cambiarEstadoLocal,
   editarProducto,
+  useCaja,
+  useCostos,
   normalizarPedido,
   usePedidosLocales,
   type PedidoAdmin,
@@ -16,6 +18,8 @@ import type { Producto } from '@/types'
  */
 export function useAdminData(token: string, onUnauthorized: () => void) {
   const local = usePedidosLocales()
+  const caja = useCaja()
+  const costos = useCostos()
   const { todos, status, reload: recargarCatalogo } = useProductos()
   const [remotos, setRemotos] = useState<PedidoAdmin[]>([])
   const [loading, setLoading] = useState(false)
@@ -46,7 +50,7 @@ export function useAdminData(token: string, onUnauthorized: () => void) {
 
   const setEstado = useCallback(
     async (p: PedidoAdmin, estado: string) => {
-      if (MODO_DEMO) return actualizarPedido(p.id, { estado })
+      if (MODO_DEMO) return cambiarEstadoLocal(p, estado, todos)
       const prev = remotos
       setRemotos((list) => list.map((x) => (x.id === p.id ? { ...x, estado } : x)))
       try {
@@ -57,7 +61,7 @@ export function useAdminData(token: string, onUnauthorized: () => void) {
         throw e
       }
     },
-    [remotos, token, onUnauthorized],
+    [remotos, token, onUnauthorized, todos],
   )
 
   const setStock = useCallback(
@@ -75,7 +79,7 @@ export function useAdminData(token: string, onUnauthorized: () => void) {
   )
 
   return useMemo(
-    () => ({ pedidos, productos: todos, catalogoListo: status !== 'loading', loading, error, reload, setEstado, setStock }),
-    [pedidos, todos, status, loading, error, reload, setEstado, setStock],
+    () => ({ pedidos, productos: todos, caja, costos, catalogoListo: status !== 'loading', loading, error, reload, setEstado, setStock }),
+    [pedidos, todos, caja, costos, status, loading, error, reload, setEstado, setStock],
   )
 }

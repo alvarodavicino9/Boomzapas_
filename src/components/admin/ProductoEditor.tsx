@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { Drawer, Field } from './ui'
 import { useUI } from '@/context/UIContext'
-import { crearProducto, editarProducto, eliminarProductoPropio, esProductoPropio } from '@/lib/adminStore'
+import { crearProducto, editarProducto, eliminarProductoPropio, esProductoPropio, setCosto, useCostos } from '@/lib/adminStore'
 import { MODO_DEMO } from '@/lib/api'
 import { BRANDS, CATEGORIAS, DEFAULT_TALLES, SITE } from '@/config/site'
 import { cn, formatARS, transferPrice } from '@/lib/format'
@@ -16,6 +16,8 @@ interface Props {
   onClose: () => void
   setStock: (p: Producto, talle: string, cantidad: number) => Promise<void>
   onCreado?: (id: number) => void
+  /** Abre la carga de mercadería para este modelo. */
+  onCompra?: (id: number) => void
 }
 
 /** Reduce la foto a ~800 px para que entre en el almacenamiento del navegador. */
@@ -39,7 +41,9 @@ function comprimir(file: File): Promise<string> {
 
 const VACIO = { nombre: '', marca: 'Nike', categoria: 'urbanas', precio: '', descripcion: '', nuevo: true }
 
-export function ProductoEditor({ producto, open, crear, onClose, setStock, onCreado }: Props) {
+export function ProductoEditor({ producto, open, crear, onClose, setStock, onCreado, onCompra }: Props) {
+  const costos = useCostos()
+  const [costo, setCostoTxt] = useState('')
   const [f, setF] = useState(VACIO)
   const [foto, setFoto] = useState<string>('')
   const [talles, setTalles] = useState<Record<string, number>>({})
@@ -54,6 +58,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
     if (!open) return
     setError('')
     setBorrar(false)
+    setCostoTxt(!crear && producto && costos[producto.id] ? String(costos[producto.id]) : '')
     if (crear) {
       setF(VACIO)
       setFoto('')
@@ -74,7 +79,15 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
   const precio = Number(f.precio) || 0
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((x) => ({ ...x, [k]: v }))
 
+  const costoNum = Number(costo) || 0
+  const margen = precio > 0 && costoNum > 0 ? ((transferPrice(precio) - costoNum) / costoNum) * 100 : null
+
   const guardar = () => {
+    if (!editable) {
+      if (producto) setCosto(producto.id, costoNum || null)
+      toast('Costo guardado')
+      return
+    }
     if (!f.nombre.trim()) return setError('Poné el nombre del modelo.')
     if (precio <= 0) return setError('Poné un precio válido.')
     if (crear) {
@@ -93,6 +106,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
         stock,
         nuevo: f.nuevo,
       })
+      if (costoNum > 0) setCosto(id, costoNum)
       toast('Modelo agregado a la tienda')
       onClose()
       onCreado?.(id)
@@ -105,6 +119,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
         descripcion: f.descripcion.trim(),
         nuevo: f.nuevo,
       })
+      setCosto(producto.id, costoNum || null)
       toast('Cambios guardados')
     }
   }
@@ -154,16 +169,14 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
       title={crear ? 'Nuevo modelo' : (producto?.nombre ?? '')}
       subtitle={crear ? 'Se agrega a la tienda en este navegador' : producto && `${producto.marca} · ID ${producto.id}`}
       footer={
-        editable ? (
-          <div className="flex gap-2">
-            <Button className="flex-1" onClick={guardar}>
-              {crear ? 'Agregar a la tienda' : 'Guardar cambios'}
-            </Button>
-            <Button variant="outline" onClick={onClose}>
-              Cerrar
-            </Button>
-          </div>
-        ) : undefined
+        <div className="flex gap-2">
+          <Button className="flex-1" onClick={guardar}>
+            {crear ? 'Agregar a la tienda' : editable ? 'Guardar cambios' : 'Guardar costo'}
+          </Button>
+          <Button variant="outline" onClick={onClose}>
+            Cerrar
+          </Button>
+        </div>
       }
     >
       <div className="space-y-6">
@@ -237,7 +250,25 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
               disabled={!editable}
             />
           </Field>
-          <div className="flex items-end">
+          <Field
+            label="Costo por par"
+            hint={
+              margen !== null
+                ? `Ganás ${formatARS(transferPrice(precio) - costoNum)} por par con transferencia (${margen.toFixed(0)}%)`
+                : 'Lo que te cuesta a vos. No se ve en la tienda.'
+            }
+          >
+            <input
+              className="field-line"
+              type="number"
+              min={0}
+              step={500}
+              inputMode="numeric"
+              value={costo}
+              onChange={(e) => setCostoTxt(e.target.value)}
+            />
+          </Field>
+          <div className="flex items-end sm:col-span-2">
             <label className={cn('flex h-[46px] w-full cursor-pointer items-center gap-3 rounded-xl border border-line px-4 text-[13px]', !editable && 'opacity-60')}>
               <input type="checkbox" className="check" checked={f.nuevo} onChange={(e) => set('nuevo', e.target.checked)} disabled={!editable} />
               Marcar como nuevo
@@ -259,9 +290,16 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
         <section>
           <div className="mb-3 flex items-center justify-between">
             <h3 className="label text-index">Stock por talle</h3>
-            {filas.length > 0 && (
-              <span className="text-[12px] text-index">{filas.reduce((a, s) => a + s.cantidad, 0)} pares</span>
-            )}
+            <span className="flex items-center gap-3">
+              {filas.length > 0 && (
+                <span className="text-[12px] text-index">{filas.reduce((a, s) => a + s.cantidad, 0)} pares</span>
+              )}
+              {!crear && producto && onCompra && (
+                <button onClick={() => onCompra(producto.id)} className="label inline-flex items-center gap-1.5 text-[color:var(--bz-accent-text)] hover:underline">
+                  <Icon name="plus" size={13} /> Entró mercadería
+                </button>
+              )}
+            </span>
           </div>
           {filas.length === 0 ? (
             <p className="text-[13px] text-index">Sin talles cargados.</p>

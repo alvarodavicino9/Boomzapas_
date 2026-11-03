@@ -1,16 +1,19 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
-import { Card, Empty, EstadoBadge, ESTADO_COLOR, PageTitle, estadoLabel } from './ui'
-import { alertasDeStock, calcularResumen, metodoLabel } from '@/lib/adminStats'
+import { Card, Empty, EstadoBadge, ESTADO_COLOR, PageTitle, Pills, estadoLabel } from './ui'
+import { PERIODOS, alertasDeStock, calcularResumen, metodoLabel, type Periodo } from '@/lib/adminStats'
 import { cn, formatARS, formatDate } from '@/lib/format'
-import type { PedidoAdmin } from '@/lib/adminStore'
+import type { Movimiento, PedidoAdmin } from '@/lib/adminStore'
 import type { Producto } from '@/types'
 import type { AdminNav } from './types'
+import { MODO_DEMO } from '@/lib/api'
 
 interface ResumenProps {
   pedidos: PedidoAdmin[]
   productos: Producto[]
+  caja: Movimiento[]
+  costos: Record<number, number>
   resenasPendientes: number
   nav: AdminNav
 }
@@ -42,12 +45,14 @@ function Kpi({
   )
 }
 
-export function Resumen({ pedidos, productos, resenasPendientes, nav }: ResumenProps) {
-  const r = useMemo(() => calcularResumen(pedidos), [pedidos])
+export function Resumen({ pedidos, productos, caja, costos, resenasPendientes, nav }: ResumenProps) {
+  const [periodo, setPeriodo] = useState<Periodo>('7')
+  const r = useMemo(() => calcularResumen(pedidos, periodo, costos, caja), [pedidos, periodo, costos, caja])
   const alertas = useMemo(() => alertasDeStock(productos), [productos])
   const agotados = alertas.filter((a) => a.total <= 0).length
   const max = Math.max(1, ...r.serie.map((d) => d.total))
-  const total14 = r.serie.reduce((a, d) => a + d.total, 0)
+  const totalSerie = r.serie.reduce((a, d) => a + d.total, 0)
+  const paso = Math.ceil(r.serie.length / 10)
   const recientes = pedidos.slice(0, 5)
 
   const avisos: { icon: IconName; text: string; cta: string; go: () => void }[] = []
@@ -82,7 +87,28 @@ export function Resumen({ pedidos, productos, resenasPendientes, nav }: ResumenP
 
   return (
     <div>
-      <PageTitle title="Resumen" subtitle="Cómo viene el negocio, de un vistazo." />
+      <PageTitle
+        title="Resumen"
+        subtitle={`Cómo viene el negocio: ${r.rango.label}.`}
+        action={
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" onClick={() => nav('caja')}>
+              <Icon name="card" size={15} className="mr-2" /> Caja
+            </Button>
+            {MODO_DEMO && (
+              <Button size="sm" onClick={() => nav('pedidos', 'nuevo')}>
+                <Icon name="plus" size={15} className="mr-2" /> Nueva venta
+              </Button>
+            )}
+          </div>
+        }
+      />
+
+      <div className="-mx-4 mb-5 overflow-x-auto px-4 sm:mx-0 sm:px-0">
+        <div className="w-max sm:w-auto">
+          <Pills value={periodo} onChange={setPeriodo} options={PERIODOS} />
+        </div>
+      </div>
 
       {avisos.length > 0 && (
         <ul className="mb-6 grid gap-2 lg:grid-cols-2">
@@ -109,18 +135,31 @@ export function Resumen({ pedidos, productos, resenasPendientes, nav }: ResumenP
               'Pagados, enviados y entregados'
             ) : (
               <span className={r.delta >= 0 ? 'text-[#3fbf7f]' : 'text-danger'}>
-                {r.delta >= 0 ? '▲' : '▼'} {Math.abs(r.delta).toFixed(0)}% <span className="text-index">vs semana anterior</span>
+                {r.delta >= 0 ? '▲' : '▼'} {Math.abs(r.delta).toFixed(0)}% <span className="text-index">vs período anterior</span>
               </span>
             )
           }
         />
-        <Kpi label="Ventas" icon="bag" value={String(r.ventas)} sub={`${pedidos.length} pedidos en total`} />
-        <Kpi label="Ticket promedio" icon="receipt" value={formatARS(r.ticket)} sub="Por pedido concretado" />
+        <Kpi
+          label="Ganancia"
+          icon="star"
+          value={r.gananciaNeta === null ? '—' : formatARS(r.gananciaNeta)}
+          sub={
+            r.gananciaNeta === null ? (
+              <button onClick={() => nav('productos', 'sincosto')} className="text-left underline underline-offset-2 hover:text-ink">
+                Cargá los costos para verla
+              </button>
+            ) : (
+              'Ventas − costo − gastos'
+            )
+          }
+        />
+        <Kpi label="Ventas" icon="bag" value={String(r.ventas)} sub={`${r.pares} pares · ticket ${formatARS(r.ticket)}`} />
         <Kpi label="Por cobrar" icon="clock" value={formatARS(r.porCobrar)} sub={`${r.pendientes} pedidos pendientes`} />
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-[1.7fr_1fr]">
-        <Card title="Ventas de los últimos 14 días" hint={`${formatARS(total14)} · últimos 7 días: ${formatARS(r.ingresos7)}`}>
+      <div className="mt-4 grid gap-4 lg:grid-cols-[1.7fr_1fr] [&>*]:min-w-0">
+        <Card title={`Ventas por día · últimos ${r.serie.length} días`} hint={`${formatARS(totalSerie)} en el gráfico`}>
           <div className="flex h-44 items-end gap-1.5 sm:gap-2" role="img" aria-label="Gráfico de ventas por día">
             {r.serie.map((d, i) => {
               const h = d.total > 0 ? Math.max(6, (d.total / max) * 100) : 2
@@ -144,7 +183,9 @@ export function Resumen({ pedidos, productos, resenasPendientes, nav }: ResumenP
           <div className="mt-2 flex gap-1.5 sm:gap-2">
             {r.serie.map((d, i) => (
               <span key={d.inicio} className="flex-1 text-center text-[10px] leading-3 text-index">
-                <span className={cn(i % 2 === (r.serie.length - 1) % 2 ? '' : 'hidden sm:inline')}>{d.label.split(' ')[0]}</span>
+                <span className={cn((r.serie.length - 1 - i) % (paso * 2) === 0 ? '' : (r.serie.length - 1 - i) % paso === 0 ? 'hidden sm:inline' : 'hidden')}>
+                  {d.label.split(' ')[0]}
+                </span>
               </span>
             ))}
           </div>
@@ -184,7 +225,7 @@ export function Resumen({ pedidos, productos, resenasPendientes, nav }: ResumenP
         </Card>
       </div>
 
-      <div className="mt-4 grid gap-4 lg:grid-cols-3">
+      <div className="mt-4 grid gap-4 lg:grid-cols-3 [&>*]:min-w-0">
         <Card title="Modelos más vendidos">
           {r.topProductos.length === 0 ? (
             <Empty>Sin ventas todavía.</Empty>

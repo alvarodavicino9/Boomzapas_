@@ -38,7 +38,7 @@ function mensajeParaCliente(p: PedidoAdmin): string {
     case 'pagado':
       return `Hola ${nombre}! Recibimos tu pago ✅ Ya estamos preparando tu ${ref}. Te avisamos cuando salga.`
     case 'enviado':
-      return `Hola ${nombre}! Tu ${ref} ya fue despachado por Correo Argentino 📦. Te paso el código de seguimiento: `
+      return `Hola ${nombre}! Tu ${ref} ya fue despachado por Correo Argentino 📦. Código de seguimiento: ${p.seguimiento ?? ''}`
     case 'entregado':
       return `Hola ${nombre}! ¿Cómo te fueron las zapatillas? Si te gustaron, nos ayudaría mucho una reseña en la web 🙌`
     case 'cancelado':
@@ -49,14 +49,14 @@ function mensajeParaCliente(p: PedidoAdmin): string {
 }
 
 export function Pedidos({ pedidos, productos, filtroInicial, abrirId, onEstado }: PedidosProps) {
-  const [filtro, setFiltro] = useState<string>(filtroInicial ?? 'todos')
+  const [filtro, setFiltro] = useState<string>(filtroInicial && filtroInicial !== 'nuevo' ? filtroInicial : 'todos')
   const [q, setQ] = useState('')
   const [sel, setSel] = useState<PedidoAdmin['id'] | null>(abrirId ?? null)
-  const [nuevo, setNuevo] = useState(false)
+  const [nuevo, setNuevo] = useState(filtroInicial === 'nuevo' && MODO_DEMO)
   const { toast } = useUI()
 
   useEffect(() => {
-    if (filtroInicial) setFiltro(filtroInicial)
+    if (filtroInicial && filtroInicial !== 'nuevo') setFiltro(filtroInicial)
   }, [filtroInicial])
   useEffect(() => {
     if (abrirId !== undefined) setSel(abrirId)
@@ -67,7 +67,7 @@ export function Pedidos({ pedidos, productos, filtroInicial, abrirId, onEstado }
     return pedidos.filter((p) => {
       if (filtro !== 'todos' && p.estado !== filtro) return false
       if (!t) return true
-      return `${p.id} ${p.cliente.nombre} ${p.cliente.telefono} ${resumenItems(p)}`.toLowerCase().includes(t)
+      return `${p.id} ${p.cliente.nombre} ${p.cliente.telefono} ${resumenItems(p)} ${p.seguimiento ?? ''}`.toLowerCase().includes(t)
     })
   }, [pedidos, filtro, q])
 
@@ -113,7 +113,7 @@ export function Pedidos({ pedidos, productos, filtroInicial, abrirId, onEstado }
             </Button>
             {MODO_DEMO && (
               <Button size="sm" onClick={() => setNuevo(true)}>
-                <Icon name="plus" size={15} className="mr-2" /> Nuevo pedido
+                <Icon name="plus" size={15} className="mr-2" /> Nueva venta
               </Button>
             )}
           </div>
@@ -233,12 +233,14 @@ function DetallePedido({
   onCerrar: () => void
 }) {
   const [nota, setNota] = useState(p.nota_interna ?? '')
+  const [seguimiento, setSeguimiento] = useState(p.seguimiento ?? '')
   const [borrar, setBorrar] = useState(false)
   const { toast } = useUI()
   useEffect(() => {
     setNota(p.nota_interna ?? '')
+    setSeguimiento(p.seguimiento ?? '')
     setBorrar(false)
-  }, [p.id, p.nota_interna])
+  }, [p.id, p.nota_interna, p.seguimiento])
 
   const pasos = ESTADOS.filter((e) => e !== 'cancelado')
   const idx = pasos.indexOf(p.estado as (typeof pasos)[number])
@@ -308,6 +310,12 @@ function DetallePedido({
             ))}
           </ul>
         )}
+        {p.descuento ? (
+          <div className="mt-3 flex items-center justify-between text-[13px] text-index">
+            <span>Descuento</span>
+            <span>−{formatARS(p.descuento)}</span>
+          </div>
+        ) : null}
         <div className="mt-4 flex items-center justify-between border-t border-line pt-3">
           <span className="label text-index">Total</span>
           <span className="font-display text-xl font-bold">{formatARS(p.total)}</span>
@@ -333,6 +341,28 @@ function DetallePedido({
             </>
           )}
         </dl>
+      </Bloque>
+
+      {MODO_DEMO && p.entrega === 'envio' && (
+        <Bloque titulo="Seguimiento del envío">
+          <input
+            value={seguimiento}
+            onChange={(e) => setSeguimiento(e.target.value)}
+            onBlur={() =>
+              seguimiento.trim() !== (p.seguimiento ?? '') &&
+              (actualizarPedido(p.id, { seguimiento: seguimiento.trim() || undefined }), toast('Código guardado'))
+            }
+            placeholder="Código de Correo Argentino"
+            className="field-line normal-case"
+          />
+          <p className="mt-2 text-[12px] text-index">Se agrega solo al mensaje de WhatsApp cuando el pedido está enviado.</p>
+        </Bloque>
+      )}
+
+      <Bloque titulo="Comprobante">
+        <Button variant="outline" size="sm" onClick={() => imprimirComprobante(p)}>
+          <Icon name="receipt" size={15} className="mr-2" /> Imprimir o guardar en PDF
+        </Button>
       </Bloque>
 
       {MODO_DEMO && (
@@ -377,4 +407,43 @@ function DetallePedido({
       )}
     </div>
   )
+}
+
+const esc = (t: string) => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!)
+
+/** Abre un comprobante simple del pedido para imprimir o guardar como PDF. */
+function imprimirComprobante(p: PedidoAdmin) {
+  const w = window.open('', '_blank', 'width=720,height=900')
+  if (!w) return
+  const filas = p.items
+    .map(
+      (i) =>
+        `<tr><td>${esc(i.nombre)}<small>${esc(i.marca)} · Talle ${esc(i.talle)}</small></td><td>${i.cantidad}</td><td>${formatARS(i.precio_unit)}</td><td>${formatARS(i.precio_unit * i.cantidad)}</td></tr>`,
+    )
+    .join('')
+  w.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Pedido #${esc(String(p.id))} · Boom Zapas</title>
+<style>
+body{font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#111;margin:40px}
+header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #d92c37;padding-bottom:16px}
+h1{font-size:22px;margin:0;letter-spacing:.02em}h1 span{color:#d92c37}
+.meta{text-align:right;color:#555;font-size:13px}
+.cols{display:flex;gap:40px;margin:24px 0}.cols div{flex:1}
+h2{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#777;margin:0 0 6px}
+table{width:100%;border-collapse:collapse;margin-top:8px}th,td{text-align:left;padding:10px 6px;border-bottom:1px solid #e4e4e4}
+th{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#777}td:not(:first-child),th:not(:first-child){text-align:right}
+small{display:block;color:#777;font-size:12px}
+.total{display:flex;justify-content:flex-end;gap:24px;font-size:18px;font-weight:700;margin-top:16px}
+footer{margin-top:40px;color:#777;font-size:12px;text-align:center}
+@media print{body{margin:16px}}
+</style></head><body>
+<header><h1>BOOM <span>ZAPAS</span></h1><div class="meta"><strong>Pedido #${esc(String(p.id))}</strong><br>${esc(formatDate(p.fecha))}<br>${esc(estadoLabel(p.estado))}</div></header>
+<div class="cols"><div><h2>Cliente</h2>${esc(p.cliente.nombre)}<br>${esc(p.cliente.telefono || '')}${p.cliente.email ? '<br>' + esc(p.cliente.email) : ''}</div>
+<div><h2>Pago y entrega</h2>${esc(metodoLabel(p.metodo_pago))}<br>${p.entrega === 'envio' ? 'Envío' + (p.direccion ? ': ' + esc(p.direccion) : '') : 'Retiro en ' + esc(SITE.address)}${p.seguimiento ? '<br>Seguimiento: ' + esc(p.seguimiento) : ''}</div></div>
+<table><thead><tr><th>Producto</th><th>Cant.</th><th>Precio</th><th>Subtotal</th></tr></thead><tbody>${filas}</tbody></table>
+${p.descuento ? `<div class="total" style="font-size:14px;font-weight:400;color:#555"><span>Descuento</span><span>−${formatARS(p.descuento)}</span></div>` : ''}
+<div class="total"><span>Total</span><span>${formatARS(p.total)}</span></div>
+<footer>Boom Zapas · ${esc(SITE.address)} · Gracias por tu compra</footer>
+<script>window.onload=()=>setTimeout(()=>window.print(),200)</script>
+</body></html>`)
+  w.document.close()
 }

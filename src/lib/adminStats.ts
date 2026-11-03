@@ -1,4 +1,4 @@
-import { ESTADOS, ESTADOS_VENTA, type PedidoAdmin } from './adminStore'
+import { ESTADOS, ESTADOS_VENTA, NO_OPERATIVOS, type Movimiento, type PedidoAdmin } from './adminStore'
 import type { Producto } from '@/types'
 
 const DIA = 86400000
@@ -22,16 +22,69 @@ export interface Cliente {
   ultimo: string
 }
 
+export type Periodo = 'hoy' | '7' | '30' | 'mes' | 'todo'
+
+export const PERIODOS: { id: Periodo; label: string }[] = [
+  { id: 'hoy', label: 'Hoy' },
+  { id: '7', label: '7 días' },
+  { id: '30', label: '30 días' },
+  { id: 'mes', label: 'Este mes' },
+  { id: 'todo', label: 'Todo' },
+]
+
+export interface Rango {
+  desde: number
+  hasta: number
+  /** Período anterior del mismo largo (para comparar). */
+  prevDesde: number | null
+  /** Días que muestra el gráfico. */
+  dias: number
+  label: string
+}
+
+export function rangoPeriodo(p: Periodo): Rango {
+  const hoy = inicioDelDia(new Date())
+  const hasta = hoy + DIA
+  switch (p) {
+    case 'hoy':
+      return { desde: hoy, hasta, prevDesde: hoy - DIA, dias: 7, label: 'hoy' }
+    case '7':
+      return { desde: hoy - 6 * DIA, hasta, prevDesde: hoy - 13 * DIA, dias: 7, label: 'los últimos 7 días' }
+    case '30':
+      return { desde: hoy - 29 * DIA, hasta, prevDesde: hoy - 59 * DIA, dias: 30, label: 'los últimos 30 días' }
+    case 'mes': {
+      const d = new Date()
+      const desde = new Date(d.getFullYear(), d.getMonth(), 1).getTime()
+      const prev = new Date(d.getFullYear(), d.getMonth() - 1, 1).getTime()
+      return { desde, hasta, prevDesde: prev, dias: Math.max(7, d.getDate()), label: 'este mes' }
+    }
+    default:
+      return { desde: 0, hasta, prevDesde: null, dias: 30, label: 'todo el historial' }
+  }
+}
+
+export const enRango = (iso: string, desde: number, hasta: number) => {
+  const t = new Date(iso).getTime() || 0
+  return t >= desde && t < hasta
+}
+
 export interface AdminResumen {
+  rango: Rango
   ingresos: number
   ventas: number
+  pares: number
   ticket: number
   porCobrar: number
   pendientes: number
   porEnviar: number
-  ingresos7: number
-  ingresosPrev7: number
   delta: number | null
+  /** Costo de los pares vendidos (sólo de los modelos con costo cargado). */
+  costoVendido: number
+  /** Parte de los pares vendidos que tiene costo cargado (0 a 1). */
+  cobertura: number
+  gananciaBruta: number | null
+  gastos: number
+  gananciaNeta: number | null
   serie: Dia[]
   porEstado: { estado: string; cantidad: number }[]
   topProductos: { nombre: string; marca: string; unidades: number; ingresos: number }[]
@@ -42,13 +95,20 @@ export interface AdminResumen {
 const esVenta = (p: PedidoAdmin) => ESTADOS_VENTA.includes(p.estado)
 const ts = (p: PedidoAdmin) => new Date(p.fecha).getTime() || 0
 
-export function calcularResumen(pedidos: PedidoAdmin[], dias = 14): AdminResumen {
-  const ventas = pedidos.filter(esVenta)
+export function calcularResumen(
+  pedidos: PedidoAdmin[],
+  periodo: Periodo = '30',
+  costos: Record<number, number> = {},
+  caja: Movimiento[] = [],
+): AdminResumen {
+  const rango = rangoPeriodo(periodo)
+  const todasLasVentas = pedidos.filter(esVenta)
+  const ventas = todasLasVentas.filter((p) => ts(p) >= rango.desde && ts(p) < rango.hasta)
   const ingresos = ventas.reduce((a, p) => a + p.total, 0)
   const hoy = inicioDelDia(new Date())
 
   const serie: Dia[] = []
-  for (let i = dias - 1; i >= 0; i--) {
+  for (let i = rango.dias - 1; i >= 0; i--) {
     const inicio = hoy - i * DIA
     const d = new Date(inicio)
     serie.push({
@@ -58,7 +118,7 @@ export function calcularResumen(pedidos: PedidoAdmin[], dias = 14): AdminResumen
       pedidos: 0,
     })
   }
-  for (const p of ventas) {
+  for (const p of todasLasVentas) {
     const idx = serie.findIndex((d) => ts(p) >= d.inicio && ts(p) < d.inicio + DIA)
     if (idx >= 0) {
       serie[idx].total += p.total
@@ -66,15 +126,25 @@ export function calcularResumen(pedidos: PedidoAdmin[], dias = 14): AdminResumen
     }
   }
 
-  const suma = (desde: number, hasta: number) =>
-    ventas.filter((p) => ts(p) >= desde && ts(p) < hasta).reduce((a, p) => a + p.total, 0)
-  const ingresos7 = suma(hoy - 6 * DIA, hoy + DIA)
-  const ingresosPrev7 = suma(hoy - 13 * DIA, hoy - 6 * DIA)
+  let delta: number | null = null
+  if (rango.prevDesde !== null) {
+    const prev = todasLasVentas.filter((p) => ts(p) >= rango.prevDesde! && ts(p) < rango.desde).reduce((a, p) => a + p.total, 0)
+    delta = prev > 0 ? ((ingresos - prev) / prev) * 100 : null
+  }
 
   const prod = new Map<string, { nombre: string; marca: string; unidades: number; ingresos: number }>()
   const marcas = new Map<string, { marca: string; unidades: number; ingresos: number }>()
+  let pares = 0
+  let paresConCosto = 0
+  let costoVendido = 0
   for (const p of ventas) {
     for (const it of p.items) {
+      pares += it.cantidad
+      const c = costos[it.producto_id]
+      if (c > 0) {
+        paresConCosto += it.cantidad
+        costoVendido += c * it.cantidad
+      }
       const a = prod.get(it.nombre) ?? { nombre: it.nombre, marca: it.marca, unidades: 0, ingresos: 0 }
       a.unidades += it.cantidad
       a.ingresos += it.cantidad * it.precio_unit
@@ -96,16 +166,27 @@ export function calcularResumen(pedidos: PedidoAdmin[], dias = 14): AdminResumen
     met.set(p.metodo_pago, m)
   }
 
+  const gastos = caja
+    .filter((m) => m.tipo === 'gasto' && !NO_OPERATIVOS.includes(m.categoria) && enRango(m.fecha, rango.desde, rango.hasta))
+    .reduce((a, m) => a + m.monto, 0)
+  const cobertura = pares ? paresConCosto / pares : 0
+  const gananciaBruta = paresConCosto > 0 ? ingresos - costoVendido : null
+
   return {
+    rango,
     ingresos,
     ventas: ventas.length,
+    pares,
     ticket: ventas.length ? ingresos / ventas.length : 0,
     porCobrar: pedidos.filter((p) => p.estado === 'pendiente').reduce((a, p) => a + p.total, 0),
     pendientes: pedidos.filter((p) => p.estado === 'pendiente').length,
     porEnviar: pedidos.filter((p) => p.estado === 'pagado').length,
-    ingresos7,
-    ingresosPrev7,
-    delta: ingresosPrev7 > 0 ? ((ingresos7 - ingresosPrev7) / ingresosPrev7) * 100 : null,
+    delta,
+    costoVendido,
+    cobertura,
+    gananciaBruta,
+    gastos,
+    gananciaNeta: gananciaBruta === null ? null : gananciaBruta - gastos,
     serie,
     porEstado: [...ESTADOS, ...new Set(pedidos.map((p) => p.estado).filter((e) => !ESTADOS.includes(e as never)))].map((estado) => ({
       estado,
@@ -175,7 +256,7 @@ export function alertasDeStock(productos: Producto[]): AlertaStock[] {
 }
 
 export const metodoLabel = (m: string) =>
-  ({ mercadopago: 'Mercado Pago', transferencia: 'Transferencia', whatsapp: 'WhatsApp' })[m] ?? m
+  ({ mercadopago: 'Mercado Pago', transferencia: 'Transferencia', whatsapp: 'A coordinar', efectivo: 'Efectivo', tarjeta: 'Tarjeta' })[m] ?? m
 
 /** Descarga un CSV (con BOM para que Excel lo abra bien con tildes). */
 export function descargarCSV(nombre: string, filas: (string | number)[][]) {
