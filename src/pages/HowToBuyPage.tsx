@@ -88,7 +88,7 @@ export default function HowToBuyPage() {
             <li key={p.title}>
               <Reveal delay={i * 0.07} className="h-full">
                 <div className="surface relative h-full overflow-hidden p-6 pt-7">
-                  <span aria-hidden="true" className="display-hero absolute -right-1 -top-3 select-none !text-[5.5rem] text-ink/[0.06]">
+                  <span aria-hidden="true" className="display-hero absolute right-5 top-4 select-none !text-[3.75rem] !leading-none text-accent/25 [:root[data-theme=oscuro]_&]:text-accent/45">
                     {i + 1}
                   </span>
                   <span className="grid size-12 place-items-center rounded-xl bg-accent text-on-accent">
