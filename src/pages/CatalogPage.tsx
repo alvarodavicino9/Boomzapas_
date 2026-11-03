@@ -5,11 +5,11 @@ import { Icon } from '@/components/ui/Icon'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
 import { CatalogFilters } from '@/components/catalog/CatalogFilters'
 import { ProductGrid } from '@/components/catalog/ProductGrid'
+import { OrdenMenu } from '@/components/catalog/OrdenMenu'
 import { useProductos } from '@/context/ProductsContext'
 import { CATEGORIAS, SITE } from '@/config/site'
 import {
   NUEVOS_RECIENTES,
-  ORDENES,
   PRICE_RANGES,
   hasStock,
   hasTalle,
@@ -19,7 +19,7 @@ import {
   type FilterState,
   type Orden,
 } from '@/lib/filters'
-import { cn, formatARS } from '@/lib/format'
+import { formatARS } from '@/lib/format'
 import type { FiltroCategoria } from '@/types'
 
 const isCategoria = (v: string | null): v is FiltroCategoria => CATEGORIAS.some((c) => c.id === v)
@@ -177,19 +177,8 @@ export default function CatalogPage() {
     />
   )
 
-  const ordenSelect = (className?: string) => (
-    <select
-      value={orden}
-      onChange={(e) => setMany({ orden: e.target.value })}
-      className={cn('field-line !w-auto !py-2.5 !text-[12px]', className)}
-      aria-label="Ordenar por"
-    >
-      {ORDENES.map((o) => (
-        <option key={o.id} value={o.id}>
-          {o.label}
-        </option>
-      ))}
-    </select>
+  const ordenSelect = (ancho?: boolean) => (
+    <OrdenMenu value={orden} onChange={(o) => setMany({ orden: o })} ancho={ancho} />
   )
 
   return (
@@ -203,44 +192,6 @@ export default function CatalogPage() {
           Fotos reales de cada par · envío gratis a todo el país · {formatARS(SITE.transferDiscount)} menos por par con transferencia.
         </p>
         {/* categorías rápidas: se deslizan en el celular */}
-        <div className="-mx-1 mt-5 flex gap-2 overflow-x-auto px-1 pb-1 [scrollbar-width:none]" role="group" aria-label="Categorías">
-          {CATEGORIAS.map((c) => {
-            const on = state.categoria === c.id
-            return (
-              <button
-                key={c.id}
-                type="button"
-                aria-pressed={on}
-                onClick={() => patch({ categoria: c.id })}
-                className={cn(
-                  'flex h-10 shrink-0 items-center gap-2 rounded-full border px-4 text-[13px] font-semibold transition-colors',
-                  on ? 'border-accent bg-accent text-on-accent' : 'border-line bg-gallery text-ink hover:border-ink',
-                )}
-              >
-                {c.label}
-                <span className={cn('text-[12px] font-medium', on ? 'text-on-accent' : 'text-index')}>{counts[c.id] ?? 0}</span>
-              </button>
-            )
-          })}
-          <span aria-hidden="true" className="mx-1 w-px shrink-0 self-stretch bg-line" />
-          {marcas.map((m) => {
-            const on = state.marcas.includes(m.nombre)
-            return (
-              <button
-                key={m.nombre}
-                type="button"
-                aria-pressed={on}
-                onClick={() => patch({ marcas: on ? state.marcas.filter((x) => x !== m.nombre) : [...state.marcas, m.nombre] })}
-                className={cn(
-                  'h-10 shrink-0 rounded-full border px-4 text-[13px] font-semibold transition-colors',
-                  on ? 'border-ink bg-ink text-gallery' : 'border-line bg-gallery text-ink hover:border-ink',
-                )}
-              >
-                {m.nombre}
-              </button>
-            )
-          })}
-        </div>
       </header>
 
       {/* barra fija del celular: filtros y orden siempre a mano */}
@@ -257,7 +208,7 @@ export default function CatalogPage() {
             <span className="grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1.5 text-[11px] font-bold text-on-accent">{activeCount}</span>
           )}
         </button>
-        {ordenSelect('!h-11 flex-1 !rounded-full !text-[13px] !font-semibold')}
+        {ordenSelect(true)}
       </div>
 
       <div className="page-x grid gap-8 pb-10 pt-5 sm:pt-8 lg:grid-cols-[290px_1fr] lg:gap-12 lg:pt-10">
@@ -279,10 +230,7 @@ export default function CatalogPage() {
               )}
             </p>
             <div className="flex items-center gap-3">
-              <label className="hidden items-center gap-3 lg:flex">
-                <span className="label text-index">Ordenar</span>
-                {ordenSelect()}
-              </label>
+              <div className="hidden lg:block">{ordenSelect()}</div>
             </div>
           </div>
 
