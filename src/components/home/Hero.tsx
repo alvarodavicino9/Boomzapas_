@@ -128,67 +128,35 @@ export function Hero() {
           <span aria-hidden="true" className="pointer-events-none absolute inset-0 rounded-[inherit] ring-1 ring-inset ring-black/10" />
         </div>
 
-        {/* controles debajo del banner: así no tapan el diseño */}
-        <div className="mt-3 flex items-center gap-3 sm:mt-4 sm:gap-4">
-          <div className="flex flex-1 gap-2 sm:gap-3" role="group" aria-label="Elegir banner">
-            {SLIDES.map((s, i) => {
-              const active = i === index
-              return (
-                <button
-                  key={s.src}
-                  type="button"
-                  onClick={() => setIndex(i)}
-                  aria-label={`Banner ${i + 1} de ${SLIDES.length}: ${s.tag}`}
-                  aria-current={active}
-                  className="group/dot flex min-h-8 flex-1 flex-col justify-center gap-1.5 text-left"
-                >
-                  <span
-                    className={cn(
-                      'hidden text-[11px] font-semibold uppercase tracking-[0.12em] transition-colors sm:block',
-                      active ? 'text-ink' : 'text-index group-hover/dot:text-ink',
-                    )}
-                  >
-                    {s.tag}
-                  </span>
-                  <span className="block h-[3px] overflow-hidden rounded-full bg-line">
-                    {active && (
-                      <span
-                        key={`${index}-${playing}`}
-                        className={cn('block h-full rounded-full bg-accent', playing ? 'bz-progreso' : 'w-full')}
-                        style={playing ? { animationDuration: `${INTERVAL_MS}ms`, animationPlayState: hover ? 'paused' : 'running' } : undefined}
-                      />
-                    )}
-                  </span>
-                </button>
-              )
-            })}
+        {/* puntos debajo del banner: así no tapan el diseño */}
+        <div className="mt-3 flex items-center justify-center gap-2 sm:mt-4">
+          <div className="flex items-center" role="group" aria-label="Elegir banner">
+            {SLIDES.map((s, i) => (
+              <button
+                key={s.src}
+                type="button"
+                onClick={() => setIndex(i)}
+                aria-label={`Banner ${i + 1} de ${SLIDES.length}: ${s.tag}`}
+                aria-current={i === index}
+                className="group/dot grid h-8 min-w-6 place-items-center px-1"
+              >
+                <span
+                  className={cn(
+                    'block h-1.5 rounded-full transition-all duration-300',
+                    i === index ? 'w-7 bg-accent' : 'w-1.5 bg-control group-hover/dot:bg-index',
+                  )}
+                />
+              </button>
+            ))}
           </div>
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setPlaying((p) => !p)}
-              aria-label={playing ? 'Pausar el carrusel' : 'Reanudar el carrusel'}
-              className="grid size-9 place-items-center rounded-full border border-line text-index transition-colors hover:border-control hover:text-ink"
-            >
-              <Icon name={playing ? 'pause' : 'play'} size={14} />
-            </button>
-            <button
-              type="button"
-              onClick={() => go(-1)}
-              aria-label="Banner anterior"
-              className="hidden size-9 place-items-center rounded-full border border-line text-ink transition-colors hover:border-accent hover:bg-accent hover:text-on-accent sm:grid"
-            >
-              <Icon name="arrow" size={16} className="rotate-180" />
-            </button>
-            <button
-              type="button"
-              onClick={() => go(1)}
-              aria-label="Banner siguiente"
-              className="hidden size-9 place-items-center rounded-full border border-line text-ink transition-colors hover:border-accent hover:bg-accent hover:text-on-accent sm:grid"
-            >
-              <Icon name="arrow" size={16} />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => setPlaying((p) => !p)}
+            aria-label={playing ? 'Pausar el carrusel' : 'Reanudar el carrusel'}
+            className="grid size-8 place-items-center rounded-full text-index transition-colors hover:text-ink"
+          >
+            <Icon name={playing ? 'pause' : 'play'} size={12} />
+          </button>
         </div>
       </div>
     </section>

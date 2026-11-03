@@ -80,17 +80,6 @@ export function ProductCard({ producto, onOpen, eager }: ProductCardProps) {
             </span>
           )}
 
-          {/* talles disponibles: sólo en la compu, al pasar el mouse */}
-          {!soldOut && talles.length > 0 && (
-            <div className="pointer-events-none absolute inset-x-2 bottom-2 hidden translate-y-2 flex-wrap gap-1 rounded-xl bg-black/70 p-2 opacity-0 backdrop-blur-sm transition-all duration-200 group-hover:translate-y-0 group-hover:opacity-100 lg:flex">
-              <span className="w-full text-[10px] font-semibold uppercase tracking-[0.1em] text-white/70">Talles</span>
-              {talles.map((t) => (
-                <span key={t} className="grid h-6 min-w-6 place-items-center rounded-md bg-white/15 px-1 text-[11px] font-semibold text-white">
-                  {t}
-                </span>
-              ))}
-            </div>
-          )}
         </div>
 
         <div className="flex flex-1 flex-col p-3 sm:p-4">
