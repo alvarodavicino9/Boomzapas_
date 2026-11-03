@@ -117,7 +117,7 @@ export function ProductGrid({
           </div>
           {faltan > 0 && (
             <Button variant="accent" className="mt-2 min-w-[240px]" onClick={() => setVisibles((v) => v + paginar)}>
-              Cargar más ({Math.min(faltan, paginar)}) <Icon name="chevron" size={17} />
+              Cargar más <Icon name="chevron" size={17} />
             </Button>
           )}
         </div>

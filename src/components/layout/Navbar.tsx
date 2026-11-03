@@ -72,7 +72,7 @@ export function Navbar() {
           >
             {/* el carrito "salta" cuando se suma un par */}
             <motion.span
-              key={agregado?.id ?? 0}
+              key={`salto-${agregado?.id ?? 0}`}
               initial={agregado && !reduced ? { scale: 1.45, rotate: -12 } : false}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', stiffness: 380, damping: 12 }}
@@ -82,7 +82,7 @@ export function Navbar() {
             </motion.span>
             {count > 0 && (
               <motion.span
-                key={count}
+                key={`n-${count}`}
                 initial={reduced ? false : { scale: 0.4 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 500, damping: 18 }}
