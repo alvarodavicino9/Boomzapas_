@@ -259,6 +259,7 @@ export default function CatalogPage() {
           <ProductGrid
             productos={filtered}
             status={status}
+            paginar={30}
             emptyMessage={
               productos.length === 0
                 ? 'El servidor no devolvió productos. Revisá que estén activos (activo = true) en la base de datos.'

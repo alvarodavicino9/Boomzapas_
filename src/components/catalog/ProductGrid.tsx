@@ -1,4 +1,6 @@
+import { useEffect, useState } from 'react'
 import { ProductCard } from './ProductCard'
+import { Icon } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
 import { useProductos } from '@/context/ProductsContext'
 import { useAbrirProducto } from '@/hooks/useAbrirProducto'
@@ -16,6 +18,8 @@ interface ProductGridProps {
   cols?: 3 | 4
   /** En el celular, una fila que se desliza con el dedo (para el inicio). */
   rail?: boolean
+  /** Cuántos pares mostrar de entrada; el resto aparece con "Cargar más" (de a la misma cantidad). */
+  paginar?: number
 }
 
 export function ProductGrid({
@@ -26,9 +30,13 @@ export function ProductGrid({
   onResetFilters,
   cols = 4,
   rail = false,
+  paginar,
 }: ProductGridProps) {
   const abrir = useAbrirProducto()
   const { error, reload } = useProductos()
+  const [visibles, setVisibles] = useState(paginar ?? Infinity)
+  // al cambiar los filtros o el orden se vuelve a empezar desde los primeros
+  useEffect(() => setVisibles(paginar ?? Infinity), [productos, paginar])
 
   const grid = cn(
     'grid grid-cols-2 gap-3 sm:gap-4 md:gap-5',
@@ -40,7 +48,7 @@ export function ProductGrid({
       <div className={grid} aria-busy="true">
         {Array.from({ length: skeletons }).map((_, i) => (
           <div key={i}>
-            <div className="skeleton aspect-square sm:aspect-[4/5]" />
+            <div className="skeleton aspect-[3/4] rounded-[18px]" />
             <div className="skeleton mt-3 h-3 w-1/3" />
             <div className="skeleton mt-2 h-4 w-2/3" />
             <div className="skeleton mt-3 h-4 w-1/2" />
@@ -88,12 +96,32 @@ export function ProductGrid({
     )
   }
 
+  const mostrados = productos.slice(0, visibles)
+  const faltan = productos.length - mostrados.length
+
   return (
-    <div className={grid}>
-      {productos.map((p, i) => (
-        // la primera fila se pide ya (es lo primero que se ve); el resto, a medida que se scrollea
-        <ProductCard key={p.id} producto={p} onOpen={abrir} eager={i < 4} />
-      ))}
-    </div>
+    <>
+      <div className={grid}>
+        {mostrados.map((p, i) => (
+          // la primera fila se pide ya (es lo primero que se ve); el resto, a medida que se scrollea
+          <ProductCard key={p.id} producto={p} onOpen={abrir} eager={i < 4} />
+        ))}
+      </div>
+      {paginar && productos.length > paginar && (
+        <div className="mt-8 flex flex-col items-center gap-3 sm:mt-10">
+          <p className="text-[13px] text-index">
+            Viendo <span className="font-semibold text-ink">{mostrados.length}</span> de {productos.length} modelos
+          </p>
+          <div className="h-1 w-48 overflow-hidden rounded-full bg-line">
+            <div className="h-full rounded-full bg-accent transition-[width] duration-500" style={{ width: `${(mostrados.length / productos.length) * 100}%` }} />
+          </div>
+          {faltan > 0 && (
+            <Button variant="accent" className="mt-2 min-w-[240px]" onClick={() => setVisibles((v) => v + paginar)}>
+              Cargar más ({Math.min(faltan, paginar)}) <Icon name="chevron" size={17} />
+            </Button>
+          )}
+        </div>
+      )}
+    </>
   )
 }

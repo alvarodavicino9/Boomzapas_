@@ -4,6 +4,7 @@ import { Navbar } from './Navbar'
 import { Footer } from './Footer'
 import { ScrollToTop } from './ScrollToTop'
 import { Toaster } from './Toaster'
+import { AvisoAgregado } from './AvisoAgregado'
 import { WhatsAppButton } from './WhatsAppButton'
 import { CartDrawer } from '@/components/cart/CartDrawer'
 import { CheckoutModal } from '@/components/checkout/CheckoutModal'
@@ -30,6 +31,7 @@ export function Layout() {
       <CheckoutModal />
       <WhatsAppButton />
       <Toaster />
+      <AvisoAgregado />
     </>
   )
 }

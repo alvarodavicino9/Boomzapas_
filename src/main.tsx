@@ -22,3 +22,12 @@ createRoot(document.getElementById('root')!).render(
     </BrowserRouter>
   </StrictMode>,
 )
+
+// App instalable: el service worker sólo en la versión publicada (en desarrollo molestaría con caché vieja)
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {
+      /* sin service worker la página funciona igual */
+    })
+  })
+}

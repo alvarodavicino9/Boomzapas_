@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Logo } from '@/components/ui/Logo'
 import { DockNav } from './DockNav'
 import { Buscador } from './Buscador'
+import { InstalarApp } from './InstalarApp'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { ModeIconButton, ModeSwitch } from '@/components/ui/ModeToggle'
 import { useCart } from '@/context/CartContext'
@@ -24,7 +25,7 @@ const MOBILE_LINKS: { to: string; label: string; icon: IconName }[] = [
 export function Navbar() {
   const [buscar, setBuscar] = useState(false)
   const { count } = useCart()
-  const { openCart, menuOpen, setMenuOpen } = useUI()
+  const { openCart, menuOpen, setMenuOpen, agregado } = useUI()
   const { pathname } = useLocation()
   const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
@@ -69,7 +70,16 @@ export function Navbar() {
             aria-label={`Abrir pedido, ${count} ${count === 1 ? 'producto' : 'productos'}`}
             className="relative grid size-10 place-items-center rounded-full border border-line text-ink transition-colors hover:border-accent hover:bg-accent hover:text-on-accent"
           >
-            <Icon name="bag" size={19} />
+            {/* el carrito "salta" cuando se suma un par */}
+            <motion.span
+              key={agregado?.id ?? 0}
+              initial={agregado && !reduced ? { scale: 1.45, rotate: -12 } : false}
+              animate={{ scale: 1, rotate: 0 }}
+              transition={{ type: 'spring', stiffness: 380, damping: 12 }}
+              className="grid place-items-center"
+            >
+              <Icon name="bag" size={19} />
+            </motion.span>
             {count > 0 && (
               <motion.span
                 key={count}
@@ -148,6 +158,7 @@ export function Navbar() {
                   </motion.li>
                 ))}
               </ul>
+              <InstalarApp className="mt-6" />
               <div className="mt-8 flex items-center justify-between gap-4">
                 <span className="label text-index">Modo</span>
                 <ModeSwitch />

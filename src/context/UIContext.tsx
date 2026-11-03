@@ -5,6 +5,16 @@ export interface Toast {
   message: string
 }
 
+/** Lo que se acaba de sumar al pedido (para el aviso "Agregado al pedido"). */
+export interface Agregado {
+  id: number
+  nombre: string
+  marca: string
+  imagen?: string
+  talle: string
+  precio: number
+}
+
 interface UIContextValue {
   /** Menú del celular (lo abren el botón del encabezado y la barra de abajo). */
   menuOpen: boolean
@@ -18,6 +28,9 @@ interface UIContextValue {
   closeCheckout: () => void
   toast: (message: string) => void
   dismissToast: (id: number) => void
+  agregado: Agregado | null
+  avisarAgregado: (a: Omit<Agregado, 'id'>) => void
+  cerrarAgregado: () => void
 }
 
 const UIContext = createContext<UIContextValue | null>(null)
@@ -29,6 +42,9 @@ export function UIProvider({ children }: { children: ReactNode }) {
   const [cartOpen, setCartOpen] = useState(false)
   const [checkoutOpen, setCheckoutOpen] = useState(false)
   const [toasts, setToasts] = useState<Toast[]>([])
+  const [agregado, setAgregado] = useState<Agregado | null>(null)
+  const avisarAgregado = useCallback((a: Omit<Agregado, 'id'>) => setAgregado({ ...a, id: ++toastId }), [])
+  const cerrarAgregado = useCallback(() => setAgregado(null), [])
 
   const dismissToast = useCallback((id: number) => setToasts((t) => t.filter((x) => x.id !== id)), [])
 
@@ -50,6 +66,7 @@ export function UIProvider({ children }: { children: ReactNode }) {
       toasts,
       openCart: () => {
         setMenuOpen(false)
+        setAgregado(null)
         setCartOpen(true)
       },
       closeCart: () => setCartOpen(false),
@@ -60,8 +77,11 @@ export function UIProvider({ children }: { children: ReactNode }) {
       closeCheckout: () => setCheckoutOpen(false),
       toast,
       dismissToast,
+      agregado,
+      avisarAgregado,
+      cerrarAgregado,
     }),
-    [menuOpen, cartOpen, checkoutOpen, toasts, toast, dismissToast],
+    [menuOpen, cartOpen, checkoutOpen, toasts, toast, dismissToast, agregado, avisarAgregado, cerrarAgregado],
   )
 
   return <UIContext.Provider value={value}>{children}</UIContext.Provider>

@@ -9,7 +9,8 @@ import { useSyncExternalStore } from 'react'
 export type Modo = 'oscuro' | 'claro'
 
 /** Color de la barra del navegador en el celular para cada modo. */
-export const COLOR_BARRA: Record<Modo, string> = { oscuro: '#070506', claro: '#faf8f7' }
+// el encabezado es oscuro en los dos modos: la barra del navegador del celular acompaña
+export const COLOR_BARRA: Record<Modo, string> = { oscuro: '#140b0c', claro: '#140b0c' }
 
 const EVENTO = 'bz-modo'
 

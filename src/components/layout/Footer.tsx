@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Logo } from '@/components/ui/Logo'
 import { Icon } from '@/components/ui/Icon'
 import { ModeSwitch } from '@/components/ui/ModeToggle'
+import { InstalarApp } from './InstalarApp'
 import { SITE } from '@/config/site'
 import { waLink, waLinkGeneric } from '@/lib/whatsapp'
 
@@ -113,9 +114,12 @@ export function Footer() {
 
         {/* ── Cierre: copyright, modo y volver arriba ─────────── */}
         <div className="flex flex-col-reverse gap-4 border-t border-line px-5 py-5 text-index sm:flex-row sm:items-center sm:justify-between sm:px-10">
-          <p className="label">
-            © {new Date().getFullYear()} {SITE.name} · {SITE.city}
-          </p>
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+            <p className="label">
+              © {new Date().getFullYear()} {SITE.name} · {SITE.city}
+            </p>
+            <InstalarApp compacto />
+          </div>
           <div className="flex flex-wrap items-center gap-3">
             <ModeSwitch />
             <button

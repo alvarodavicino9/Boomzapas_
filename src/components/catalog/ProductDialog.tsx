@@ -64,7 +64,7 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
   const topRef = useRef<HTMLDivElement>(null)
   const { add } = useCart()
   const { productos } = useProductos()
-  const { toast, openCart } = useUI()
+  const { toast, avisarAgregado } = useUI()
 
   // Con la ficha abierta, va bajando las otras vistas para que cambien al instante.
   useEffect(() => {
@@ -130,9 +130,8 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
       talle: selected.talle,
       max: selected.cantidad,
     })
-    toast(`${p.nombre} · Talle ${selected.talle} sumado al pedido`)
+    avisarAgregado({ nombre: p.nombre, marca: p.marca, imagen: p.imagenes[0], talle: selected.talle, precio: p.precio })
     onClose()
-    openCart()
   }
 
   const handleWhatsApp = () => {

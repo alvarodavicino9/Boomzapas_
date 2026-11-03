@@ -3,12 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#070506" />
+    <meta name="theme-color" content="#140b0c" />
     <script>
       // Modo claro u oscuro (se recuerda en este navegador; también ?modo=claro|oscuro).
       // Antes había temas de color: los guardados como "claro"/"verde" pasan a claro y el resto a oscuro.
       (function () {
-        var barra = { oscuro: '#070506', claro: '#faf8f7' };
+        var barra = { oscuro: '#140b0c', claro: '#140b0c' };
         var m = 'oscuro';
         try {
           var q = new URLSearchParams(location.search).get('modo');
@@ -35,7 +35,12 @@
       })();
     </script>
     <link rel="icon" type="image/png" sizes="32x32" href="/icon-32.png" />
-    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Boom Zapas" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
     <!-- SEO y vista previa al compartir. __SITE__ lo completa vite.config.ts con la dirección de la tienda.
          Cada zapatilla tiene además su propia página con su foto (ver paginasDeProducto en vite.config.ts). -->
