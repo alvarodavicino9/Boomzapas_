@@ -14,7 +14,7 @@ import {
   hasStock,
   hasTalle,
   isOrden,
-  normText,
+  coincideBusqueda,
   sortProductos,
   type FilterState,
   type Orden,
@@ -106,7 +106,7 @@ export default function CatalogPage() {
   }, [productos])
 
   const filtered = useMemo(() => {
-    const q = normText(query.trim())
+    const q = query.trim()
     const ranges = PRICE_RANGES.filter((r) => state.precios.includes(r.id))
     const min = state.pmin ? Number(state.pmin) : null
     const max = state.pmax ? Number(state.pmax) : null
@@ -120,7 +120,7 @@ export default function CatalogPage() {
         (max === null || p.precio <= max) &&
         (!state.stock || hasStock(p)) &&
         (!state.nuevos || p.nuevo || p.id >= nuevoDesde) &&
-        (!q || normText(`${p.nombre} ${p.marca}`).includes(q)),
+        coincideBusqueda(p, q),
     )
     return sortProductos(out, orden)
     // eslint-disable-next-line react-hooks/exhaustive-deps

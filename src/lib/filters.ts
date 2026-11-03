@@ -26,6 +26,17 @@ export const isOrden = (v: string | null): v is Orden => ORDENES.some((o) => o.i
 
 export const normText = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
 
+/**
+ * ¿La zapatilla coincide con lo que se buscó? Cada palabra tiene que aparecer en el nombre,
+ * la marca o la categoría, en cualquier orden ("samba negra" encuentra "Adidas Samba Negras Clásicas").
+ */
+export const coincideBusqueda = (p: Producto, q: string) => {
+  const palabras = normText(q).split(/\s+/).filter(Boolean)
+  if (palabras.length === 0) return true
+  const texto = normText(`${p.nombre} ${p.marca} ${p.categoria}`)
+  return palabras.every((w) => texto.includes(w) || (w.length > 3 && texto.includes(w.replace(/s$/, ''))))
+}
+
 /** ¿Hay stock en ese talle? Si el producto no trae stock cargado se asume que sí. */
 export const hasTalle = (p: Producto, talle: string) =>
   p.stock.length === 0 || p.stock.some((s) => s.talle === talle && s.cantidad > 0)

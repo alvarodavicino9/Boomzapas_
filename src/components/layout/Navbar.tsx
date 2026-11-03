@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Logo } from '@/components/ui/Logo'
 import { DockNav } from './DockNav'
+import { Buscador } from './Buscador'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { ModeIconButton, ModeSwitch } from '@/components/ui/ModeToggle'
 import { useCart } from '@/context/CartContext'
@@ -21,45 +22,22 @@ const MOBILE_LINKS: { to: string; label: string; icon: IconName }[] = [
 ]
 
 export function Navbar() {
-  const [q, setQ] = useState('')
+  const [buscar, setBuscar] = useState(false)
   const { count } = useCart()
   const { openCart, menuOpen, setMenuOpen } = useUI()
   const { pathname } = useLocation()
-  const navigate = useNavigate()
   const reduced = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-  useEffect(() => setMenuOpen(false), [pathname, setMenuOpen])
-
-  const search = (e: React.FormEvent) => {
-    e.preventDefault()
-    const term = q.trim()
-    navigate(term ? `/catalogo?q=${encodeURIComponent(term)}` : '/catalogo')
-    setQ('')
+  useEffect(() => {
     setMenuOpen(false)
-  }
-
-  const searchField = (id: string, className?: string) => (
-    <form onSubmit={search} role="search" className={cn('relative', className)}>
-      <label htmlFor={id} className="sr-only">
-        Buscar modelo o marca
-      </label>
-      <input
-        id={id}
-        type="search"
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder="Buscar modelo o marca"
-        autoComplete="off"
-        className="field-line !rounded-full !py-2.5 !pl-4 !pr-10"
-      />
-      <button type="submit" aria-label="Buscar" className="absolute right-3 top-1/2 -translate-y-1/2 text-index hover:text-ink">
-        <Icon name="search" size={16} />
-      </button>
-    </form>
-  )
+    setBuscar(false)
+  }, [pathname, setMenuOpen])
 
   return (
-    <header className="fixed inset-x-0 top-0 z-[300] border-b border-line bg-[color-mix(in_srgb,var(--bz-card)_88%,transparent)] backdrop-blur-xl">
+    <header className="fixed inset-x-0 top-0 z-[300] border-b border-line">
+      {/* fondo con desenfoque en una capa aparte: si el desenfoque estuviera en el header,
+          el menú del celular (que es fixed) quedaría atrapado adentro y no se vería */}
+      <span aria-hidden="true" className="absolute inset-0 -z-10 bg-[color-mix(in_srgb,var(--bz-card)_88%,transparent)] backdrop-blur-xl" />
       {/* filo rojo abajo del encabezado, como las líneas del logo */}
       <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-[linear-gradient(90deg,transparent,rgb(217_44_55/0.7)_30%,rgb(217_44_55/0.7)_70%,transparent)]" />
       <div className="page-x grid h-[84px] grid-cols-[1fr_auto_1fr] items-center gap-4">
@@ -76,7 +54,17 @@ export function Navbar() {
         <DockNav />
 
         <div className="col-start-3 flex items-center justify-end gap-3">
-          {searchField('nav-search', 'hidden w-44 xl:block xl:w-56')}
+          <Buscador id="nav-search" variante="barra" className="hidden w-56 xl:block 2xl:w-64" />
+          {/* en pantallas medianas el buscador se abre desde una lupa */}
+          <button
+            type="button"
+            onClick={() => setBuscar((b) => !b)}
+            aria-expanded={buscar}
+            aria-label={buscar ? 'Cerrar buscador' : 'Buscar'}
+            className="hidden size-10 place-items-center rounded-full border border-line text-ink transition-colors hover:border-control lg:grid xl:hidden"
+          >
+            <Icon name={buscar ? 'x' : 'search'} size={18} />
+          </button>
           <ModeIconButton className="max-sm:hidden" />
           <button
             onClick={openCart}
@@ -118,6 +106,12 @@ export function Navbar() {
         </div>
       </div>
 
+      {buscar && (
+        <div className="page-x absolute inset-x-0 top-full hidden justify-end pt-3 lg:flex xl:hidden">
+          <Buscador id="nav-search-md" variante="barra" className="w-[420px]" autoFocus onElegir={() => setBuscar(false)} />
+        </div>
+      )}
+
       <AnimatePresence>
         {menuOpen && (
           <motion.div
@@ -129,7 +123,7 @@ export function Navbar() {
             className="fixed inset-x-0 bottom-0 top-[var(--header-h)] overflow-y-auto bg-gallery lg:hidden"
           >
             <div className="page-x pb-10 pt-6">
-              {searchField('menu-search')}
+              <Buscador id="menu-search" variante="menu" onElegir={() => setMenuOpen(false)} />
               <ul className="mt-5 grid grid-cols-2 gap-2.5">
                 {MOBILE_LINKS.map((l, i) => (
                   <motion.li
