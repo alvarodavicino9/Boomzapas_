@@ -17,11 +17,14 @@ interface CatalogFiltersProps {
   activeCount: number
 }
 
-/** Grupo plegable de filtros: título, contador de elegidos y flecha. */
-function Group({ id, title, badge = 0, defaultOpen = true, children }: { id: string; title: string; badge?: number; defaultOpen?: boolean; children: ReactNode }) {
+/**
+ * Grupo plegable de filtros: título, contador de elegidos y flecha.
+ * Arranca cerrado (así el panel es corto) salvo que ya tenga un filtro elegido.
+ */
+function Group({ id, title, badge = 0, defaultOpen, children }: { id: string; title: string; badge?: number; defaultOpen?: boolean; children: ReactNode }) {
   return (
-    <details className="group border-b border-line py-5 first:pt-0 last:border-b-0 last:pb-0" open={defaultOpen}>
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 [&::-webkit-details-marker]:hidden">
+    <details className="group border-b border-line py-1 last:border-b-0" open={defaultOpen ?? badge > 0}>
+      <summary className="-mx-2 flex cursor-pointer list-none items-center justify-between gap-3 rounded-lg px-2 py-3.5 transition-colors hover:bg-ink/[0.04] [&::-webkit-details-marker]:hidden">
         <h2 id={id} className="label flex items-center gap-2.5 text-ink">
           {title}
           {badge > 0 && (
@@ -30,9 +33,9 @@ function Group({ id, title, badge = 0, defaultOpen = true, children }: { id: str
             </span>
           )}
         </h2>
-        <Icon name="plus" size={16} className="text-index transition-transform duration-200 group-open:rotate-45" />
+        <Icon name="chevron" size={16} className="text-index transition-transform duration-200 group-open:rotate-180" />
       </summary>
-      <div className="pt-4">{children}</div>
+      <div className="pb-4 pt-1">{children}</div>
     </details>
   )
 }
@@ -62,7 +65,7 @@ export function CatalogFilters({ value, onChange, query, onQuery, counts, marcas
 
   return (
     <div className="surface p-5 sm:p-6 lg:max-h-[calc(100svh-var(--header-h)-56px)] lg:overflow-y-auto">
-      <div className="mb-5 flex items-center justify-between gap-3 border-b border-line pb-4">
+      <div className="mb-1 flex items-center justify-between gap-3 border-b border-line pb-4">
         <p className="display-product !text-[1.1rem]">Filtros</p>
         {activeCount > 0 ? (
           <button onClick={onReset} className="label link-u text-accent">
@@ -74,7 +77,7 @@ export function CatalogFilters({ value, onChange, query, onQuery, counts, marcas
       </div>
 
       <div>
-        <Group id="f-buscar" title="Buscar">
+        <Group id="f-buscar" title="Buscar" badge={query.trim() ? 1 : 0}>
           <label htmlFor="f-q" className="sr-only">
             Buscar modelo o marca
           </label>
@@ -121,7 +124,7 @@ export function CatalogFilters({ value, onChange, query, onQuery, counts, marcas
 
         {marcas.length > 1 && (
           <Group id="f-marca" title="Marca" badge={value.marcas.length}>
-            <ul className="max-h-60 space-y-1 overflow-y-auto pr-1">
+            <ul className="space-y-1">
               {marcas.map((m) => (
                 <li key={m.nombre}>
                   <label className="label flex cursor-pointer items-center justify-between gap-3 rounded-lg px-3 py-2.5 hover:bg-ink/[0.06]">

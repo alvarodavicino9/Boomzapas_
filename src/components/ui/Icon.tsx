@@ -46,6 +46,7 @@ const PATHS = {
   alert: ['M12 4l9.5 16h-19L12 4z', 'M12 10v4', 'M12 17.5v.01'],
   receipt: ['M6 3h12v18l-3-2-3 2-3-2-3 2V3z', 'M9 8h6', 'M9 12h6'],
   external: ['M14 4h6v6', 'M20 4l-9 9', 'M18 14v6H4V6h6'],
+  chevron: ['M6 9l6 6 6-6'],
   pause: ['M9 5v14', 'M15 5v14'],
   play: ['M8 5.5v13l10-6.5-10-6.5z'],
   sparkle: ['M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3z'],
