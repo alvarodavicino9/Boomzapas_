@@ -18,6 +18,19 @@ import { waLink } from '@/lib/whatsapp'
 import { rutaProducto } from '@/lib/slug'
 import type { Producto } from '@/types'
 
+/** true en pantallas de compu (desde 1024 px): ahí la foto se amplía con el mouse en vez de deslizarse. */
+function useEsCompu() {
+  const q = '(min-width: 1024px)'
+  const [es, setEs] = useState(() => typeof window !== 'undefined' && window.matchMedia(q).matches)
+  useEffect(() => {
+    const m = window.matchMedia(q)
+    const f = () => setEs(m.matches)
+    m.addEventListener('change', f)
+    return () => m.removeEventListener('change', f)
+  }, [])
+  return es
+}
+
 interface ProductDialogProps {
   producto: Producto | null
   onClose: () => void
@@ -42,6 +55,8 @@ const GARANTIAS: { icon: IconName; title: string; text: string }[] = [
 export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProps) {
   const [talle, setTalle] = useState<string | null>(null)
   const [photo, setPhoto] = useState(0)
+  const carril = useRef<HTMLDivElement>(null)
+  const esCompu = useEsCompu()
   const [showError, setShowError] = useState(false)
   const [tab, setTab] = useState<Tab>('descripcion')
   const [origin, setOrigin] = useState<string | null>(null)
@@ -65,6 +80,7 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
       setShown(producto)
       setTalle(null)
       setPhoto(0)
+      carril.current?.scrollTo({ left: 0 })
       setShowError(false)
       setTab('descripcion')
     } else {
@@ -163,23 +179,55 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
       <div ref={topRef} />
       <div className="grid lg:grid-cols-[1.05fr_1fr]">
         {/* Galería */}
-        <div className="bg-stage lg:sticky lg:top-0 lg:self-start">
+        <div className="foto-estudio lg:sticky lg:top-0 lg:self-start">
           <div
             className="group relative overflow-hidden"
             onMouseMove={(e) => {
+              if (!esCompu) return
               const r = e.currentTarget.getBoundingClientRect()
               setOrigin(`${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`)
             }}
             onMouseLeave={() => setOrigin(null)}
             style={{ '--zo': origin ?? '50% 50%' } as React.CSSProperties}
           >
-            <ProductImage
-              src={p.imagenes[photo]}
-              alt={p.nombre}
-              sizes={SIZES.ficha}
-              className="aspect-[4/3] size-full transition-transform duration-300 ease-out md:aspect-square lg:aspect-[4/5] [transform-origin:var(--zo)] lg:group-hover:scale-[1.8] motion-reduce:transition-none"
-              eager
-            />
+            {esCompu ? (
+              <ProductImage
+                src={p.imagenes[photo]}
+                alt={p.nombre}
+                sizes={SIZES.ficha}
+                className="aspect-[3/4] size-full !bg-transparent !object-contain transition-transform duration-300 ease-out [transform-origin:var(--zo)] group-hover:scale-[1.8] motion-reduce:transition-none"
+                eager
+              />
+            ) : (
+              // celular: las fotos completas, grandes, y se pasan deslizando
+              <div
+                ref={carril}
+                onScroll={(e) => {
+                  const el = e.currentTarget
+                  setPhoto(Math.round(el.scrollLeft / Math.max(1, el.clientWidth)))
+                }}
+                className="flex aspect-[3/4] max-h-[70dvh] w-full snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              >
+                {p.imagenes.map((src, i) => (
+                  <div key={src.slice(-48) + i} className="size-full shrink-0 snap-center">
+                    <ProductImage
+                      src={src}
+                      alt={i === 0 ? p.nombre : `${p.nombre}, foto ${i + 1}`}
+                      sizes="100vw"
+                      eager={i === 0}
+                      className="size-full !bg-transparent !object-contain"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
+            {!esCompu && p.imagenes.length > 1 && (
+              <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-4 flex justify-center gap-1.5">
+                {p.imagenes.map((_, i) => (
+                  <span key={i} className={cn('h-1.5 rounded-full transition-all duration-300', i === photo ? 'w-5 bg-black/75' : 'w-1.5 bg-black/25')} />
+                ))}
+              </span>
+            )}
             {status && (
               <span className="label absolute left-4 top-4 rounded-full bg-accent px-3.5 py-1.5 text-[10px] font-bold text-on-accent">
                 {status}
@@ -198,11 +246,15 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
             </span>
           </div>
           {p.imagenes.length > 1 && (
-            <ul className="flex gap-px overflow-x-auto bg-line">
+            <ul className="hidden gap-px overflow-x-auto bg-line lg:flex">
               {p.imagenes.map((src, i) => (
                 <li key={src.slice(-40) + i} className="shrink-0">
                   <button
-                    onClick={() => setPhoto(i)}
+                    onClick={() => {
+                      setPhoto(i)
+                      const el = carril.current
+                      if (el) el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' })
+                    }}
                     aria-label={`Ver foto ${i + 1}`}
                     aria-current={i === photo}
                     className={cn('block size-20 bg-stage', i === photo ? 'opacity-100' : 'opacity-50 hover:opacity-100')}

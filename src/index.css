@@ -516,3 +516,6 @@ html { scrollbar-color: var(--bz-control) var(--bz-gallery); }
 /* barra de progreso de cada banner de la portada */
 @keyframes bz-progreso { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 .bz-progreso { transform-origin: left; animation: bz-progreso linear forwards; }
+
+/* fondo de las fotos de estudio (mismo degradé gris que las fotos): la zapatilla se ve entera sin cortes */
+.foto-estudio { background: linear-gradient(180deg, #f8f8f8 0%, #e7e7e7 50%, #cdcdcd 100%); }
