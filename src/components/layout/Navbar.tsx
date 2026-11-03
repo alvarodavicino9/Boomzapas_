@@ -1,26 +1,16 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, useLocation } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { Link, useLocation } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import { Logo } from '@/components/ui/Logo'
 import { DockNav } from './DockNav'
 import { Buscador } from './Buscador'
-import { InstalarApp } from './InstalarApp'
-import { Icon, type IconName } from '@/components/ui/Icon'
-import { ModeIconButton, ModeSwitch } from '@/components/ui/ModeToggle'
+import { MenuMovil } from './MenuMovil'
+import { Icon } from '@/components/ui/Icon'
+import { ModeIconButton } from '@/components/ui/ModeToggle'
 import { useCart } from '@/context/CartContext'
 import { useUI } from '@/context/UIContext'
 import { cn } from '@/lib/format'
 
-const MOBILE_LINKS: { to: string; label: string; icon: IconName }[] = [
-  { to: '/', label: 'Inicio', icon: 'home' },
-  { to: '/catalogo', label: 'Catálogo', icon: 'grid' },
-  { to: '/envios', label: 'Envíos', icon: 'truck' },
-  { to: '/pagos', label: 'Pagos', icon: 'card' },
-  { to: '/como-comprar', label: 'Cómo comprar', icon: 'receipt' },
-  { to: '/guia-de-talles', label: 'Tabla de talles', icon: 'tag' },
-  { to: '/nosotros', label: 'Quiénes somos', icon: 'users' },
-  { to: '/contacto', label: 'Contacto', icon: 'chat' },
-]
 
 export function Navbar() {
   const [buscar, setBuscar] = useState(false)
@@ -35,6 +25,7 @@ export function Navbar() {
   }, [pathname, setMenuOpen])
 
   return (
+    <>
     <header className="on-bar fixed inset-x-0 top-0 z-[300] border-b border-white/10 !shadow-[0_10px_30px_-18px_rgb(0_0_0/0.8)]">
       {/* encabezado con los colores del logo (negro y granate) en los dos modos */}
       {/* filo rojo abajo del encabezado, como las líneas del logo */}
@@ -120,53 +111,8 @@ export function Navbar() {
         </div>
       )}
 
-      <AnimatePresence>
-        {menuOpen && (
-          <motion.div
-            id="menu-movil"
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.18 }}
-            className="fixed inset-x-0 bottom-0 top-[var(--header-h)] overflow-y-auto bg-gallery lg:hidden"
-          >
-            <div className="page-x pb-10 pt-6">
-              <Buscador id="menu-search" variante="menu" onElegir={() => setMenuOpen(false)} />
-              <ul className="mt-5 grid grid-cols-2 gap-2.5">
-                {MOBILE_LINKS.map((l, i) => (
-                  <motion.li
-                    key={l.to}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.03 * i, duration: 0.2 }}
-                  >
-                    <NavLink
-                      to={l.to}
-                      end={l.to === '/'}
-                      className={({ isActive }) =>
-                        cn(
-                          'flex h-full flex-col gap-3 rounded-2xl border p-4 text-[15px] font-semibold transition-colors',
-                          isActive ? 'border-accent bg-accent/10 text-[color:var(--bz-accent-text)]' : 'border-line bg-card hover:border-control',
-                        )
-                      }
-                    >
-                      <span className="grid size-9 place-items-center rounded-xl bg-stage text-ink">
-                        <Icon name={l.icon} size={19} />
-                      </span>
-                      {l.label}
-                    </NavLink>
-                  </motion.li>
-                ))}
-              </ul>
-              <InstalarApp className="mt-6" />
-              <div className="mt-8 flex items-center justify-between gap-4">
-                <span className="label text-index">Modo</span>
-                <ModeSwitch />
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </header>
+    <MenuMovil />
+    </>
   )
 }

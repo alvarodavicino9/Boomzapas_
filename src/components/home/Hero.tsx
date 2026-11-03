@@ -69,7 +69,7 @@ export function Hero() {
 
   return (
     <section
-      className="page-x pt-4 sm:pt-6"
+      className="page-x pt-3 max-sm:!px-2.5 sm:pt-6"
       aria-roledescription="carrusel"
       aria-label="Portada"
       onMouseEnter={() => setHover(true)}
@@ -92,7 +92,7 @@ export function Hero() {
           className="pointer-events-none absolute -inset-x-6 -bottom-10 top-10 -z-10 rounded-[40px] opacity-70"
           style={{ background: 'radial-gradient(60% 70% at 50% 60%, rgb(var(--bz-glow) / 0.55), transparent 75%)' }}
         />
-        <div className="relative overflow-hidden rounded-[22px] bg-[#e9e9e7] shadow-[0_30px_70px_-40px_rgb(0_0_0/0.9)] ring-1 ring-white/10 sm:rounded-[28px]">
+        <div className="relative overflow-hidden rounded-[16px] bg-[#e9e9e7] shadow-[0_30px_70px_-40px_rgb(0_0_0/0.9)] ring-1 ring-white/10 sm:rounded-[28px]">
           <div className="grid">
             {SLIDES.map((s, i) => {
               const active = i === index
@@ -117,7 +117,7 @@ export function Hero() {
                     loading={i === 0 ? 'eager' : 'lazy'}
                     {...(i === 0 ? { fetchpriority: 'high' } : {})}
                     decoding="async"
-                    className="block aspect-[16/10] w-full object-cover sm:aspect-[2048/768]"
+                    className="block aspect-[2048/768] w-full object-cover"
                     style={{ objectPosition: s.focoCelular }}
                   />
                 </Link>

@@ -519,3 +519,6 @@ html { scrollbar-color: var(--bz-control) var(--bz-gallery); }
 
 /* fondo de las fotos de estudio (mismo degradé gris que las fotos): la zapatilla se ve entera sin cortes */
 .foto-estudio { background: linear-gradient(180deg, #f8f8f8 0%, #e7e7e7 50%, #cdcdcd 100%); }
+
+/* nada puede ensanchar la página hacia los costados (en el celular se correría la pantalla) */
+html, body { overflow-x: clip; }
