@@ -59,13 +59,16 @@ export function Navbar() {
   )
 
   return (
-    <header className="fixed inset-x-0 top-0 z-[300] border-b border-line bg-card">
+    <header className="fixed inset-x-0 top-0 z-[300] border-b border-line bg-[color-mix(in_srgb,var(--bz-card)_88%,transparent)] backdrop-blur-xl">
+      {/* filo rojo abajo del encabezado, como las líneas del logo */}
+      <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 -bottom-px h-px bg-[linear-gradient(90deg,transparent,rgb(217_44_55/0.7)_30%,rgb(217_44_55/0.7)_70%,transparent)]" />
       <div className="page-x grid h-[84px] grid-cols-[1fr_auto_1fr] items-center gap-4">
         {/* logo al costado: se agranda al acercar el mouse */}
         <div className="flex items-center">
           <motion.div whileHover={reduced ? undefined : { scale: 1.18 }} transition={{ type: 'spring', stiffness: 260, damping: 18 }} style={{ originX: 0 }}>
             <Link to="/" className="block">
               <Logo size={64} wordmark wordmarkClassName="text-[24px] sm:text-[28px]" className="gap-2.5 sm:gap-3.5" />
+              <span className="sr-only">: ir al inicio</span>
             </Link>
           </motion.div>
         </div>
@@ -78,15 +81,21 @@ export function Navbar() {
           <button
             onClick={openCart}
             aria-label={`Abrir pedido, ${count} ${count === 1 ? 'producto' : 'productos'}`}
-            className="relative grid size-10 place-items-center hover:text-accent"
+            className="relative grid size-10 place-items-center rounded-full border border-line text-ink transition-colors hover:border-accent hover:bg-accent hover:text-on-accent"
           >
-            <Icon name="bag" size={22} />
-            <span
-              aria-hidden="true"
-              className="absolute right-0 top-0.5 grid min-w-[18px] place-items-center rounded-full bg-accent px-1 text-[10px] font-bold leading-[18px] text-on-accent"
-            >
-              {count}
-            </span>
+            <Icon name="bag" size={19} />
+            {count > 0 && (
+              <motion.span
+                key={count}
+                initial={reduced ? false : { scale: 0.4 }}
+                animate={{ scale: 1 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 18 }}
+                aria-hidden="true"
+                className="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1 text-[10.5px] font-bold text-on-accent ring-2 ring-[color:var(--bz-card)]"
+              >
+                {count}
+              </motion.span>
+            )}
           </button>
           {/* botón del menú del celular: píldora con las rayitas que se convierten en una cruz */}
           <button

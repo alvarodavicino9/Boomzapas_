@@ -300,7 +300,7 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
           </fieldset>
 
           <div className="grid gap-3 pt-8">
-            <Button size="lg" full onClick={handleAdd} disabled={soldOut}>
+            <Button size="lg" variant="accent" full onClick={handleAdd} disabled={soldOut}>
               {soldOut ? 'Agotado' : 'Sumar al pedido'}
             </Button>
             <Button variant="outline" full onClick={handleWhatsApp}>

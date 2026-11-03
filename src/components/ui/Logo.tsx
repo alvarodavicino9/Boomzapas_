@@ -21,7 +21,7 @@ export function Logo({ className, size = 48, wordmark = false, wordmarkClassName
       width={size}
       height={size}
       decoding="async"
-      className={cn('shrink-0 rounded-full shadow-card ring-2 ring-accent/40', !wordmark && className)}
+      className={cn('shrink-0 rounded-full shadow-[0_8px_24px_-8px_rgb(var(--bz-glow)/0.9)] ring-2 ring-accent/50', !wordmark && className)}
       style={{ width: size, height: size }}
     />
   )
@@ -35,8 +35,8 @@ export function Logo({ className, size = 48, wordmark = false, wordmarkClassName
           wordmarkClassName ?? 'text-[22px]',
         )}
       >
-        Boom{' '}
-        <span className="block text-accent">Zapas</span>
+        <span className="wm-boom">Boom</span>{' '}
+        <span className="wm-zapas block">Zapas</span>
       </span>
     </span>
   )

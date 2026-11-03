@@ -2,13 +2,14 @@ import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from 'reac
 import { Link, type LinkProps } from 'react-router-dom'
 import { cn } from '@/lib/format'
 
-/** primary: relleno blanco que se invierte al pasar el mouse. outline: borde gris que se rellena. */
-type Variant = 'primary' | 'outline'
+/** primary: relleno de texto que pasa a rojo. outline: borde que se marca. accent: rojo de la marca, para la acción principal. */
+type Variant = 'primary' | 'outline' | 'accent'
 type Size = 'sm' | 'md' | 'lg'
 
 const variants: Record<Variant, string> = {
   primary: 'btn btn-primary',
   outline: 'btn btn-outline',
+  accent: 'btn btn-accent',
 }
 
 const sizes: Record<Size, string> = {

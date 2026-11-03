@@ -191,9 +191,10 @@ export function WhatsAppButton() {
               initial={{ opacity: 0, x: 12 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 12 }}
-              className="hidden rounded-full bg-white px-4 py-2.5 text-[13px] font-semibold text-black shadow-lift sm:block"
+              className="relative rounded-2xl rounded-br-md bg-white px-3.5 py-2 text-[12.5px] font-semibold leading-4 text-black shadow-[0_14px_30px_-12px_rgb(0_0_0/0.6)] sm:px-4 sm:py-2.5 sm:text-[13px]"
             >
               ¿Te ayudamos a elegir?
+              <span className="block text-[11px] font-medium text-black/55">Respondemos hoy</span>
             </motion.span>
           )}
         </AnimatePresence>
@@ -203,10 +204,12 @@ export function WhatsAppButton() {
           aria-expanded={open}
           aria-controls={id}
           aria-label={open ? 'Cerrar chat de WhatsApp' : 'Escribinos por WhatsApp'}
-          className="group relative grid size-[52px] place-items-center sm:size-[60px] rounded-full bg-gradient-to-br from-[#ef3a46] to-[#b3121d] text-white shadow-[0_14px_34px_-8px_rgb(217_44_55/0.85)] ring-2 ring-white/15 transition-transform hover:scale-105 active:scale-95"
+          className="group relative grid size-[54px] place-items-center rounded-full bg-[linear-gradient(160deg,#f24853_0%,#d92c37_45%,#9e1620_100%)] text-white shadow-[0_16px_34px_-10px_rgb(217_44_55/0.9),inset_0_1px_0_rgb(255_255_255/0.35)] ring-1 ring-white/20 transition-transform hover:-translate-y-0.5 hover:scale-105 active:scale-95 sm:size-[60px]"
         >
-          {!open && <span aria-hidden="true" className="absolute inset-0 -z-10 animate-ping rounded-full bg-[#d92c37]/40 [animation-duration:2.6s] motion-reduce:hidden" />}
-          <Icon name={open ? 'x' : 'whatsapp'} size={open ? 24 : 28} />
+          <Icon name={open ? 'x' : 'whatsapp'} size={open ? 24 : 27} />
+          {!open && (
+            <span aria-hidden="true" className="absolute right-0.5 top-0.5 size-3.5 rounded-full border-2 border-[#d92c37] bg-[#4ade80]" />
+          )}
         </button>
       </div>
     </div>

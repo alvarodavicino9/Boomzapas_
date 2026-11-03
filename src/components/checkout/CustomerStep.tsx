@@ -123,7 +123,7 @@ export function CustomerStep({ form, errors, onChange, onNext }: CustomerStepPro
         </p>
       )}
 
-      <Button type="submit" size="lg" full>
+      <Button type="submit" size="lg" variant="accent" full>
         Continuar
       </Button>
     </form>

@@ -1,33 +1,49 @@
 import { Link } from 'react-router-dom'
 import { Icon, type IconName } from '@/components/ui/Icon'
-import { SITE } from '@/config/site'
 
-const ITEMS: { icon: IconName; title: string; text: string; to: string }[] = [
-  { icon: 'truck', title: 'Envío gratis a todo el país', text: 'Por Correo Argentino, con seguimiento.', to: '/envios' },
-  { icon: 'store', title: 'Retiro en tienda', text: SITE.address, to: '/envios' },
-  { icon: 'card', title: 'Medios de pago', text: 'Mercado Pago, transferencia y efectivo.', to: '/pagos' },
-  { icon: 'chat', title: 'Atención por WhatsApp', text: 'Respondemos todos los días.', to: '/contacto' },
+const ITEMS: { icon: IconName; text: string; to: string }[] = [
+  { icon: 'truck', text: 'Envío gratis a todo el país', to: '/envios' },
+  { icon: 'store', text: 'Retiro en Córdoba', to: '/envios' },
+  { icon: 'card', text: 'Mercado Pago, transferencia o efectivo', to: '/pagos' },
+  { icon: 'whatsapp', text: 'Te asesoramos por WhatsApp', to: '/contacto' },
 ]
 
-/** Cuatro datos de servicio en tarjetas oscuras. */
+/**
+ * Beneficios en una sola línea, sin tarjetas: en la compu quedan fijos y centrados,
+ * en el celular se deslizan solos (si la persona no pidió menos movimiento).
+ */
 export function InfoStrip() {
+  const fila = (oculta?: boolean) => (
+    <ul className="flex shrink-0 items-center" aria-hidden={oculta || undefined}>
+      {ITEMS.map((i) => (
+        <li key={i.text} className="flex items-center">
+          <Link
+            to={i.to}
+            tabIndex={oculta ? -1 : undefined}
+            className="flex items-center gap-2 whitespace-nowrap px-4 text-[12.5px] font-medium text-index transition-colors hover:text-ink sm:px-5 sm:text-[13px]"
+          >
+            <Icon name={i.icon} size={16} className="text-[color:var(--bz-accent-text)]" />
+            {i.text}
+          </Link>
+          <span aria-hidden="true" className="size-1 rounded-full bg-control" />
+        </li>
+      ))}
+    </ul>
+  )
+
   return (
-    <section className="page-x pt-6 sm:pt-8" aria-label="Cómo comprar">
-      <ul className="grid grid-cols-2 gap-2.5 sm:gap-3 lg:grid-cols-4">
-        {ITEMS.map((i) => (
-          <li key={i.title}>
-            <Link to={i.to} className="on-bar flex h-full flex-col items-start gap-2.5 rounded-2xl p-3.5 transition-transform hover:-translate-y-0.5 sm:flex-row sm:items-center sm:gap-4 sm:p-4">
-              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-white/10 sm:size-11">
-                <Icon name={i.icon} size={22} />
-              </span>
-              <span className="min-w-0">
-                <span className="block text-[11.5px] font-bold uppercase leading-4 tracking-wide sm:text-[12px]">{i.title}</span>
-                <span className="mt-1 block text-[11.5px] leading-4 text-index sm:text-[12px]">{i.text}</span>
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
+    <section className="pt-5 sm:pt-7" aria-label="Beneficios">
+      {/* celular: cinta que se desliza */}
+      <div className="overflow-hidden border-y border-line py-3 [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)] lg:hidden">
+        <div className="bz-marquee flex w-max">
+          {fila()}
+          {fila(true)}
+        </div>
+      </div>
+      {/* compu: fija */}
+      <div className="page-x hidden lg:block">
+        <div className="mx-auto flex max-w-[1600px] justify-center border-y border-line py-3.5 [&_li:last-child>span]:hidden">{fila()}</div>
+      </div>
     </section>
   )
 }

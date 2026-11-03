@@ -17,9 +17,9 @@ export function ModeIconButton({ className }: { className?: string }) {
       onClick={() => setModo(siguiente)}
       aria-label={`Cambiar a modo ${siguiente}`}
       title={`Modo ${siguiente}`}
-      className={cn('grid size-10 place-items-center rounded-full text-ink transition-colors hover:text-accent', className)}
+      className={cn('grid size-10 place-items-center rounded-full border border-line text-ink transition-colors hover:border-control', className)}
     >
-      <Icon name={modo === 'oscuro' ? 'sun' : 'moon'} size={20} />
+      <Icon name={modo === 'oscuro' ? 'sun' : 'moon'} size={18} />
     </button>
   )
 }

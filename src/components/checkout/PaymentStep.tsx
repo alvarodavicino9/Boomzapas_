@@ -102,7 +102,7 @@ export function PaymentStep({
         <Button variant="outline" onClick={onBack} disabled={submitting}>
           Volver
         </Button>
-        <Button size="lg" className="flex-1" onClick={onConfirm} disabled={submitting}>
+        <Button size="lg" variant="accent" className="flex-1" onClick={onConfirm} disabled={submitting}>
           {submitting ? 'Enviando' : 'Confirmar pedido'}
         </Button>
       </div>

@@ -14,6 +14,13 @@ interface ProductCardProps {
   eager?: boolean
 }
 
+/** "38 · 39 · 40" si son pocos, "38 al 44" si son muchos. */
+function resumenTalles(t: string[]): string {
+  if (t.length === 0) return ''
+  const orden = [...t].sort((a, b) => Number(a) - Number(b))
+  return orden.length <= 4 ? orden.join(' · ') : `${orden[0]} al ${orden[orden.length - 1]}`
+}
+
 const ETIQUETA: Record<string, string> = {
   NUEVO: 'bg-accent text-on-accent',
   'ÚLTIMOS PARES': 'bg-black/85 text-white',
@@ -39,7 +46,7 @@ export function ProductCard({ producto, onOpen, eager }: ProductCardProps) {
 
   return (
     <article
-      className="group surface overflow-hidden transition-[box-shadow,transform] duration-200 [contain-intrinsic-size:auto_360px] [content-visibility:auto] hover:shadow-lift"
+      className="group surface overflow-hidden !rounded-[20px] transition-[box-shadow,transform,border-color] duration-300 [contain-intrinsic-size:auto_380px] [content-visibility:auto] hover:-translate-y-1 hover:shadow-[0_24px_50px_-28px_rgb(var(--bz-glow)/0.9)]"
       onPointerEnter={conSegunda ? (e) => e.pointerType === 'mouse' && setVerSegunda(true) : undefined}
     >
       <button onClick={() => onOpen(producto)} className="flex h-full w-full flex-col text-left">
@@ -89,7 +96,10 @@ export function ProductCard({ producto, onOpen, eager }: ProductCardProps) {
         <div className="flex flex-1 flex-col p-3 sm:p-4">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-index sm:text-[11px]">{producto.marca}</p>
           <h3 className="mt-1 line-clamp-2 min-h-10 text-[13.5px] font-medium leading-5 sm:text-[14.5px]">{producto.nombre}</h3>
-          <div className="mt-auto pt-3">
+          <p className="mt-1.5 truncate text-[11.5px] leading-4 text-index sm:text-[12px]">
+            {soldOut ? 'Sin stock por ahora' : talles.length ? `Talles ${resumenTalles(talles)}` : 'Consultá talles'}
+          </p>
+          <div className="mt-auto pt-2.5">
             <div className="flex items-center justify-between gap-2">
               <p className={cn('whitespace-nowrap text-[15px] font-bold leading-5 sm:text-[17px]', soldOut && 'text-index line-through')}>
                 {formatARS(producto.precio)}

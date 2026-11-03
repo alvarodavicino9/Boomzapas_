@@ -1,92 +1,54 @@
-import { useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { motion, useMotionValue, useSpring, useTransform, type MotionValue } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { cn } from '@/lib/format'
 
 export const DOCK_ITEMS: { to: string; label: string; icon: IconName; end?: boolean }[] = [
-  { to: '/', label: 'Inicio', icon: 'store', end: true },
-  { to: '/catalogo', label: 'Catálogo', icon: 'bag' },
+  { to: '/', label: 'Inicio', icon: 'home', end: true },
+  { to: '/catalogo', label: 'Catálogo', icon: 'grid' },
   { to: '/envios', label: 'Envíos', icon: 'truck' },
   { to: '/pagos', label: 'Pagos', icon: 'card' },
-  { to: '/como-comprar', label: 'Cómo comprar', icon: 'check' },
+  { to: '/como-comprar', label: 'Cómo comprar', icon: 'receipt' },
   { to: '/contacto', label: 'Contacto', icon: 'chat' },
 ]
 
-const BASE = 42
-const MAX = 64
-const RANGE = 140
-
-const reducedMotion = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-function DockItem({ item, mouseX, animate }: { item: (typeof DOCK_ITEMS)[number]; mouseX: MotionValue<number>; animate: boolean }) {
-  const ref = useRef<HTMLAnchorElement>(null)
-  const [tip, setTip] = useState(false)
-
-  // Distancia del mouse al centro de este icono → tamaño (cuanto más cerca, más grande).
-  const distance = useTransform(mouseX, (x) => {
-    const b = ref.current?.getBoundingClientRect()
-    return b ? x - (b.left + b.width / 2) : Infinity
-  })
-  const target = useTransform(distance, [-RANGE, 0, RANGE], [BASE, MAX, BASE])
-  const size = useSpring(target, { mass: 0.12, stiffness: 190, damping: 15 })
-
-  return (
-    <NavLink
-      ref={ref}
-      to={item.to}
-      end={item.end}
-      aria-label={item.label}
-      onMouseEnter={() => setTip(true)}
-      onMouseLeave={() => setTip(false)}
-      onFocus={() => setTip(true)}
-      onBlur={() => setTip(false)}
-      className="relative flex items-end"
-    >
-      {({ isActive }) => (
-        <>
-          <motion.span
-            style={animate ? { width: size, height: size } : { width: BASE, height: BASE }}
-            className={cn(
-              'grid aspect-square place-items-center rounded-full transition-colors',
-              isActive ? 'bg-accent text-on-accent' : 'text-ink hover:bg-ink/10',
-            )}
-          >
-            <Icon name={item.icon} size={20} />
-          </motion.span>
-          <span
-            role="presentation"
-            className={cn(
-              'pointer-events-none absolute left-1/2 top-full z-10 mt-4 -translate-x-1/2 whitespace-nowrap rounded-full bg-ink px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-gallery shadow-lift transition-all duration-150',
-              tip ? 'translate-y-0 opacity-100' : '-translate-y-1 opacity-0',
-            )}
-          >
-            {item.label}
-          </span>
-        </>
-      )}
-    </NavLink>
-  )
-}
-
-/** Barra de iconos redondos al centro: se agrandan según qué tan cerca esté el mouse (como el dock de macOS). */
+/**
+ * Barra de secciones de la compu: píldora con ícono y nombre de cada sección.
+ * La sección actual se marca con una píldora roja que se desliza de una a otra.
+ */
 export function DockNav() {
-  const mouseX = useMotionValue(Infinity)
-  const animate = !reducedMotion()
-
   return (
     <nav aria-label="Principal" className="hidden lg:block">
-      <motion.ul
-        onMouseMove={(e) => mouseX.set(e.clientX)}
-        onMouseLeave={() => mouseX.set(Infinity)}
-        className="flex h-[68px] items-center gap-1.5 rounded-full border border-line bg-ink/[0.05] px-3 backdrop-blur"
-      >
+      <ul className="flex items-center gap-0.5 rounded-full border border-line bg-[color-mix(in_srgb,var(--bz-card)_70%,transparent)] p-1.5 shadow-[0_10px_30px_-18px_rgb(0_0_0/0.8)] backdrop-blur-md">
         {DOCK_ITEMS.map((item) => (
-          <li key={item.to} className="flex items-center">
-            <DockItem item={item} mouseX={mouseX} animate={animate} />
+          <li key={item.to}>
+            <NavLink
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) =>
+                cn(
+                  'relative flex h-10 items-center gap-2 rounded-full px-3.5 text-[13px] font-semibold transition-colors xl:px-4',
+                  isActive ? 'text-white' : 'text-index hover:bg-[color-mix(in_srgb,var(--bz-ink)_7%,transparent)] hover:text-ink',
+                )
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  {isActive && (
+                    <motion.span
+                      layoutId="seccion-activa"
+                      transition={{ type: 'spring', stiffness: 420, damping: 34 }}
+                      className="absolute inset-0 rounded-full bg-[linear-gradient(180deg,#ea3a45,#c41f2b)] shadow-[0_8px_20px_-8px_rgb(217_44_55/0.9),inset_0_1px_0_rgb(255_255_255/0.25)]"
+                    />
+                  )}
+                  <Icon name={item.icon} size={16} className="relative hidden xl:block" />
+                  <span className="relative whitespace-nowrap">{item.label}</span>
+                </>
+              )}
+            </NavLink>
           </li>
         ))}
-      </motion.ul>
+      </ul>
     </nav>
   )
 }
