@@ -4,8 +4,9 @@ import { ProductDialog } from './ProductDialog'
 import { useProductos } from '@/context/ProductsContext'
 import { useUI } from '@/context/UIContext'
 import { useAbrirProducto, type EstadoFicha } from '@/hooks/useAbrirProducto'
-import { slugify } from '@/lib/slug'
-import { formatARS } from '@/lib/format'
+import { rutaProducto, slugify } from '@/lib/slug'
+import { hasStock } from '@/lib/filters'
+import { aplicarSeo, jsonLdMigas, jsonLdProducto, metaProducto } from '@/lib/seo'
 
 const RUTA = /^\/zapatilla\/([^/]+)\/?$/
 
@@ -42,21 +43,37 @@ export function ProductoHost() {
     }
   }, [slug, status, producto, toast, navigate])
 
-  // Título de la pestaña y descripción con el modelo abierto (lo usa Google y el historial).
+  // Título, descripción, dirección canónica y datos de precio para Google con el modelo abierto.
+  // Al cerrar la ficha cambia la dirección y SeoRuta vuelve a poner los de la página de fondo.
   useEffect(() => {
     if (!producto) return
-    const titulo = document.title
-    const meta = document.querySelector<HTMLMetaElement>('meta[name="description"]')
-    const descripcion = meta?.content
-    document.title = `${producto.nombre} · ${formatARS(producto.precio)} · Boom Zapas`
-    meta?.setAttribute(
-      'content',
-      `${producto.nombre} a ${formatARS(producto.precio)} en Boom Zapas. Envío gratis a todo el país y retiro en Córdoba.`,
-    )
-    return () => {
-      document.title = titulo
-      if (meta && descripcion) meta.setAttribute('content', descripcion)
+    const datos = {
+      nombre: producto.nombre,
+      marca: producto.marca,
+      precio: producto.precio,
+      imagenes: producto.imagenes,
+      descripcion: producto.descripcion,
+      disponible: hasStock(producto),
     }
+    const ruta = rutaProducto(producto)
+    const m = metaProducto(datos)
+    aplicarSeo({
+      titulo: m.titulo,
+      descripcion: m.descripcion,
+      ruta,
+      imagen: producto.imagenes[0],
+      tipo: 'product',
+      jsonld: [
+        jsonLdProducto(datos, ruta),
+        jsonLdMigas(
+          [
+            { nombre: 'Inicio', ruta: '/' },
+            { nombre: 'Catálogo', ruta: '/catalogo' },
+            { nombre: producto.nombre, ruta },
+          ],
+        ),
+      ],
+    })
   }, [producto])
 
   return <ProductDialog producto={producto} onClose={cerrar} onSelect={abrir} />

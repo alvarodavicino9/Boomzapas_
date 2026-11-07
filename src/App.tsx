@@ -3,6 +3,7 @@ import { Route, Routes, useLocation } from 'react-router-dom'
 import { Layout } from '@/components/layout/Layout'
 import { ProductoHost } from '@/components/catalog/ProductoHost'
 import type { EstadoFicha } from '@/hooks/useAbrirProducto'
+import { SeoRuta } from '@/components/layout/SeoRuta'
 import HomePage from '@/pages/HomePage'
 
 // El resto de las páginas se descargan sólo cuando se visitan.
@@ -24,6 +25,7 @@ export default function App() {
 
   return (
     <>
+      <SeoRuta />
       <Routes location={fondo ?? location}>
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />

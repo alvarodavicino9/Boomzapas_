@@ -44,13 +44,16 @@
 
     <!-- SEO y vista previa al compartir. __SITE__ lo completa vite.config.ts con la dirección de la tienda.
          Cada zapatilla tiene además su propia página con su foto (ver paginasDeProducto en vite.config.ts). -->
-    <title>Boom Zapas · Zapatillas en Córdoba con envío gratis a todo el país</title>
-    <meta name="description" content="Zapatillas Nike, Adidas, Jordan, New Balance, Puma y Vans al mejor precio. Envío gratis a todo el país por Correo Argentino, retiro en Córdoba y pago con Mercado Pago, transferencia o WhatsApp." />
+    <title>Boom Zapas | Zapatillas en Córdoba con envío gratis</title>
+    <meta name="description" content="Zapatillas Nike, Adidas, Jordan, New Balance, Puma y Vans en Córdoba. Envío gratis a todo el país, retiro en el local y pago con Mercado Pago o transferencia." />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <meta name="geo.region" content="AR-X" />
+    <meta name="geo.placename" content="Córdoba, Argentina" />
     <link rel="canonical" href="__SITE__/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Boom Zapas" />
     <meta property="og:url" content="__SITE__/" />
-    <meta property="og:title" content="Boom Zapas · Tu próximo par está acá" />
+    <meta property="og:title" content="Boom Zapas | Zapatillas en Córdoba con envío gratis" />
     <meta property="og:description" content="Zapatillas Nike, Adidas, Jordan, New Balance, Puma y Vans. Envío gratis a todo el país y retiro en Córdoba." />
     <meta property="og:image" content="__SITE__/og.jpg" />
     <meta property="og:image:width" content="1200" />
@@ -58,19 +61,55 @@
     <meta property="og:image:alt" content="Boom Zapas: zapatillas en Córdoba con envío gratis a todo el país" />
     <meta property="og:locale" content="es_AR" />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Boom Zapas | Zapatillas en Córdoba con envío gratis" />
+    <meta name="twitter:description" content="Zapatillas Nike, Adidas, Jordan, New Balance, Puma y Vans. Envío gratis a todo el país y retiro en Córdoba." />
+    <meta name="twitter:image" content="__SITE__/og.jpg" />
 
+    <!-- Datos para Google: la tienda (nombre, dirección, horarios) y el buscador del sitio. -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "ShoeStore",
-        "name": "Boom Zapas",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Duarte Quirós 477",
-          "addressLocality": "Córdoba",
-          "addressCountry": "AR"
-        },
-        "sameAs": ["https://www.instagram.com/boom.zapass"]
+        "@graph": [
+          {
+            "@type": "ShoeStore",
+            "@id": "__SITE__/#tienda",
+            "name": "Boom Zapas",
+            "url": "__SITE__/",
+            "logo": "__SITE__/icon-512.png",
+            "image": "__SITE__/og.jpg",
+            "description": "Tienda de zapatillas Nike, Adidas, Jordan, New Balance, Puma y Vans en Córdoba, con envío gratis a todo el país.",
+            "telephone": "+5493491461899",
+            "priceRange": "$$",
+            "currenciesAccepted": "ARS",
+            "paymentAccepted": "Mercado Pago, Transferencia bancaria, Efectivo, Tarjeta de crédito, Tarjeta de débito",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Duarte Quirós 477",
+              "addressLocality": "Córdoba",
+              "addressRegion": "Córdoba",
+              "addressCountry": "AR"
+            },
+            "areaServed": { "@type": "Country", "name": "Argentina" },
+            "openingHoursSpecification": [
+              { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"], "opens": "10:00", "closes": "19:00" },
+              { "@type": "OpeningHoursSpecification", "dayOfWeek": "Saturday", "opens": "10:00", "closes": "14:00" }
+            ],
+            "sameAs": ["https://www.instagram.com/boom.zapass"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "__SITE__/#sitio",
+            "url": "__SITE__/",
+            "name": "Boom Zapas",
+            "inLanguage": "es-AR",
+            "publisher": { "@id": "__SITE__/#tienda" },
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "__SITE__/catalogo?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          }
+        ]
       }
     </script>
   </head>
