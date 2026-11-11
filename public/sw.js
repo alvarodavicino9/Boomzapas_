@@ -5,7 +5,7 @@
  * - Fotos, logos y archivos de la página (que nunca cambian de nombre): se guardan y se sirven desde el celular.
  * Para forzar que todos bajen todo de nuevo, cambiá VERSION.
  */
-const VERSION = 'bz-v2'
+const VERSION = 'bz-v3'
 const PAGINAS = `${VERSION}-paginas`
 const ARCHIVOS = `${VERSION}-archivos`
 const MAX_ARCHIVOS = 250

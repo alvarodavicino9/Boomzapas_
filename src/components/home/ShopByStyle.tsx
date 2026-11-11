@@ -4,8 +4,8 @@ import { useProductos } from '@/context/ProductsContext'
 import { SectionHead } from './SectionHead'
 
 const ESTILOS = [
-  { cat: 'deportivas', label: 'Deportivas', texto: 'Duramo, Adizero, New Balance 530', foto: '/fotos/modelos/adidas-adizero-evo-sl-pink/portada.jpg', fondo: 'marcas-banda' },
-  { cat: 'urbanas', label: 'Urbanas', texto: 'Dunk, Samba, Forum, Jordan, Blazer, Vans', foto: '/fotos/modelos/nike-air-jordan-1-mocca-x-travis/portada.jpg', fondo: 'on-bar bg-bar' },
+  { cat: 'deportivas', label: 'Deportivas', texto: 'Duramo, Adizero, New Balance 530', foto: '/fotos/modelos/adidas-adizero-evo-sl-pink/principal.jpg', fondo: 'marcas-banda' },
+  { cat: 'urbanas', label: 'Urbanas', texto: 'Dunk, Samba, Forum, Jordan, Blazer, Vans', foto: '/fotos/modelos/nike-air-jordan-1-mocca-x-travis/principal.jpg', fondo: 'on-bar bg-bar' },
 ]
 
 /** Dos puertas de entrada al catálogo: deportivas y urbanas. */
