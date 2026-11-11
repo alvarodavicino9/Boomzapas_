@@ -90,10 +90,10 @@ export function Modal({ open, onClose, title, children, size = 'md', hideTitle }
                 aria-label="Cerrar"
                 className={cn(
                   'label ml-auto flex h-10 items-center gap-2 rounded-full px-4 text-ink hover:bg-stage',
-                  hideTitle && 'm-3 bg-card shadow-card',
+                  hideTitle && 'm-3 bg-card/90 shadow-card backdrop-blur max-sm:w-10 max-sm:justify-center max-sm:px-0',
                 )}
               >
-                Cerrar <Icon name="x" size={16} />
+                <span className={cn(hideTitle && 'max-sm:sr-only')}>Cerrar</span> <Icon name="x" size={16} />
               </button>
             </div>
             <div className="overflow-y-auto overscroll-contain">{children}</div>

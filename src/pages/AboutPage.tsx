@@ -40,8 +40,8 @@ export default function AboutPage() {
           {stats.map((s, i) => (
             <li key={s.label} className="border-b border-r border-line">
               <Reveal delay={i * 0.06}>
-                <div className="p-6 sm:p-8">
-                  <p className="font-display text-[3.25rem] leading-none">{s.value}</p>
+                <div className="p-5 sm:p-8">
+                  <p className="font-display text-[clamp(2.1rem,10vw,3.25rem)] leading-none">{s.value}</p>
                   <p className="label mt-3 text-index">{s.label}</p>
                 </div>
               </Reveal>

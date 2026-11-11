@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
@@ -63,6 +63,17 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
   const [origin, setOrigin] = useState<string | null>(null)
   const [tablaOpen, setTablaOpen] = useState(false)
   const topRef = useRef<HTMLDivElement>(null)
+  // Celular: cuando el botón de compra no está a la vista, aparece una barra fija abajo.
+  const tallesRef = useRef<HTMLFieldSetElement>(null)
+  const [verBarra, setVerBarra] = useState(false)
+  const observador = useRef<IntersectionObserver | null>(null)
+  // se engancha cuando el botón aparece en pantalla (el modal se monta después)
+  const botonesRef = useCallback((el: HTMLDivElement | null) => {
+    observador.current?.disconnect()
+    if (!el) return
+    observador.current = new IntersectionObserver(([e]) => setVerBarra(!e.isIntersecting), { threshold: 0 })
+    observador.current.observe(el)
+  }, [])
   const { add } = useCart()
   const { productos } = useProductos()
   const { toast, avisarAgregado } = useUI()
@@ -320,25 +331,23 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
             ))}
           </ul>
 
-          <fieldset className="mt-8" disabled={soldOut}>
-            <legend className="mb-3 flex w-full items-center justify-between">
-              <span className="label">Talle (AR)</span>
-              <span className="flex items-center gap-4">
-                {showError && !selected && (
-                  <span role="alert" className="label text-danger">
-                    Elegí un talle
-                  </span>
-                )}
-                <button
-                  type="button"
-                  onClick={() => setTablaOpen(true)}
-                  aria-haspopup="dialog"
-                  className="label link-u text-index hover:text-ink"
-                >
-                  Tabla de talles
-                </button>
-              </span>
+          <fieldset ref={tallesRef} className="mt-8 scroll-mt-20" disabled={soldOut}>
+            <legend className="mb-3 flex w-full items-center justify-between gap-3">
+              <span className="label whitespace-nowrap">Talle (AR)</span>
+              <button
+                type="button"
+                onClick={() => setTablaOpen(true)}
+                aria-haspopup="dialog"
+                className="label link-u whitespace-nowrap text-index hover:text-ink"
+              >
+                Tabla de talles
+              </button>
             </legend>
+            {showError && !selected && (
+              <p role="alert" className="mb-3 flex items-center gap-2 rounded-xl bg-danger/10 px-3 py-2 text-[13px] font-semibold text-danger">
+                <Icon name="alert" size={15} /> Elegí un talle para sumarlo al pedido
+              </p>
+            )}
             <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Talle">
               {talles.map((t) => {
                 const out = t.cantidad <= 0
@@ -372,7 +381,7 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
             </p>
           </fieldset>
 
-          <div className="grid gap-3 pt-8">
+          <div ref={botonesRef} className="grid gap-3 pt-8">
             <Button size="lg" variant="accent" full onClick={handleAdd} disabled={soldOut}>
               {soldOut ? 'Agotado' : 'Sumar al pedido'}
             </Button>
@@ -510,6 +519,35 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {/* barra fija del celular: precio y compra siempre a mano */}
+      {!soldOut && (
+        <div
+          className={cn(
+            'sticky bottom-0 z-20 flex items-center gap-3 border-t border-line bg-gallery/95 px-4 pb-[calc(12px+env(safe-area-inset-bottom))] pt-3 backdrop-blur-md transition-[transform,opacity] duration-300 lg:hidden',
+            verBarra ? 'translate-y-0 opacity-100' : 'pointer-events-none translate-y-full opacity-0',
+          )}
+        >
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[12px] text-index">{selected ? `Talle ${selected.talle}` : 'Elegí tu talle'}</p>
+            <p className="text-[18px] font-bold leading-6">{formatARS(p.precio)}</p>
+          </div>
+          <Button
+            variant="accent"
+            onClick={() => {
+              if (!selected) {
+                setShowError(true)
+                tallesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                return
+              }
+              handleAdd()
+            }}
+            className="shrink-0"
+          >
+            {selected ? 'Sumar al pedido' : 'Elegir talle'}
+          </Button>
         </div>
       )}
     </Modal>

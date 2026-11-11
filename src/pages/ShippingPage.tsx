@@ -59,8 +59,8 @@ export default function ShippingPage() {
                 ['24-48 hs', 'Despacho'],
                 ['3 a 7 días', 'Entrega'],
               ].map(([v, t]) => (
-                <div key={t} className="rounded-2xl bg-white/[0.06] px-3 py-4 text-center ring-1 ring-inset ring-white/10">
-                  <p className="font-display text-[clamp(1rem,2.2vw,1.35rem)] font-black leading-none text-white">{v}</p>
+                <div key={t} className="rounded-2xl bg-white/[0.06] px-1.5 py-4 text-center ring-1 ring-inset ring-white/10 sm:px-3">
+                  <p className="whitespace-nowrap font-display text-[clamp(0.85rem,3.6vw,1.35rem)] font-black leading-none text-white">{v}</p>
                   <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/55">{t}</p>
                 </div>
               ))}

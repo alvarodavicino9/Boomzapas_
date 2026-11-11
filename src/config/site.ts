@@ -21,7 +21,7 @@ export const SITE = {
   ],
 
   bank: {
-    holder: 'Valentina Sambrini',
+    holder: 'Valentin Sambrini',
     alias: 'valesambrini.lemon',
     cbu: '0000003100088109534086',
     bank: 'Mercado Pago',

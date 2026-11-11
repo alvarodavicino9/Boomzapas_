@@ -7,7 +7,7 @@ import { Testimonials } from '@/components/home/Testimonials'
 import { BrandStory } from '@/components/home/BrandStory'
 
 /**
- * Inicio: banners, últimos ingresos, accesos por marca, banda de marcas, estilos, reseñas e historia.
+ * Inicio: banners, últimos ingresos, banda de marcas, accesos por marca, estilos, reseñas e historia.
  * El llamado final a WhatsApp vive en el pie de página (está en todas las páginas).
  */
 export default function HomePage() {
@@ -15,8 +15,8 @@ export default function HomePage() {
     <>
       <Hero />
       <FeaturedProducts />
-      <ComprarPorMarca />
       <BrandTicker />
+      <ComprarPorMarca />
       <ShopByStyle />
       <Testimonials />
       <BrandStory />

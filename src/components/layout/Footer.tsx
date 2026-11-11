@@ -23,9 +23,7 @@ export function Footer() {
         {/* ── Llamado a la acción ─────────────────────────────── */}
         <div className="flex flex-col gap-6 border-b border-line px-5 py-7 sm:px-10 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="label text-accent-soft">¿Dudas con tu talle o tu pedido?</p>
-            <p className="display-section mt-2 !text-[clamp(1.25rem,2.6vw,1.75rem)]">Te asesoramos por WhatsApp</p>
-            <p className="body-text mt-1.5">Respondemos todos los días, con fotos reales del par que te gusta.</p>
+            <p className="display-section !text-[clamp(1.25rem,2.6vw,1.75rem)]">Te asesoramos por WhatsApp</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <a

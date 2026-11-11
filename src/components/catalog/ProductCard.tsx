@@ -128,7 +128,7 @@ export function ProductCard({ producto, onOpen, eager }: ProductCardProps) {
               onClick={(e) => mover(e, paso)}
               aria-label={paso < 0 ? `Foto anterior de ${producto.nombre}` : `Foto siguiente de ${producto.nombre}`}
               className={cn(
-                'absolute top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full bg-white/85 text-black shadow-[0_2px_10px_rgb(0_0_0/0.18)] backdrop-blur-sm transition-[opacity,background-color,transform] duration-200 hover:bg-white active:scale-90 sm:size-9 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100',
+                'absolute top-1/2 hidden size-8 -translate-y-1/2 place-items-center rounded-full bg-white/85 lg:grid text-black shadow-[0_2px_10px_rgb(0_0_0/0.18)] backdrop-blur-sm transition-[opacity,background-color,transform] duration-200 hover:bg-white active:scale-90 sm:size-9 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100',
                 paso < 0 ? 'left-1.5 sm:left-2.5' : 'right-1.5 sm:right-2.5',
               )}
             >

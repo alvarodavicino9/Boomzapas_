@@ -141,7 +141,7 @@ export default function ContactPage() {
         }
       />
 
-      <section className="page-x grid gap-10 py-14 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
+      <section className="page-x grid grid-cols-[minmax(0,1fr)] gap-10 py-14 lg:grid-cols-[1fr_1.1fr] lg:gap-14">
         <div>
           <p className="label mb-3 text-accent">Canales</p>
           <h2 className="display-section mb-8">Qué usar para cada cosa</h2>
@@ -159,10 +159,8 @@ export default function ContactPage() {
                       <Icon name={c.icon} size={23} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="flex flex-wrap items-baseline gap-x-2">
-                        <span className="text-[15.5px] font-bold">{c.label}</span>
-                        <span className="break-all text-[13px] text-index">{c.value}</span>
-                      </span>
+                      <span className="block text-[15.5px] font-bold leading-5">{c.label}</span>
+                      <span className="mt-0.5 block truncate text-[13px] font-medium text-ink/80">{c.value}</span>
                       <span className="mt-1 block text-[13px] leading-5 text-index">{c.para}</span>
                     </span>
                     <Icon name="arrow" size={17} className="shrink-0 text-index transition-transform group-hover:translate-x-1 group-hover:text-ink" />

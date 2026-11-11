@@ -143,7 +143,7 @@ export default function PaymentsPage() {
 
       {/* datos para transferir + qué pasa después de pagar */}
       <section className="page-x pb-16" aria-label="Transferencia">
-        <div className="grid gap-5 lg:grid-cols-[1.1fr_1fr]">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[1.1fr_1fr]">
           <Reveal>
             <div className="on-bar relative h-full overflow-hidden rounded-3xl p-7 sm:p-9">
               <span aria-hidden="true" className="pointer-events-none absolute -right-16 -top-16 size-56 rounded-full bg-[#1f9d55]/25 blur-3xl" />
@@ -165,9 +165,9 @@ export default function PaymentsPage() {
                     ['CBU / CVU', SITE.bank.cbu, 'cbu'],
                   ] as const
                 ).map(([label, value, id]) => (
-                  <div key={label} className="flex items-center justify-between gap-4 rounded-xl bg-white/[0.05] px-4 py-3 ring-1 ring-inset ring-white/10">
-                    <dt className="shrink-0 text-white/60">{label}</dt>
-                    <dd className="flex min-w-0 items-center gap-3">
+                  <div key={label} className="flex flex-col gap-1 rounded-xl bg-white/[0.05] px-3.5 py-3 ring-1 ring-inset ring-white/10 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-4">
+                    <dt className="shrink-0 text-[12px] text-white/60 sm:text-[14px]">{label}</dt>
+                    <dd className="flex min-w-0 items-center justify-between gap-3 sm:justify-end">
                       <span className={`truncate text-white ${label.startsWith('CBU') ? 'font-mono text-[12.5px]' : 'font-semibold'}`}>{value}</span>
                       {id && (
                         <button

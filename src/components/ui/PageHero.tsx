@@ -29,7 +29,7 @@ interface PageHeroProps {
 export function PageHero({ eyebrow, title, subtitle, foto, datos, lateral, actions, position = '50% 55%' }: PageHeroProps) {
   return (
     <header className="page-x border-b border-line bg-card pb-12 pt-10 sm:pt-14 lg:pb-16">
-      <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
         <div>
           <p className="label mb-5 flex items-center gap-3 text-accent">
             <span aria-hidden="true" className="h-[2px] w-8 bg-accent" />
