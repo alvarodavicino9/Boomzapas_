@@ -28,7 +28,7 @@ export function BrandTicker() {
                 to={`/catalogo?marca=${encodeURIComponent(b)}`}
                 tabIndex={escondido ? -1 : undefined}
                 aria-label={escondido ? undefined : `Ver ${b}`}
-                className="group mx-2 flex h-[72px] w-[150px] items-center justify-center rounded-2xl bg-white/[0.08] ring-1 ring-inset ring-white/20 backdrop-blur-sm transition-[background-color,transform,box-shadow] duration-300 hover:-translate-y-1 hover:bg-white/[0.16] hover:shadow-[0_16px_34px_-16px_rgb(0_0_0/0.65)] sm:mx-2.5 sm:h-[92px] sm:w-[210px]"
+                className="group mx-2 flex h-[72px] w-[150px] items-center justify-center rounded-2xl bg-[linear-gradient(160deg,rgb(255_255_255/0.14),rgb(255_255_255/0.04))] ring-1 ring-inset ring-white/15 backdrop-blur-sm transition-[background-color,transform,box-shadow] duration-300 hover:-translate-y-1 hover:ring-[#ff6b73]/60 hover:shadow-[0_16px_34px_-16px_rgb(0_0_0/0.65)] sm:mx-2.5 sm:h-[92px] sm:w-[210px]"
               >
                 <LogoMarca marca={b} blanco className={ALTO[b] ?? 'h-7 sm:h-9'} texto="text-[22px] sm:text-[30px]" />
               </Link>
@@ -60,9 +60,19 @@ export function BrandTicker() {
   )
 
   return (
-    <section className="marcas-banda relative mt-12 overflow-hidden sm:mt-16" aria-labelledby="marcas-titulo">
-      <span aria-hidden="true" className="pointer-events-none absolute -left-24 -top-24 -z-10 size-72 rounded-full bg-white/15 blur-3xl" />
-      <span aria-hidden="true" className="pointer-events-none absolute -bottom-28 right-[-8%] -z-10 size-96 rounded-full bg-black/30 blur-3xl" />
+    <section className="banda-marcas relative mt-12 overflow-hidden sm:mt-16" aria-labelledby="marcas-titulo">
+      {/* fondo: base bordó oscura con luces rojas, puntos y el nombre de la tienda en contorno */}
+      <span aria-hidden="true" className="banda-marcas-luz pointer-events-none absolute -left-[10%] -top-1/2 -z-10 h-[160%] w-[55%] rounded-full" />
+      <span aria-hidden="true" className="banda-marcas-luz banda-marcas-luz--2 pointer-events-none absolute -bottom-1/2 right-[-10%] -z-10 h-[150%] w-[50%] rounded-full" />
+      <span aria-hidden="true" className="banda-marcas-puntos pointer-events-none absolute inset-0 -z-10" />
+      <span
+        aria-hidden="true"
+        className="banda-marcas-nombre pointer-events-none absolute left-1/2 top-1/2 -z-10 -translate-x-1/2 -translate-y-1/2 select-none whitespace-nowrap font-display text-[clamp(5rem,16vw,15rem)] font-black uppercase italic leading-none tracking-tighter"
+      >
+        Boom Zapas
+      </span>
+      <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#ff6b73]/80 to-transparent" />
+      <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-[#ff6b73]/50 to-transparent" />
 
       <div className="page-x flex items-end justify-between gap-4 pt-6 sm:pt-9">
         <div>
@@ -91,7 +101,7 @@ export function BrandTicker() {
       </div>
 
       {/* cinta de beneficios que corre al revés */}
-      <div className="relative border-t border-white/15 bg-black/30 py-3 backdrop-blur-sm">
+      <div className="relative border-t border-white/10 bg-black/35 py-3 backdrop-blur-sm">
         <div className="ticker flex w-max [animation-direction:reverse]" style={{ animationDuration: '32s' }}>
           {cinta(false)}
           {cinta(true)}

@@ -541,19 +541,39 @@ html, body { overflow-x: clip; }
   background-image: repeating-linear-gradient(115deg, rgb(255 255 255 / 0.05) 0 2px, transparent 2px 22px);
 }
 
-/* Borde de la barra de secciones: rojo en los costados que gira despacio. */
-.dock-borde {
-  background: conic-gradient(from var(--dock-ang, 0deg), rgb(217 44 55 / 0.75), rgb(255 255 255 / 0.1) 25%, rgb(255 255 255 / 0.06) 50%, rgb(217 44 55 / 0.75) 75%, rgb(255 255 255 / 0.1));
-  animation: dock-giro 9s linear infinite;
+
+/* Fondo de la banda de marcas: bordó profundo con luces rojas suaves, puntos y el nombre en contorno. */
+.banda-marcas {
+  isolation: isolate;
+  color: #fff;
+  background:
+    linear-gradient(90deg, rgb(20 6 8 / 0.65), transparent 22%, transparent 78%, rgb(20 6 8 / 0.65)),
+    radial-gradient(60% 120% at 50% 55%, rgb(150 20 32 / 0.55), transparent 70%),
+    linear-gradient(180deg, #440e15 0%, #2a090e 55%, #1c070a 100%);
 }
-@property --dock-ang {
-  syntax: '<angle>';
-  initial-value: 0deg;
-  inherits: false;
+.banda-marcas-luz {
+  background: radial-gradient(closest-side, rgb(240 60 72 / 0.95), rgb(205 35 48 / 0.5) 45%, transparent 78%);
+  filter: blur(20px);
+  animation: banda-luz 14s ease-in-out infinite alternate;
 }
-@keyframes dock-giro {
-  to { --dock-ang: 360deg; }
+.banda-marcas-luz--2 {
+  background: radial-gradient(closest-side, rgb(242 104 64 / 0.8), rgb(205 35 48 / 0.35) 50%, transparent 78%);
+  animation-duration: 17s;
+  animation-direction: alternate-reverse;
+}
+@keyframes banda-luz {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to { transform: translate3d(8%, 6%, 0) scale(1.08); }
+}
+.banda-marcas-puntos {
+  background-image: radial-gradient(rgb(255 255 255 / 0.11) 1px, transparent 1.4px);
+  background-size: 18px 18px;
+  mask-image: radial-gradient(70% 90% at 50% 50%, #000 30%, transparent 85%);
+}
+.banda-marcas-nombre {
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(255 255 255 / 0.07);
 }
 @media (prefers-reduced-motion: reduce) {
-  .dock-borde { animation: none; }
+  .banda-marcas-luz { animation: none; }
 }
