@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Icon } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
-import { waLink } from '@/lib/whatsapp'
+import { waPlantilla } from '@/lib/whatsapp'
 
 interface SizeChartDialogProps {
   open: boolean
@@ -74,7 +74,7 @@ export function SizeChartDialog({ open, onClose }: SizeChartDialogProps) {
             </div>
             <div className="flex items-center justify-between gap-3 border-t border-line px-5 py-3">
               <p className="text-[12.5px] leading-4 text-index">¿Dudas con tu talle? Te asesoramos.</p>
-              <Button href={waLink('Hola Boom Zapas. Necesito ayuda para elegir mi talle.')} size="sm" variant="outline">
+              <Button href={waPlantilla('talle')} size="sm" variant="outline">
                 WhatsApp
               </Button>
             </div>

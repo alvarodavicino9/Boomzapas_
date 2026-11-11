@@ -4,7 +4,7 @@ import { Icon, type IconName } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
 import { Reveal } from '@/components/ui/Reveal'
 import { SITE } from '@/config/site'
-import { waLink, waLinkGeneric } from '@/lib/whatsapp'
+import { waConsulta, waLinkGeneric } from '@/lib/whatsapp'
 
 const CHANNELS: { icon: IconName; label: string; value: string; href: string; note?: string }[] = [
   { icon: 'whatsapp', label: 'WhatsApp', value: SITE.whatsappDisplay, href: waLinkGeneric(), note: 'Respuesta el mismo día' },
@@ -28,15 +28,18 @@ export default function ContactPage() {
     e.preventDefault()
     setTouched(true)
     if (!valid) return
-    const text = [
-      `Hola Boom Zapas, soy ${form.nombre.trim()}.`,
-      form.asunto.trim() && `Asunto: ${form.asunto.trim()}`,
-      form.mensaje.trim(),
-      form.email.trim() && `Mi email: ${form.email.trim()}`,
-    ]
-      .filter(Boolean)
-      .join('\n\n')
-    window.open(waLink(text), '_blank', 'noopener,noreferrer')
+    window.open(
+      waConsulta([
+        `¡Hola Boom Zapas! 👋 Soy ${form.nombre.trim()}.`,
+        '',
+        form.asunto.trim() ? `*Asunto:* ${form.asunto.trim()}` : null,
+        `💬 ${form.mensaje.trim()}`,
+        form.email.trim() ? '' : null,
+        form.email.trim() ? `📧 Mi email: ${form.email.trim()}` : null,
+      ]),
+      '_blank',
+      'noopener,noreferrer',
+    )
   }
 
   const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>

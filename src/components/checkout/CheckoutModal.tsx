@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
-import { CustomerStep, EMPTY_FORM, validateCustomer, type CustomerErrors, type CustomerForm } from './CustomerStep'
+import { CustomerStep, EMPTY_FORM, direccionCompleta, validateCustomer, type CustomerErrors, type CustomerForm } from './CustomerStep'
+import { codigoPedido, type DatosCliente } from '@/lib/whatsapp'
 import { PaymentStep } from './PaymentStep'
 import { DoneStep, type OrderResult } from './DoneStep'
 import { useCart } from '@/context/CartContext'
@@ -59,24 +60,46 @@ export function CheckoutModal() {
     const e = validateCustomer(form)
     setErrors(e)
     if (Object.keys(e).length === 0) setStep('pago')
+    // lleva al primer dato que falta
+    else setTimeout(() => document.querySelector<HTMLElement>('[role="dialog"] [aria-invalid="true"]')?.focus(), 30)
   }
 
-  const buildNotas = () =>
-    [
-      form.entrega === 'envio' ? `Envío: ${form.direccion.trim()}` : 'Retiro en el showroom',
-      form.email.trim() && `Email: ${form.email.trim()}`,
+  const datosCliente = (): DatosCliente => ({
+    nombre: form.nombre.trim(),
+    telefono: form.telefono.trim(),
+    dni: form.dni.replace(/\D/g, '') || undefined,
+    email: form.email.trim() || undefined,
+    direccion: form.entrega === 'envio' ? direccionCompleta(form) : undefined,
+    referencias: form.entrega === 'envio' ? form.referencias.trim() || undefined : undefined,
+    notas: form.notas.trim() || undefined,
+    origen: form.origen || undefined,
+  })
+
+  const buildNotas = (codigo: string) => {
+    const c = datosCliente()
+    return [
+      `Código ${codigo}`,
+      form.entrega === 'envio' ? `Envío: ${c.direccion}` : 'Retiro en el showroom',
+      c.referencias && `Referencias: ${c.referencias}`,
+      c.dni && `DNI: ${c.dni}`,
+      c.email && `Email: ${c.email}`,
+      c.notas && `Notas: ${c.notas}`,
+      c.origen && `Nos conoció por: ${c.origen}`,
     ]
       .filter(Boolean)
       .join(' | ')
+  }
 
-  const finish = (pedidoId: number | string | undefined, offline: boolean) => {
+  const finish = (pedidoId: number | string | undefined, offline: boolean, codigo = codigoPedido()) => {
     setOrder({
       pedidoId,
+      codigo,
+      fecha: new Date(),
       items,
       total,
       metodo,
       entrega: form.entrega,
-      nombre: form.nombre.trim(),
+      cliente: datosCliente(),
       offline,
     })
     clear()
@@ -86,6 +109,7 @@ export function CheckoutModal() {
   const confirm = async () => {
     setSubmitting(true)
     setError(null)
+    const codigo = codigoPedido()
 
     const payload: PedidoPayload = {
       cliente: {
@@ -100,7 +124,7 @@ export function CheckoutModal() {
         precio_unit: precioUnitario(i.precio, count),
       })),
       metodo_pago: metodo,
-      notas: buildNotas(),
+      notas: buildNotas(codigo),
     }
 
     if (MODO_DEMO) {
@@ -113,9 +137,9 @@ export function CheckoutModal() {
         nombre: form.nombre.trim(),
         telefono: form.telefono.trim(),
         email: form.email.trim() || undefined,
-        direccion: form.entrega === 'envio' ? form.direccion.trim() : undefined,
+        direccion: form.entrega === 'envio' ? direccionCompleta(form) : undefined,
       })
-      finish(undefined, true)
+      finish(undefined, true, codigo)
       setSubmitting(false)
       return
     }
@@ -128,7 +152,7 @@ export function CheckoutModal() {
         window.location.assign(res.init_point)
         return
       }
-      finish(res.pedido_id, false)
+      finish(res.pedido_id, false, codigo)
     } catch (e) {
       setError(
         e instanceof ApiError && e.status === 0

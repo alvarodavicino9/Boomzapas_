@@ -11,7 +11,7 @@ import { useUI } from '@/context/UIContext'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
 import { SITE } from '@/config/site'
 import { cn } from '@/lib/format'
-import { waLink } from '@/lib/whatsapp'
+import { waLinkGeneric } from '@/lib/whatsapp'
 
 const GRUPOS: { titulo: string; links: { to: string; label: string; icon: IconName; end?: boolean }[] }[] = [
   {
@@ -165,7 +165,7 @@ export function MenuMovil() {
             <div className="border-t border-line bg-card px-4 pb-[calc(16px+env(safe-area-inset-bottom))] pt-4">
               <div className="grid grid-cols-[1fr_auto] gap-2">
                 <a
-                  href={waLink('Hola Boom Zapas. Quiero hacer una consulta.')}
+                  href={waLinkGeneric()}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="btn btn-accent !min-h-12 !px-4"

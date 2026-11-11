@@ -6,7 +6,7 @@ import { Reveal } from '@/components/ui/Reveal'
 import { ContactSection } from '@/components/sections/ContactSection'
 import { SITE } from '@/config/site'
 import { formatARS, PROMO } from '@/lib/format'
-import { waLink } from '@/lib/whatsapp'
+import { waPlantilla } from '@/lib/whatsapp'
 
 const PASOS: { icon: IconName; title: string; text: string }[] = [
   { icon: 'search', title: 'Elegí tu par', text: 'Entrá al catálogo, filtrá por marca, talle o precio y abrí el modelo que te guste.' },
@@ -72,7 +72,7 @@ export default function HowToBuyPage() {
               Ir al catálogo
               <Icon name="arrow" size={18} />
             </Button>
-            <Button href={waLink('Hola Boom Zapas. Quiero comprar por WhatsApp.')} variant="outline" size="lg">
+            <Button href={waPlantilla('comprar')} variant="outline" size="lg">
               <Icon name="whatsapp" size={18} />
               Comprar por WhatsApp
             </Button>

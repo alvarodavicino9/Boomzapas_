@@ -6,7 +6,7 @@ import { ContactSection } from '@/components/sections/ContactSection'
 import { SITE } from '@/config/site'
 import { useCopy } from '@/hooks/useCopy'
 import { formatARS, PROMO } from '@/lib/format'
-import { waLink } from '@/lib/whatsapp'
+import { waPlantilla } from '@/lib/whatsapp'
 
 const METHODS: { icon: IconName; title: string; text: string; tag?: string }[] = [
   { icon: 'bolt', title: 'Mercado Pago', text: 'Pagá con tu cuenta, con tarjeta o en cuotas.' },
@@ -49,7 +49,7 @@ export default function PaymentsPage() {
             <Button to="/catalogo" size="lg">
               Elegir mis zapatillas
             </Button>
-            <Button href={waLink('Hola Boom Zapas. Quiero consultar por los medios de pago.')} variant="outline" size="lg">
+            <Button href={waPlantilla('pagos')} variant="outline" size="lg">
               <Icon name="whatsapp" size={18} />
               Consultar
             </Button>
@@ -67,7 +67,7 @@ export default function PaymentsPage() {
                 de descuento en cada par llevando {PROMO.minimo} pares o más. Vale con cualquier medio de pago.
               </p>
             </div>
-            <Button href={waLink(`Hola Boom Zapas. Quiero aprovechar la promo de ${PROMO.minimo} pares o más.`)} variant="outline" className="!border-white !text-white hover:!bg-white hover:!text-black">
+            <Button href={waPlantilla('promo')} variant="outline" className="!border-white !text-white hover:!bg-white hover:!text-black">
               Quiero la promo
               <Icon name="arrow" size={16} />
             </Button>
@@ -128,7 +128,7 @@ export default function PaymentsPage() {
               ))}
             </dl>
             <p className="label mt-6 text-index">Enviá el comprobante por WhatsApp para confirmar tu pedido.</p>
-            <Button href={waLink('Hola Boom Zapas. Te envío el comprobante de mi transferencia.')} full className="mt-6">
+            <Button href={waPlantilla('comprobante')} full className="mt-6">
               Enviar comprobante
             </Button>
           </aside>

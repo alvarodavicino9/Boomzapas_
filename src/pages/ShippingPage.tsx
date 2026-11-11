@@ -6,7 +6,7 @@ import { PhotoStrip } from '@/components/sections/PhotoStrip'
 import { ContactSection } from '@/components/sections/ContactSection'
 import { FOTOS } from '@/config/fotos'
 import { SITE } from '@/config/site'
-import { waLink } from '@/lib/whatsapp'
+import { waPlantilla } from '@/lib/whatsapp'
 import { srcsetWebp } from '@/lib/imagenes'
 
 const DATOS: { icon: IconName; title: string; text: string }[] = [
@@ -46,7 +46,7 @@ export default function ShippingPage() {
         position="50% 60%"
         actions={
           <>
-            <Button href={waLink('Hola Boom Zapas. Quiero consultar por un envío.')} size="lg">
+            <Button href={waPlantilla('envio')} size="lg">
               <Icon name="whatsapp" size={18} />
               Consultar mi envío
             </Button>
@@ -145,7 +145,7 @@ export default function ShippingPage() {
                 </div>
               </address>
               <div className="mt-8 flex flex-wrap gap-3">
-                <Button href={waLink('Hola Boom Zapas. Quiero coordinar el retiro de mi pedido.')} size="lg">
+                <Button href={waPlantilla('retiro')} size="lg">
                   Coordinar retiro
                 </Button>
                 <Button href={`https://maps.google.com/?q=${encodeURIComponent(SITE.address)}`} variant="outline" size="lg">

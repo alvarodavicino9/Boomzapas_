@@ -6,7 +6,7 @@ import { useProductos } from '@/context/ProductsContext'
 import { useAbrirProducto } from '@/hooks/useAbrirProducto'
 import { coincideBusqueda, hasStock } from '@/lib/filters'
 import { cn, formatARS, precioPromo } from '@/lib/format'
-import { waLink } from '@/lib/whatsapp'
+import { waConsulta } from '@/lib/whatsapp'
 import type { Producto } from '@/types'
 
 const MAX = 6
@@ -175,7 +175,7 @@ export function Buscador({ id, variante, className, onElegir, autoFocus }: Props
             ))}
           </div>
           <a
-            href={waLink(`Hola Boom Zapas. ¿Tienen ${termino}?`)}
+            href={waConsulta([`¡Hola Boom Zapas! 👋 ¿Tienen ${termino}?`, '', '• Talle:', '• Color o versión que busco:'])}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-4 flex items-center gap-2 text-[13px] font-semibold text-[color:var(--bz-accent-text)] hover:underline hover:underline-offset-4"

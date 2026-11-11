@@ -4,7 +4,7 @@ import { Icon } from '@/components/ui/Icon'
 import { ModeSwitch } from '@/components/ui/ModeToggle'
 import { InstalarApp } from './InstalarApp'
 import { SITE } from '@/config/site'
-import { waLink, waLinkGeneric } from '@/lib/whatsapp'
+import { waLinkGeneric } from '@/lib/whatsapp'
 
 const MAPA = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SITE.address)}`
 
@@ -29,7 +29,7 @@ export function Footer() {
           </div>
           <div className="flex flex-wrap gap-3">
             <a
-              href={waLink('Hola Boom Zapas. Quiero hacer una consulta.')}
+              href={waLinkGeneric()}
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn-accent max-sm:!px-5"

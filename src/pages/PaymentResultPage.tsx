@@ -3,7 +3,7 @@ import { useParams, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { useCart } from '@/context/CartContext'
-import { waLink } from '@/lib/whatsapp'
+import { waConsulta } from '@/lib/whatsapp'
 
 const TEXTOS = {
   exito: {
@@ -51,7 +51,7 @@ export default function PaymentResultPage() {
         <Button
           variant="outline"
           size="lg"
-          href={waLink(`Hola Boom Zapas. Te escribo por mi pedido${pedido ? ` #${pedido}` : ''}.`)}
+          href={waConsulta([`¡Hola Boom Zapas! 👋 Te escribo por mi pedido${pedido ? ` #${pedido}` : ''}.`, '', '• Nombre y apellido:', '• Consulta:'])}
         >
           <Icon name="whatsapp" size={18} className="mr-2" /> Escribirnos
         </Button>

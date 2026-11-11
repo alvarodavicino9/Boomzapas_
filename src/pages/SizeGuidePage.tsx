@@ -2,7 +2,7 @@ import { PageHeader } from '@/components/ui/PageHeader'
 import { Button } from '@/components/ui/Button'
 import { Reveal } from '@/components/ui/Reveal'
 import { TABLA_DE_TALLES_ALT, TABLA_DE_TALLES_SRC } from '@/components/catalog/SizeChartDialog'
-import { waLink } from '@/lib/whatsapp'
+import { waPlantilla } from '@/lib/whatsapp'
 
 const PASOS = [
   'Apoyá el pie descalzo sobre una hoja, contra una pared.',
@@ -33,7 +33,7 @@ export default function SizeGuidePage() {
             Los talles pueden variar 0,5 cm según la marca. Ante la duda, consultanos los centímetros del modelo que te
             gusta.
           </p>
-          <Button href={waLink('Hola Boom Zapas. Necesito ayuda para elegir mi talle.')} className="mt-8">
+          <Button href={waPlantilla('talle')} className="mt-8">
             Consultar mi talle
           </Button>
         </Reveal>

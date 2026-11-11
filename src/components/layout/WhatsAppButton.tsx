@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Icon } from '@/components/ui/Icon'
 import { Logo } from '@/components/ui/Logo'
 import { cn } from '@/lib/format'
-import { waLink } from '@/lib/whatsapp'
+import { waConsulta, waLinkGeneric } from '@/lib/whatsapp'
 
 const PREGUNTAS = [
   'Quiero consultar por un modelo',
@@ -71,12 +71,24 @@ export function WhatsAppButton() {
   const toggle = (q: string) => setElegidas((l) => (l.includes(q) ? l.filter((x) => x !== q) : [...l, q]))
 
   const enviar = () => {
-    const partes = [
-      `Hola Boom Zapas${nombre.trim() ? `, soy ${nombre.trim()}` : ''}.`,
-      elegidas.length ? `Quería consultarles:\n${elegidas.map((q) => `• ${q}`).join('\n')}` : '',
-      mensaje.trim(),
-    ].filter(Boolean)
-    window.open(waLink(partes.length > 1 ? partes.join('\n\n') : 'Hola Boom Zapas. Quiero hacer una consulta.'), '_blank', 'noopener,noreferrer')
+    const hayAlgo = elegidas.length > 0 || mensaje.trim()
+    window.open(
+      hayAlgo
+        ? waConsulta([
+            `¡Hola Boom Zapas! 👋${nombre.trim() ? ` Soy ${nombre.trim()}.` : ''}`,
+            '',
+            elegidas.length ? '*Quería consultarles:*' : null,
+            ...elegidas.map((q) => `• ${q}`),
+            elegidas.length && mensaje.trim() ? '' : null,
+            mensaje.trim() ? `💬 ${mensaje.trim()}` : null,
+            '',
+            '• Modelo que me interesa:',
+            '• Talle:',
+          ])
+        : waLinkGeneric(),
+      '_blank',
+      'noopener,noreferrer',
+    )
     setOpen(false)
     setElegidas([])
     setMensaje('')

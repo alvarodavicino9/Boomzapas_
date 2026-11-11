@@ -4,35 +4,38 @@ import { OrderSummary } from './OrderSummary'
 import { SITE } from '@/config/site'
 import { useCopy } from '@/hooks/useCopy'
 import { aplicaPromo, formatARS, PROMO, precioUnitario } from '@/lib/format'
-import { buildOrderMessage, waLink } from '@/lib/whatsapp'
+import { buildOrderMessage, waLink, type DatosCliente } from '@/lib/whatsapp'
 import type { CartItem, MetodoPago, TipoEntrega } from '@/types'
 
 export interface OrderResult {
   pedidoId?: number | string
+  /** Código corto del pedido (BZ-1111-4F7K), para buscarlo en el chat. */
+  codigo: string
+  fecha: Date
   items: CartItem[]
   total: number
   metodo: MetodoPago
   entrega: TipoEntrega
-  nombre: string
+  cliente: DatosCliente
   /** true si el pedido no pudo registrarse en el servidor y se coordina sólo por WhatsApp. */
   offline: boolean
 }
 
 export function DoneStep({ order, onClose }: { order: OrderResult; onClose: () => void }) {
   const { copied, copy } = useCopy()
-  const { pedidoId, items, total, metodo, entrega, nombre, offline } = order
+  const { pedidoId, codigo, fecha, items, total, metodo, entrega, cliente, offline } = order
   const pares = items.reduce((n, i) => n + i.cantidad, 0)
 
   // Sin servidor (modo local) igual se muestran los datos de pago: el pedido se confirma por WhatsApp.
   const showPay = !offline || MODO_DEMO
 
   const message = (comprobante = false) =>
-    buildOrderMessage({ items, total, metodo, entrega, nombre, pedidoId, comprobante })
+    buildOrderMessage({ codigo, fecha, items, metodo, entrega, cliente, pedidoId, comprobante })
 
   return (
     <div className="space-y-7 px-5 pb-8 pt-8 sm:px-8">
       <div>
-        <p className="label text-index">{offline ? 'Un paso más' : pedidoId ? `Pedido #${pedidoId}` : 'Pedido'}</p>
+        <p className="label text-index">{offline ? `Un paso más · Pedido ${codigo}` : pedidoId ? `Pedido #${pedidoId} · ${codigo}` : `Pedido ${codigo}`}</p>
         <h3 className="display-product mt-3">{offline ? (MODO_DEMO ? 'Enviá tu pedido por WhatsApp' : 'Falta enviarlo por WhatsApp') : 'Pedido recibido'}</h3>
         <p className="body-text mt-3">
           {offline

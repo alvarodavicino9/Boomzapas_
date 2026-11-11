@@ -14,7 +14,8 @@ import { detallesDe } from '@/data/detalles'
 import { cn, descuentoOferta, formatARS, PROMO, precioPromo } from '@/lib/format'
 import { getTalles, isSoldOut } from '@/lib/stock'
 import { getStatus } from '@/lib/status'
-import { waLink } from '@/lib/whatsapp'
+import { mensajeProducto, waLink } from '@/lib/whatsapp'
+import { SITE_URL } from '@/lib/seo'
 import { rutaProducto } from '@/lib/slug'
 import type { Producto } from '@/types'
 
@@ -135,18 +136,10 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
   }
 
   const handleWhatsApp = () => {
-    window.open(
-      waLink(
-        selected
-          ? `Hola Boom Zapas. Quiero consultar por: ${p.nombre} · Talle ${selected.talle} (${formatARS(p.precio)}).\n${link}`
-          : `Hola Boom Zapas. Quiero consultar por: ${p.nombre} (${formatARS(p.precio)}). ¿Qué talles tienen?\n${link}`,
-      ),
-      '_blank',
-      'noopener,noreferrer',
-    )
+    window.open(waLink(mensajeProducto(p, selected?.talle)), '_blank', 'noopener,noreferrer')
   }
 
-  const link = `${window.location.origin}${rutaProducto(p)}`
+  const link = `${SITE_URL}${rutaProducto(p)}`
 
   // Compartir: el menú del celular (WhatsApp, Instagram…) o, en la compu, copiar el link.
   const compartir = async () => {
