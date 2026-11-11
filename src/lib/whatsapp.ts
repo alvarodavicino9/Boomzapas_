@@ -1,6 +1,6 @@
 import { SITE } from '@/config/site'
 import type { CartItem, MetodoPago, TipoEntrega } from '@/types'
-import { formatARS } from './format'
+import { aplicaPromo, descuentoPromo, formatARS, PROMO } from './format'
 
 export const waLink = (message: string) =>
   `https://wa.me/${SITE.whatsapp}?text=${encodeURIComponent(message)}`
@@ -33,6 +33,7 @@ export const buildOrderMessage = ({
   comprobante,
 }: OrderMessageInput) => {
   const lines = items.map((i) => `• ${i.nombre} · Talle ${i.talle} · x${i.cantidad}`)
+  const pares = items.reduce((n, i) => n + i.cantidad, 0)
   return [
     comprobante
       ? `Hola. Te envío el comprobante de mi pedido${pedidoId ? ` #${pedidoId}` : ''}.`
@@ -40,6 +41,7 @@ export const buildOrderMessage = ({
     '',
     ...lines,
     '',
+    ...(aplicaPromo(pares) ? [`Promo ${PROMO.minimo} pares o más: −${formatARS(descuentoPromo(pares))}`] : []),
     `Total: ${formatARS(total)}`,
     `Pago: ${metodoLabel[metodo]}`,
     `Entrega: ${entrega === 'envio' ? 'Envío gratis por Correo Argentino' : 'Retiro en el showroom'}`,

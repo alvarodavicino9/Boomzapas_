@@ -9,7 +9,7 @@ import { useUI } from '@/context/UIContext'
 import { setCostos, useCostos } from '@/lib/adminStore'
 import { estadoStock, totalStock } from '@/lib/adminStats'
 import { MODO_DEMO } from '@/lib/api'
-import { cn, formatARS, transferPrice } from '@/lib/format'
+import { cn, formatARS } from '@/lib/format'
 import type { Producto } from '@/types'
 
 type Filtro = 'todos' | 'bajo' | 'agotados' | 'ocultos' | 'nuevos' | 'sincosto'
@@ -49,7 +49,7 @@ export function Productos({ productos, filtroInicial, setStock }: ProductosProps
     [productos, costos],
   )
 
-  const ganancia = (p: Producto) => (costos[p.id] ? transferPrice(p.precio) - costos[p.id] : -Infinity)
+  const ganancia = (p: Producto) => (costos[p.id] ? p.precio - costos[p.id] : -Infinity)
 
   const lista = useMemo(() => {
     const t = q.trim().toLowerCase()
@@ -188,7 +188,7 @@ export function Productos({ productos, filtroInicial, setStock }: ProductosProps
                     <span className="block truncate text-[12px] text-index">
                       {p.marca} · {formatARS(p.precio)}
                       {costos[p.id] ? (
-                        <span className="text-[#3fbf7f]"> · gana {formatARS(transferPrice(p.precio) - costos[p.id])}</span>
+                        <span className="text-[#3fbf7f]"> · gana {formatARS(p.precio - costos[p.id])}</span>
                       ) : (
                         <span> · sin costo</span>
                       )}

@@ -7,9 +7,8 @@ import { ProductImage } from '@/components/catalog/ProductImage'
 import { useCart } from '@/context/CartContext'
 import { useUI } from '@/context/UIContext'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
-import { formatARS } from '@/lib/format'
+import { aplicaPromo, descuentoPromo, formatARS, PROMO } from '@/lib/format'
 import { Icon } from '@/components/ui/Icon'
-import { SITE } from '@/config/site'
 
 /** Pedido: panel lateral con las líneas del pedido y el paso a confirmar. */
 export function CartDrawer() {
@@ -24,9 +23,10 @@ export function CartDrawer() {
     return () => document.removeEventListener('keydown', onKey)
   }, [cartOpen, closeCart])
 
-  const transferTotal = Math.max(0, subtotal - SITE.transferDiscount * count)
-
-  const ahorro = subtotal - transferTotal
+  // Promo: llevando 2 pares o más, $5.000 off por cada par.
+  const promo = descuentoPromo(count)
+  const total = subtotal - promo
+  const conPromo = aplicaPromo(count)
 
   return createPortal(
     <AnimatePresence>
@@ -160,9 +160,11 @@ export function CartDrawer() {
                             </div>
                             <div className="text-right">
                               <p className="text-[15px] font-bold leading-5">{formatARS(i.precio * i.cantidad)}</p>
-                              <p className="text-[11.5px] leading-4 text-[color:var(--bz-accent-text)]">
-                                {formatARS(Math.max(0, i.precio - SITE.transferDiscount) * i.cantidad)} transf.
-                              </p>
+                              {conPromo && (
+                                <p className="text-[11.5px] leading-4 text-[#1f9d55]">
+                                  −{formatARS(PROMO.descuento * i.cantidad)} promo
+                                </p>
+                              )}
                             </div>
                           </div>
                         </div>
@@ -177,20 +179,48 @@ export function CartDrawer() {
                       <dt className="text-index">Subtotal</dt>
                       <dd className="font-medium">{formatARS(subtotal)}</dd>
                     </div>
+                    {conPromo && (
+                      <div className="flex items-baseline justify-between">
+                        <dt className="text-index">Promo {PROMO.minimo} pares o más</dt>
+                        <dd className="font-semibold text-[#1f9d55]">−{formatARS(promo)}</dd>
+                      </div>
+                    )}
                     <div className="flex items-baseline justify-between">
                       <dt className="text-index">Envío</dt>
                       <dd className="font-semibold text-[#3fbf7f]">Gratis</dd>
                     </div>
                     <div className="flex items-baseline justify-between border-t border-line pt-2.5">
                       <dt className="font-semibold">Total</dt>
-                      <dd className="font-display text-[1.45rem] font-bold leading-none">{formatARS(subtotal)}</dd>
+                      <dd className="font-display text-[1.45rem] font-bold leading-none">{formatARS(total)}</dd>
                     </div>
                   </dl>
-                  <div className="mt-3 flex items-center justify-between gap-3 rounded-xl bg-accent/10 px-3.5 py-2.5 text-[12.5px] leading-4">
+                  <div
+                    className={
+                      conPromo
+                        ? 'mt-3 flex items-center justify-between gap-3 rounded-xl bg-[#1f9d55]/12 px-3.5 py-2.5 text-[12.5px] leading-4'
+                        : 'mt-3 flex items-center justify-between gap-3 rounded-xl bg-accent/10 px-3.5 py-2.5 text-[12.5px] leading-4'
+                    }
+                  >
                     <span>
-                      Con transferencia o efectivo <strong className="font-semibold">{formatARS(transferTotal)}</strong>
+                      {conPromo ? (
+                        <>
+                          Promo aplicada: <strong className="font-semibold">{formatARS(PROMO.descuento)} off</strong> en cada par
+                        </>
+                      ) : (
+                        <>
+                          Sumá otro par y ahorrás <strong className="font-semibold">{formatARS(PROMO.descuento * PROMO.minimo)}</strong> ({formatARS(PROMO.descuento)} por par)
+                        </>
+                      )}
                     </span>
-                    <span className="shrink-0 rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold text-on-accent">−{formatARS(ahorro)}</span>
+                    <span
+                      className={
+                        conPromo
+                          ? 'shrink-0 rounded-full bg-[#1f9d55] px-2 py-0.5 text-[11px] font-bold text-white'
+                          : 'shrink-0 rounded-full bg-accent px-2 py-0.5 text-[11px] font-bold text-on-accent'
+                      }
+                    >
+                      {conPromo ? `−${formatARS(promo)}` : `${PROMO.minimo}+ pares`}
+                    </span>
                   </div>
                   <Button size="lg" variant="accent" full onClick={openCheckout} className="mt-4">
                     Finalizar pedido <Icon name="arrow" size={17} />

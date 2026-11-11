@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Icon, type IconName } from '@/components/ui/Icon'
 
 const ITEMS: { icon: IconName; text: string; to: string }[] = [
+  { icon: 'tag', text: 'Llevando 2 pares o más: $5.000 off c/u', to: '/pagos' },
   { icon: 'truck', text: 'Envío gratis a todo el país', to: '/envios' },
   { icon: 'store', text: 'Retiro en Córdoba', to: '/envios' },
   { icon: 'card', text: 'Mercado Pago, transferencia o efectivo', to: '/pagos' },

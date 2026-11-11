@@ -26,7 +26,7 @@ export const PAGINAS: Record<string, MetaPagina> = {
   },
   '/catalogo': {
     titulo: 'Catálogo de zapatillas: Nike, Adidas, Jordan | Boom Zapas',
-    descripcion: `Mirá todas las zapatillas Nike, Adidas, Jordan, New Balance, Puma y Vans con fotos reales y talles disponibles. Envío gratis y ${'$'}${SITE.transferDiscount.toLocaleString('es-AR')} menos con transferencia.`,
+    descripcion: `Mirá todas las zapatillas Nike, Adidas, Jordan, New Balance, Puma y Vans con fotos reales y talles disponibles. Envío gratis y ${'$'}${SITE.promoPares.descuento.toLocaleString('es-AR')} off por par llevando 2 o más.`,
     h1: 'Catálogo de zapatillas',
   },
   '/envios': {
@@ -37,7 +37,7 @@ export const PAGINAS: Record<string, MetaPagina> = {
   },
   '/pagos': {
     titulo: 'Medios de pago: Mercado Pago, transferencia y tarjetas | Boom Zapas',
-    descripcion: `Pagá tus zapatillas con Mercado Pago, tarjeta, QR, transferencia o efectivo. Con transferencia o efectivo tenés ${'$'}${SITE.transferDiscount.toLocaleString('es-AR')} de descuento por par.`,
+    descripcion: `Pagá tus zapatillas con Mercado Pago, tarjeta, QR, transferencia o efectivo. Llevando 2 pares o más tenés ${'$'}${SITE.promoPares.descuento.toLocaleString('es-AR')} de descuento en cada par.`,
     h1: 'Medios de pago',
   },
   '/como-comprar': {
@@ -104,7 +104,7 @@ export interface DatosProducto {
 export function metaProducto(p: DatosProducto): MetaPagina {
   const precio =
     p.precio && p.precio > 0
-      ? ` a ${pesos(p.precio)}${p.precio > SITE.transferDiscount ? ` (${pesos(p.precio - SITE.transferDiscount)} con transferencia)` : ''}`
+      ? ` a ${pesos(p.precio)}${p.precio > SITE.promoPares.descuento ? ` (${pesos(p.precio - SITE.promoPares.descuento)} c/u llevando 2 o más)` : ''}`
       : ''
   return {
     titulo: `${p.nombre} | Boom Zapas Córdoba`,

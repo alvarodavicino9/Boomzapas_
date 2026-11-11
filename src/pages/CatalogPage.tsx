@@ -7,7 +7,7 @@ import { CatalogFilters } from '@/components/catalog/CatalogFilters'
 import { ProductGrid } from '@/components/catalog/ProductGrid'
 import { OrdenMenu } from '@/components/catalog/OrdenMenu'
 import { useProductos } from '@/context/ProductsContext'
-import { CATEGORIAS, SITE } from '@/config/site'
+import { CATEGORIAS } from '@/config/site'
 import {
   NUEVOS_RECIENTES,
   PRICE_RANGES,
@@ -19,7 +19,7 @@ import {
   type FilterState,
   type Orden,
 } from '@/lib/filters'
-import { formatARS } from '@/lib/format'
+import { formatARS, PROMO } from '@/lib/format'
 import type { FiltroCategoria } from '@/types'
 
 const isCategoria = (v: string | null): v is FiltroCategoria => CATEGORIAS.some((c) => c.id === v)
@@ -189,7 +189,7 @@ export default function CatalogPage() {
           {query ? <>Resultados para “{query}”</> : 'Catálogo'}
         </h1>
         <p className="body-text mt-2 max-w-2xl text-[13.5px] leading-6 sm:text-[15px]">
-          Fotos reales de cada par · envío gratis a todo el país · {formatARS(SITE.transferDiscount)} menos por par con transferencia.
+          Fotos reales de cada par · envío gratis a todo el país · llevando {PROMO.minimo} o más, {formatARS(PROMO.descuento)} off en cada par.
         </p>
         {/* categorías rápidas: se deslizan en el celular */}
       </header>

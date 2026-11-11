@@ -3,7 +3,7 @@ import { MODO_DEMO } from '@/lib/api'
 import { OrderSummary } from './OrderSummary'
 import { SITE } from '@/config/site'
 import { useCopy } from '@/hooks/useCopy'
-import { formatARS, transferPrice } from '@/lib/format'
+import { aplicaPromo, formatARS, PROMO, precioUnitario } from '@/lib/format'
 import { buildOrderMessage, waLink } from '@/lib/whatsapp'
 import type { CartItem, MetodoPago, TipoEntrega } from '@/types'
 
@@ -21,6 +21,7 @@ export interface OrderResult {
 export function DoneStep({ order, onClose }: { order: OrderResult; onClose: () => void }) {
   const { copied, copy } = useCopy()
   const { pedidoId, items, total, metodo, entrega, nombre, offline } = order
+  const pares = items.reduce((n, i) => n + i.cantidad, 0)
 
   // Sin servidor (modo local) igual se muestran los datos de pago: el pedido se confirma por WhatsApp.
   const showPay = !offline || MODO_DEMO
@@ -50,7 +51,7 @@ export function DoneStep({ order, onClose }: { order: OrderResult; onClose: () =
             <Row label="Banco" value={SITE.bank.bank} />
             <Row label="Alias" value={SITE.bank.alias} onCopy={() => copy(SITE.bank.alias, 'alias')} copied={copied === 'alias'} />
             <Row label="CBU" value={SITE.bank.cbu} mono onCopy={() => copy(SITE.bank.cbu, 'cbu')} copied={copied === 'cbu'} />
-            <Row label="Importe" value={formatARS(items.reduce((s, i) => s + transferPrice(i.precio) * i.cantidad, 0))} strong />
+            <Row label="Importe" value={formatARS(total)} strong />
           </dl>
           <p className="label mt-4 text-index">Enviá el comprobante por WhatsApp para confirmar tu pedido.</p>
         </div>
@@ -63,7 +64,12 @@ export function DoneStep({ order, onClose }: { order: OrderResult; onClose: () =
         </p>
       )}
 
-      <OrderSummary items={items} total={total} />
+      <OrderSummary
+        items={items}
+        total={total}
+        unitPrice={aplicaPromo(pares) ? (i) => precioUnitario(i.precio, pares) : undefined}
+        discountLabel={aplicaPromo(pares) ? `Promo ${PROMO.minimo} pares o más: ${formatARS(PROMO.descuento)} off en cada par.` : undefined}
+      />
 
       <div className="grid gap-3">
         <Button size="lg" full href={waLink(message(metodo === 'transferencia' && showPay))}>

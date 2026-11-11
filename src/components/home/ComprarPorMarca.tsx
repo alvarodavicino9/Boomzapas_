@@ -8,11 +8,11 @@ import { LogoMarca } from './LogoMarca'
 
 /** Las cinco marcas de la tienda, cada una con un par de muestra. Llevan al catálogo filtrado por marca. */
 const MARCAS = [
-  { marca: 'Nike', foto: '/fotos/modelos/nike-sb-dunk-panda/1.jpg', color: '#f26a21' },
-  { marca: 'Adidas', foto: '/fotos/modelos/adidas-samba-clasicas/1.jpg', color: '#2d6cdf' },
-  { marca: 'Puma', foto: '/fotos/modelos/puma-180-total-black/1.jpg', color: '#d92c37' },
-  { marca: 'Vans', foto: '/fotos/modelos/vans-knu-gum-blue/1.jpg', color: '#c8102e' },
-  { marca: 'New Balance', foto: '/fotos/modelos/new-balance-530-cloud-grey/1.jpg', color: '#8a8f98' },
+  { marca: 'Nike', foto: '/fotos/modelos/nike-sb-dunk-panda/portada.jpg', color: '#f26a21' },
+  { marca: 'Adidas', foto: '/fotos/modelos/adidas-samba-clasicas/portada.jpg', color: '#2d6cdf' },
+  { marca: 'Puma', foto: '/fotos/modelos/puma-180-total-black/portada.jpg', color: '#d92c37' },
+  { marca: 'Vans', foto: '/fotos/modelos/vans-knu-gum-blue/portada.jpg', color: '#c8102e' },
+  { marca: 'New Balance', foto: '/fotos/modelos/new-balance-530-cloud-grey/portada.jpg', color: '#8a8f98' },
 ]
 
 export function ComprarPorMarca() {

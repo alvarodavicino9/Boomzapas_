@@ -5,8 +5,8 @@ import { Drawer, Field } from './ui'
 import { useUI } from '@/context/UIContext'
 import { crearProducto, editarProducto, eliminarProductoPropio, esProductoPropio, setCosto, useCostos } from '@/lib/adminStore'
 import { MODO_DEMO } from '@/lib/api'
-import { BRANDS, CATEGORIAS, DEFAULT_TALLES, SITE } from '@/config/site'
-import { cn, formatARS, transferPrice } from '@/lib/format'
+import { BRANDS, CATEGORIAS, DEFAULT_TALLES } from '@/config/site'
+import { cn, formatARS, PROMO, precioPromo } from '@/lib/format'
 import type { Producto } from '@/types'
 
 interface Props {
@@ -82,7 +82,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((x) => ({ ...x, [k]: v }))
 
   const costoNum = Number(costo) || 0
-  const margen = precio > 0 && costoNum > 0 ? ((transferPrice(precio) - costoNum) / costoNum) * 100 : null
+  const margen = precio > 0 && costoNum > 0 ? ((precio - costoNum) / costoNum) * 100 : null
 
   const guardar = () => {
     if (!editable) {
@@ -211,7 +211,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
             ) : (
               <>
                 <p className="font-display text-xl font-bold">{formatARS(precio || producto?.precio || 0)}</p>
-                <p className="text-index">Transferencia: {formatARS(transferPrice(precio || producto?.precio || 0))}</p>
+                <p className="text-index">Llevando {PROMO.minimo}+: {formatARS(precioPromo(precio || producto?.precio || 0))} c/u</p>
               </>
             )}
           </div>
@@ -242,7 +242,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
           </Field>
           <Field
             label={antes > precio ? 'Precio de venta (oferta)' : 'Precio de venta'}
-            hint={precio > 0 ? `Por transferencia: ${formatARS(transferPrice(precio))} (−${formatARS(SITE.transferDiscount)})` : undefined}
+            hint={precio > 0 ? `Llevando ${PROMO.minimo} pares o más: ${formatARS(precioPromo(precio))} c/u (−${formatARS(PROMO.descuento)})` : undefined}
           >
             <input
               className="field-line"
@@ -274,7 +274,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
             label="Costo por par"
             hint={
               margen !== null
-                ? `Ganás ${formatARS(transferPrice(precio) - costoNum)} por par con transferencia (${margen.toFixed(0)}%)`
+                ? `Ganás ${formatARS(precio - costoNum)} por par (${margen.toFixed(0)}%) · ${formatARS(precioPromo(precio) - costoNum)} con la promo de ${PROMO.minimo}+`
                 : 'Lo que te cuesta a vos. No se ve en la tienda.'
             }
           >

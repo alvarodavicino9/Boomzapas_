@@ -196,7 +196,7 @@ function semilla(): PedidoAdmin[] {
         marca: p.marca,
         talle,
         cantidad: 1,
-        precio_unit: metodo === 'transferencia' ? Math.max(0, p.precio - SITE.transferDiscount) : p.precio,
+        precio_unit: nItems >= SITE.promoPares.minimo ? Math.max(0, p.precio - SITE.promoPares.descuento) : p.precio,
       })
     }
     const edad = dias
@@ -363,7 +363,9 @@ export function registrarPedidoDeTienda(input: {
   email?: string
   direccion?: string
 }) {
-  const esTransf = input.metodo === 'transferencia'
+  // Promo de la tienda: llevando 2 pares o más, $5.000 off por cada par.
+  const pares = input.items.reduce((n, i) => n + i.cantidad, 0)
+  const conPromo = pares >= SITE.promoPares.minimo
   return crearPedidoManual({
     cliente: { nombre: input.nombre, telefono: input.telefono, email: input.email },
     items: input.items.map((i) => ({
@@ -372,7 +374,7 @@ export function registrarPedidoDeTienda(input: {
       marca: i.marca,
       talle: i.talle,
       cantidad: i.cantidad,
-      precio_unit: esTransf ? Math.max(0, i.precio - SITE.transferDiscount) : i.precio,
+      precio_unit: conPromo ? Math.max(0, i.precio - SITE.promoPares.descuento) : i.precio,
     })),
     metodo_pago: input.metodo,
     entrega: input.entrega,

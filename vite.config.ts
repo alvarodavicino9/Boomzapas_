@@ -144,7 +144,7 @@ function paginasDeProducto(): Plugin {
             jsonLdProducto(m, ruta, SITE),
             jsonLdMigas([{ nombre: 'Inicio', ruta: '/' }, { nombre: 'Catálogo', ruta: '/catalogo' }, { nombre: m.nombre, ruta }], SITE),
           ],
-          extra: `<p>${esc(m.marca)} · ${pesos(m.precio)} (${pesos(m.precio - SITE_INFO.transferDiscount)} con transferencia o efectivo). Envío gratis a todo el país y retiro en Córdoba.</p><p><a href="/catalogo">Ver todo el catálogo</a></p>`,
+          extra: `<p>${esc(m.marca)} · ${pesos(m.precio)} (${pesos(m.precio - SITE_INFO.promoPares.descuento)} c/u llevando 2 pares o más). Envío gratis a todo el país y retiro en Córdoba.</p><p><a href="/catalogo">Ver todo el catálogo</a></p>`,
         })
         // Dos copias: /zapatilla/<modelo>.html (Vercel la sirve sin el .html gracias a "cleanUrls")
         // y /zapatilla/<modelo>/index.html (por si se abre con barra al final).

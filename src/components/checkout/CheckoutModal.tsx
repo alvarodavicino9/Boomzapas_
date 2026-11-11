@@ -6,9 +6,8 @@ import { PaymentStep } from './PaymentStep'
 import { DoneStep, type OrderResult } from './DoneStep'
 import { useCart } from '@/context/CartContext'
 import { useUI } from '@/context/UIContext'
-import { SITE } from '@/config/site'
 import { ApiError, MODO_DEMO, crearPedido } from '@/lib/api'
-import { cn, transferPrice } from '@/lib/format'
+import { cn, descuentoPromo, precioUnitario } from '@/lib/format'
 import { registrarPedidoDeTienda } from '@/lib/adminStore'
 import type { MetodoPago, PedidoPayload } from '@/types'
 
@@ -44,8 +43,8 @@ export function CheckoutModal() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [checkoutOpen])
 
-  const isTransfer = metodo === 'transferencia'
-  const total = isTransfer ? Math.max(0, subtotal - SITE.transferDiscount * count) : subtotal
+  // Promo: llevando 2 pares o más, $5.000 off por cada par (con cualquier medio de pago).
+  const total = subtotal - descuentoPromo(count)
 
   const patchForm = (patch: Partial<CustomerForm>) => {
     setForm((f) => ({ ...f, ...patch }))
@@ -98,7 +97,7 @@ export function CheckoutModal() {
         producto_id: i.productoId,
         talle: i.talle,
         cantidad: i.cantidad,
-        precio_unit: isTransfer ? transferPrice(i.precio) : i.precio,
+        precio_unit: precioUnitario(i.precio, count),
       })),
       metodo_pago: metodo,
       notas: buildNotas(),

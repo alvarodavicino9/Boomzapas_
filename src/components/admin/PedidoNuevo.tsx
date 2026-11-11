@@ -5,8 +5,7 @@ import { Icon } from '@/components/ui/Icon'
 import { Field } from './ui'
 import { crearPedidoManual, type ItemPedido } from '@/lib/adminStore'
 import { useUI } from '@/context/UIContext'
-import { SITE } from '@/config/site'
-import { cn, formatARS } from '@/lib/format'
+import { cn, descuentoPromo, formatARS, PROMO, precioUnitario } from '@/lib/format'
 import type { Producto } from '@/types'
 
 interface Props {
@@ -30,9 +29,6 @@ const ESTADOS_INICIALES = [
   { id: 'pendiente', label: 'Falta cobrar', hint: 'Queda esperando el pago' },
 ]
 
-/** Precio con el descuento que corresponde al medio de pago. */
-const precioPara = (p: Producto, metodo: string) =>
-  metodo === 'transferencia' || metodo === 'efectivo' ? Math.max(0, p.precio - SITE.transferDiscount) : p.precio
 
 /** Cargar una venta del showroom o un pedido que llegó por Instagram o WhatsApp, con uno o varios pares. */
 export function PedidoNuevo({ open, onClose, productos, onCreado }: Props) {
@@ -53,18 +49,13 @@ export function PedidoNuevo({ open, onClose, productos, onCreado }: Props) {
   const ordenados = useMemo(() => [...productos].filter((p) => !p.oculto).sort((a, b) => a.nombre.localeCompare(b.nombre)), [productos])
   const prod = productos.find((p) => String(p.id) === prodId)
   const subtotal = items.reduce((a, i) => a + i.precio_unit * i.cantidad, 0)
-  const desc = Math.min(subtotal, Math.max(0, Number(descuento) || 0))
-  const total = subtotal - desc
+  // Promo de la tienda: llevando 2 pares o más, $5.000 off por cada par.
+  const pares = items.reduce((a, i) => a + i.cantidad, 0)
+  const promo = descuentoPromo(pares)
+  const desc = Math.min(subtotal - promo, Math.max(0, Number(descuento) || 0))
+  const total = subtotal - promo - desc
 
-  const cambiarMetodo = (m: string) => {
-    setMetodo(m)
-    setItems((list) =>
-      list.map((i) => {
-        const p = productos.find((x) => x.id === i.producto_id)
-        return p ? { ...i, precio_unit: precioPara(p, m) } : i
-      }),
-    )
-  }
+  const cambiarMetodo = (m: string) => setMetodo(m)
 
   const agregar = () => {
     if (!prod) return setError('Elegí un modelo.')
@@ -73,7 +64,7 @@ export function PedidoNuevo({ open, onClose, productos, onCreado }: Props) {
     setItems((list) => {
       const k = list.findIndex((i) => i.producto_id === prod.id && i.talle === talle)
       if (k >= 0) return list.map((i, n) => (n === k ? { ...i, cantidad: i.cantidad + 1 } : i))
-      return [...list, { producto_id: prod.id, nombre: prod.nombre, marca: prod.marca, talle, cantidad: 1, precio_unit: precioPara(prod, metodo) }]
+      return [...list, { producto_id: prod.id, nombre: prod.nombre, marca: prod.marca, talle, cantidad: 1, precio_unit: prod.precio }]
     })
     setTalle('')
   }
@@ -96,7 +87,7 @@ export function PedidoNuevo({ open, onClose, productos, onCreado }: Props) {
     const id = crearPedidoManual(
       {
         cliente: { nombre: nombre.trim() || 'Cliente del showroom', telefono: telefono.trim(), email: email.trim() || undefined },
-        items,
+        items: items.map((i) => ({ ...i, precio_unit: precioUnitario(i.precio_unit, pares) })),
         metodo_pago: metodo,
         entrega,
         direccion: entrega === 'envio' ? direccion.trim() : undefined,
@@ -254,9 +245,11 @@ export function PedidoNuevo({ open, onClose, productos, onCreado }: Props) {
         )}
         <div className="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-4">
           <div className="text-[13px] text-index">
-            {desc > 0 && (
+            {(promo > 0 || desc > 0) && (
               <span className="block">
-                Subtotal {formatARS(subtotal)} · descuento −{formatARS(desc)}
+                Subtotal {formatARS(subtotal)}
+                {promo > 0 && ` · promo ${PROMO.minimo}+ pares −${formatARS(promo)}`}
+                {desc > 0 && ` · descuento −${formatARS(desc)}`}
               </span>
             )}
             Total <span className="ml-2 font-display text-xl font-bold text-ink">{formatARS(total)}</span>

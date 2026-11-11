@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { ProductImage } from './ProductImage'
 import { Icon } from '@/components/ui/Icon'
-import { cn, descuentoOferta, formatARS, transferPrice } from '@/lib/format'
+import { cn, descuentoOferta, formatARS, precioPromo } from '@/lib/format'
 import { getStatus } from '@/lib/status'
 import { getTalles } from '@/lib/stock'
 import type { Producto } from '@/types'
@@ -27,7 +27,7 @@ const ETIQUETA: Record<string, string> = {
 }
 
 /**
- * Tarjeta de producto: foto, marca, modelo, precio y precio con transferencia.
+ * Tarjeta de producto: foto, marca, modelo, precio y precio llevando 2 pares o más.
  * Las fotos se ven completas (sin recortar la zapatilla) y se pasan deslizando con el dedo;
  * en la compu, al pasar el mouse se desliza a la segunda. Tocar la foto o el texto abre la ficha.
  */
@@ -175,9 +175,9 @@ export function ProductCard({ producto, onOpen, eager }: ProductCardProps) {
           </span>
           {!soldOut && (
             <span className="mt-0.5 block truncate text-[11.5px] leading-4 text-[color:var(--bz-accent-text)] sm:text-[12.5px]">
-              <span className="font-semibold">{formatARS(transferPrice(producto.precio))}</span>{' '}
-              <span className="sm:hidden">transf.</span>
-              <span className="hidden sm:inline">con transferencia</span>
+              <span className="font-semibold">{formatARS(precioPromo(producto.precio))}</span>{' '}
+              <span className="sm:hidden">llevando 2</span>
+              <span className="hidden sm:inline">llevando 2 o más</span>
             </span>
           )}
         </span>

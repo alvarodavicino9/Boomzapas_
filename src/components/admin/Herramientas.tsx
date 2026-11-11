@@ -7,7 +7,7 @@ import { descargarBlob, descargarCSV, agruparClientes, metodoLabel, totalStock }
 import { exportarRespaldo, importarRespaldo, restablecerDatosLocales, type PedidoAdmin } from '@/lib/adminStore'
 import { MODO_DEMO } from '@/lib/api'
 import { SITE } from '@/config/site'
-import { formatARS, formatDate, transferPrice } from '@/lib/format'
+import { formatARS, formatDate, PROMO, precioPromo } from '@/lib/format'
 import type { Producto } from '@/types'
 
 const copiar = async (t: string) => {
@@ -31,9 +31,9 @@ function Calculadora() {
   const m = Number(margen) || 0
   const k = Math.min(0.5, Math.max(0, Number(comision) || 0) / 100)
   const lista = c > 0 ? redondear((c * (1 + m / 100)) / (1 - k)) : 0
-  const transf = lista > 0 ? transferPrice(lista) : 0
+  const promo = lista > 0 ? precioPromo(lista) : 0
   const gananciaLista = lista * (1 - k) - c
-  const gananciaTransf = transf - c
+  const gananciaPromo = promo * (1 - k) - c
   const Fila = ({ l, v, fuerte }: { l: string; v: string; fuerte?: boolean }) => (
     <div className="flex items-baseline justify-between gap-3 py-2">
       <span className="text-[13px] text-index">{l}</span>
@@ -41,7 +41,7 @@ function Calculadora() {
     </div>
   )
   return (
-    <Card title="Calculadora de precios" hint="Del costo al precio de lista y al precio por transferencia.">
+    <Card title="Calculadora de precios" hint={`Del costo al precio de venta y al precio con la promo de ${PROMO.minimo} pares o más.`}>
       <div className="grid grid-cols-3 gap-3">
         <Field label="Costo ($)">
           <input className="field-line" type="number" min={0} inputMode="numeric" value={costo} onChange={(e) => setCosto(e.target.value)} />
@@ -54,11 +54,11 @@ function Calculadora() {
         </Field>
       </div>
       <div className="mt-4 divide-y divide-line rounded-xl border border-line px-4">
-        <Fila l="Precio de lista sugerido" v={lista ? formatARS(lista) : '—'} fuerte />
-        <Fila l={`Por transferencia (−${formatARS(SITE.transferDiscount)})`} v={lista ? formatARS(transf) : '—'} />
-        <Fila l="Ganancia a precio de lista" v={lista ? formatARS(gananciaLista) : '—'} />
-        <Fila l="Ganancia por transferencia" v={lista ? formatARS(gananciaTransf) : '—'} />
-        <Fila l="Margen real por transferencia" v={lista && c ? `${((gananciaTransf / c) * 100).toFixed(0)}%` : '—'} />
+        <Fila l="Precio de venta sugerido" v={lista ? formatARS(lista) : '—'} fuerte />
+        <Fila l={`Con la promo ${PROMO.minimo}+ pares (−${formatARS(PROMO.descuento)})`} v={lista ? formatARS(promo) : '—'} />
+        <Fila l="Ganancia por par (1 par)" v={lista ? formatARS(gananciaLista) : '—'} />
+        <Fila l={`Ganancia por par (${PROMO.minimo} o más)`} v={lista ? formatARS(gananciaPromo) : '—'} />
+        <Fila l={`Margen real con la promo`} v={lista && c ? `${((gananciaPromo / c) * 100).toFixed(0)}%` : '—'} />
       </div>
       <p className="mt-3 text-[12px] leading-4 text-index">La comisión es la que te cobra el medio de pago (Mercado Pago, por ejemplo). Poné 0 si no aplica.</p>
     </Card>

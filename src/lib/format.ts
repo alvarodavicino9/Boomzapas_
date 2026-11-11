@@ -3,8 +3,16 @@ import { SITE } from '@/config/site'
 /** Precios en pesos con el formato de la tienda: `$ 89.900`. */
 export const formatARS = (n: number) => `$ ${Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`
 
-/** Precio final pagando por transferencia / efectivo. */
-export const transferPrice = (precio: number) => Math.max(0, precio - SITE.transferDiscount)
+/** Promo de la tienda: llevando 2 pares o más, $5.000 off por cada par. */
+export const PROMO = SITE.promoPares
+/** Precio de un par con la promo aplicada. */
+export const precioPromo = (precio: number) => Math.max(0, precio - PROMO.descuento)
+/** ¿Con esta cantidad de pares en el pedido corre la promo? */
+export const aplicaPromo = (pares: number) => pares >= PROMO.minimo
+/** Lo que se descuenta en un pedido con esa cantidad de pares. */
+export const descuentoPromo = (pares: number) => (aplicaPromo(pares) ? PROMO.descuento * pares : 0)
+/** Precio de cada par según cuántos pares lleva el pedido. */
+export const precioUnitario = (precio: number, pares: number) => (aplicaPromo(pares) ? precioPromo(precio) : precio)
 
 /** Cuánto se descuenta en la oferta del par (0 si no está en oferta). */
 export const descuentoOferta = (p: { precio: number; precioAntes?: number }) =>

@@ -11,7 +11,7 @@ import { useProductos } from '@/context/ProductsContext'
 import { useUI } from '@/context/UIContext'
 import { SITE } from '@/config/site'
 import { detallesDe } from '@/data/detalles'
-import { cn, descuentoOferta, formatARS, transferPrice } from '@/lib/format'
+import { cn, descuentoOferta, formatARS, PROMO, precioPromo } from '@/lib/format'
 import { getTalles, isSoldOut } from '@/lib/stock'
 import { getStatus } from '@/lib/status'
 import { waLink } from '@/lib/whatsapp'
@@ -109,7 +109,6 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
     talles.map((t) => t.talle),
   )
   const disponibles = talles.filter((t) => t.cantidad > 0).length
-  const ahorro = p.precio - transferPrice(p.precio)
   const oferta = descuentoOferta(p)
 
   const requireTalle = () => {
@@ -310,11 +309,11 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
             </div>
             <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-4">
               <p className="text-[14px]">
-                <span className="text-[20px] font-bold text-accent">{formatARS(transferPrice(p.precio))}</span>{' '}
-                <span className="text-index">con transferencia o efectivo</span>
+                <span className="text-[20px] font-bold text-accent">{formatARS(precioPromo(p.precio))}</span>{' '}
+                <span className="text-index">c/u llevando {PROMO.minimo} pares o más</span>
               </p>
               <span className="label shrink-0 rounded-full bg-accent px-3 py-1 text-[10px] font-bold text-on-accent">
-                Ahorrás {formatARS(ahorro)}
+                {formatARS(PROMO.descuento)} off c/u
               </span>
             </div>
           </div>
@@ -479,7 +478,7 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
                 {
                   icon: 'card' as const,
                   title: 'Medios de pago',
-                  text: `Mercado Pago, tarjetas, QR y transferencia. Pagando por transferencia o en efectivo tenés ${formatARS(SITE.transferDiscount)} de descuento por par.`,
+                  text: `Mercado Pago, tarjetas, QR, transferencia o efectivo. Llevando ${PROMO.minimo} pares o más tenés ${formatARS(PROMO.descuento)} de descuento por cada par.`,
                   to: '/pagos',
                 },
               ].map((b) => (

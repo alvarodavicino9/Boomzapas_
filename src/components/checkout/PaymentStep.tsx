@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/Button'
 import { OrderSummary } from './OrderSummary'
-import { SITE } from '@/config/site'
-import { cn, formatARS, transferPrice } from '@/lib/format'
+import { aplicaPromo, cn, formatARS, PROMO, precioUnitario } from '@/lib/format'
 import type { CartItem, MetodoPago } from '@/types'
 
 const METHODS: { id: MetodoPago; title: string; text: string; note?: string }[] = [
@@ -14,7 +13,6 @@ const METHODS: { id: MetodoPago; title: string; text: string; note?: string }[] 
     id: 'transferencia',
     title: 'Transferencia',
     text: 'CBU o alias. Confirmás enviando el comprobante.',
-    note: `${formatARS(SITE.transferDiscount)} menos por par`,
   },
   {
     id: 'whatsapp',
@@ -46,7 +44,8 @@ export function PaymentStep({
   onConfirm,
   onFallback,
 }: PaymentStepProps) {
-  const isTransfer = metodo === 'transferencia'
+  const pares = items.reduce((n, i) => n + i.cantidad, 0)
+  const conPromo = aplicaPromo(pares)
   return (
     <div className="space-y-7 px-5 pb-8 pt-7 sm:px-8">
       <div role="radiogroup" aria-label="Medio de pago" className="space-y-3">
@@ -84,9 +83,9 @@ export function PaymentStep({
 
       <OrderSummary
         items={items}
-        unitPrice={isTransfer ? (i) => transferPrice(i.precio) : undefined}
+        unitPrice={conPromo ? (i) => precioUnitario(i.precio, pares) : undefined}
         total={total}
-        discountLabel={isTransfer ? 'Precio con descuento por transferencia aplicado.' : undefined}
+        discountLabel={conPromo ? `Promo ${PROMO.minimo} pares o más aplicada: ${formatARS(PROMO.descuento)} off en cada par.` : undefined}
       />
 
       {error && (

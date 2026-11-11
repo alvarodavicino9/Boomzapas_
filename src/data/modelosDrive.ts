@@ -1,7 +1,7 @@
 /**
  * Modelos con fotos de estudio (carpeta "BOOM ZAPAS - Fotos página web" de Drive).
- * Cada modelo tiene su carpeta en /public/fotos/modelos/<carpeta>/ con las fotos numeradas 1.jpg, 2.jpg…
- * La 1 es la foto principal (zapatilla entera de costado); el resto son detalles.
+ * Cada modelo tiene su carpeta en /public/fotos/modelos/<carpeta>/ con la foto principal (portada.jpg) y las demás numeradas 2.jpg, 3.jpg…
+ * La portada es la foto principal (zapatilla entera de costado); el resto son detalles.
  * Todas están en 1100 × 1467 (3:4), igual que las primeras fotos reales del negocio.
  *
  * Para sumar un modelo: copiá sus fotos a una carpeta nueva con ese formato y agregá una línea acá.
@@ -90,8 +90,13 @@ export const MODELOS_DRIVE: ModeloDrive[] = [
   { nombre: 'Nike SB Dunk Low Grafito Brown', marca: 'Nike', categoria: 'urbanas', precio: 60800, carpeta: 'nike-sb-dunk-low-grafito-brown', fotos: 4 },
 ]
 
+/**
+ * Fotos de un modelo: la principal se llama "portada.jpg" y las demás 2.jpg, 3.jpg…
+ * (Si se reemplaza la portada por otra, conviene cambiarle el nombre o subir VERSION en public/sw.js
+ * para que nadie siga viendo la anterior guardada en su celular.)
+ */
 export const fotosDeModelo = (m: ModeloDrive): string[] =>
-  Array.from({ length: m.fotos }, (_, i) => `/fotos/modelos/${m.carpeta}/${i + 1}.jpg`)
+  Array.from({ length: m.fotos }, (_, i) => `/fotos/modelos/${m.carpeta}/${i === 0 ? 'portada' : i + 1}.jpg`)
 
 /** Modelos con fotos de estudio que no están en la carpeta de Drive (primeras fotos del negocio). */
 export const OTROS_MODELOS = [

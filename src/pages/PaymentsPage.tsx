@@ -5,7 +5,7 @@ import { Reveal } from '@/components/ui/Reveal'
 import { ContactSection } from '@/components/sections/ContactSection'
 import { SITE } from '@/config/site'
 import { useCopy } from '@/hooks/useCopy'
-import { formatARS } from '@/lib/format'
+import { formatARS, PROMO } from '@/lib/format'
 import { waLink } from '@/lib/whatsapp'
 
 const METHODS: { icon: IconName; title: string; text: string; tag?: string }[] = [
@@ -15,8 +15,7 @@ const METHODS: { icon: IconName; title: string; text: string; tag?: string }[] =
   {
     icon: 'check',
     title: 'Transferencia o efectivo',
-    text: `Te pasamos CBU y alias al confirmar. Pagando así tenés ${formatARS(SITE.transferDiscount)} de descuento por par.`,
-    tag: `${formatARS(SITE.transferDiscount)} off`,
+    text: 'Te pasamos CBU y alias al confirmar, o pagás en efectivo en el showroom.',
   },
 ]
 
@@ -38,10 +37,10 @@ export default function PaymentsPage() {
             Medios de <span className="text-accent">pago</span>
           </>
         }
-        subtitle="Elegí el que más te convenga. Siempre con atención personalizada y con descuento si pagás por transferencia o en efectivo."
+        subtitle={`Elegí el que más te convenga, siempre con atención personalizada. Y llevando ${PROMO.minimo} pares o más tenés ${formatARS(PROMO.descuento)} de descuento en cada par.`}
         datos={[
           { icon: 'bolt', title: 'Mercado Pago', text: 'Con tu cuenta, tarjeta o en cuotas.' },
-          { icon: 'tag', title: `${formatARS(SITE.transferDiscount)} menos por par`, text: 'Pagando por transferencia o en efectivo.' },
+          { icon: 'tag', title: `${formatARS(PROMO.descuento)} off por par`, text: `Llevando ${PROMO.minimo} pares o más, con cualquier medio de pago.` },
           { icon: 'card', title: 'Débito y crédito', text: 'Coordinamos el pago por WhatsApp.' },
           { icon: 'store', title: 'QR en el showroom', text: 'O te lo mandamos por WhatsApp.' },
         ]}
@@ -59,17 +58,17 @@ export default function PaymentsPage() {
       />
 
       {/* descuento destacado */}
-      <section className="page-x pt-10" aria-label="Descuento">
+      <section className="page-x pt-10" aria-label="Promo">
         <Reveal>
           <div className="on-accent flex flex-wrap items-center justify-between gap-5 rounded-2xl px-6 py-6 sm:px-10">
             <div className="flex items-center gap-5">
-              <span className="display-hero !text-[clamp(2rem,4vw,3rem)]">{formatARS(SITE.transferDiscount)}</span>
+              <span className="display-hero !text-[clamp(2rem,4vw,3rem)]">{formatARS(PROMO.descuento)}</span>
               <p className="max-w-xs text-[15px] font-medium leading-snug">
-                de descuento por cada par pagando por transferencia o en efectivo.
+                de descuento en cada par llevando {PROMO.minimo} pares o más. Vale con cualquier medio de pago.
               </p>
             </div>
-            <Button href={waLink('Hola Boom Zapas. Quiero pagar por transferencia.')} variant="outline" className="!border-white !text-white hover:!bg-white hover:!text-black">
-              Quiero mi descuento
+            <Button href={waLink(`Hola Boom Zapas. Quiero aprovechar la promo de ${PROMO.minimo} pares o más.`)} variant="outline" className="!border-white !text-white hover:!bg-white hover:!text-black">
+              Quiero la promo
               <Icon name="arrow" size={16} />
             </Button>
           </div>

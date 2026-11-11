@@ -5,7 +5,7 @@ import { Icon, type IconName } from '@/components/ui/Icon'
 import { Reveal } from '@/components/ui/Reveal'
 import { ContactSection } from '@/components/sections/ContactSection'
 import { SITE } from '@/config/site'
-import { formatARS } from '@/lib/format'
+import { formatARS, PROMO } from '@/lib/format'
 import { waLink } from '@/lib/whatsapp'
 
 const PASOS: { icon: IconName; title: string; text: string }[] = [
@@ -37,7 +37,7 @@ const FAQ = [
   },
   {
     q: '¿Qué medios de pago tienen?',
-    a: `Mercado Pago, tarjetas, QR y transferencia. Pagando con transferencia o efectivo tenés ${formatARS(SITE.transferDiscount)} de descuento por par.`,
+    a: `Mercado Pago, tarjetas, QR, transferencia o efectivo. Llevando ${PROMO.minimo} pares o más tenés ${formatARS(PROMO.descuento)} de descuento en cada par.`,
   },
   {
     q: '¿Cómo sé qué talle pedir?',

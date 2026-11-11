@@ -5,7 +5,7 @@ import { Icon } from '@/components/ui/Icon'
 import { useProductos } from '@/context/ProductsContext'
 import { useAbrirProducto } from '@/hooks/useAbrirProducto'
 import { coincideBusqueda, hasStock } from '@/lib/filters'
-import { cn, formatARS, transferPrice } from '@/lib/format'
+import { cn, formatARS, precioPromo } from '@/lib/format'
 import { waLink } from '@/lib/whatsapp'
 import type { Producto } from '@/types'
 
@@ -130,7 +130,7 @@ export function Buscador({ id, variante, className, onElegir, autoFocus }: Props
                         ) : (
                           <>
                             <span className="font-semibold">{formatARS(p.precio)}</span>
-                            <span className="text-[color:var(--bz-accent-text)]"> · {formatARS(transferPrice(p.precio))} transf.</span>
+                            <span className="text-[color:var(--bz-accent-text)]"> · {formatARS(precioPromo(p.precio))} llevando 2</span>
                           </>
                         )}
                       </span>

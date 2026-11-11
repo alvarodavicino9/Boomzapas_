@@ -27,8 +27,8 @@ export const SITE = {
     bank: 'Mercado Pago',
   },
 
-  /** Descuento por unidad al pagar por transferencia / efectivo. */
-  transferDiscount: 5000,
+  /** Promo: llevando 2 pares o más, $5.000 de descuento por cada par (con cualquier medio de pago). */
+  promoPares: { minimo: 2, descuento: 5000 },
 
   stats: [
     { value: '+500', label: 'Ventas' },
