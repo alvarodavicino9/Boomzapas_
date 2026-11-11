@@ -87,8 +87,16 @@ export function ProductGrid({
   if (rail) {
     return (
       <div className={railClases(cols === 4 ? 'sm:grid-cols-3 xl:grid-cols-4' : 'sm:grid-cols-3')}>
-        {productos.map((p) => (
-          <div key={p.id} className="w-[64%] shrink-0 snap-start sm:w-auto">
+        {/* una sola fila: en el celular se desliza; en la compu se muestran los que entran (3 o 4) */}
+        {productos.map((p, i) => (
+          <div
+            key={p.id}
+            className={cn(
+              'w-[64%] shrink-0 snap-start sm:w-auto',
+              i >= 4 && 'sm:hidden',
+              i === 3 && (cols === 4 ? 'sm:hidden xl:block' : 'sm:hidden'),
+            )}
+          >
             <ProductCard producto={p} onOpen={abrir} />
           </div>
         ))}
