@@ -17,6 +17,8 @@ interface PageHeroProps {
   foto?: Foto
   /** Panel de color con datos clave, en lugar de la foto. */
   datos?: DatoHero[]
+  /** Contenido propio a la derecha (en lugar de foto o datos). */
+  lateral?: ReactNode
   /** Botones debajo del subtítulo. */
   actions?: ReactNode
   /** Posición vertical del recorte de la foto. */
@@ -24,7 +26,7 @@ interface PageHeroProps {
 }
 
 /** Encabezado de las páginas internas: texto a la izquierda y, a la derecha, una foto o un panel con los datos clave. */
-export function PageHero({ eyebrow, title, subtitle, foto, datos, actions, position = '50% 55%' }: PageHeroProps) {
+export function PageHero({ eyebrow, title, subtitle, foto, datos, lateral, actions, position = '50% 55%' }: PageHeroProps) {
   return (
     <header className="page-x border-b border-line bg-card pb-12 pt-10 sm:pt-14 lg:pb-16">
       <div className="grid items-center gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
@@ -68,7 +70,9 @@ export function PageHero({ eyebrow, title, subtitle, foto, datos, actions, posit
             ))}
             </ul>
           </div>
-        ) : null}
+        ) : (
+          (lateral ?? null)
+        )}
       </div>
     </header>
   )
