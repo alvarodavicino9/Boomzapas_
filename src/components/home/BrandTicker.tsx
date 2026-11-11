@@ -1,7 +1,5 @@
-import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { BRANDS } from '@/config/site'
-import { useProductos } from '@/context/ProductsContext'
 import { formatARS, PROMO } from '@/lib/format'
 import { LogoMarca } from './LogoMarca'
 
@@ -15,37 +13,24 @@ const ALTO: Record<string, string> = {
 
 /**
  * Banda de marcas: fondo con los rojos de la tienda y los logos en blanco pasando solos,
- * cada uno en un recuadro de vidrio con la cantidad de modelos. Debajo, una cinta oscura con
+ * cada uno en un recuadro de vidrio. Debajo, una cinta oscura con
  * los beneficios que corre al revés. Se frena al pasar el mouse y queda quieta si la persona pidió menos movimiento.
  */
 export function BrandTicker() {
-  const { productos } = useProductos()
-  const cantidad = useMemo(() => {
-    const c: Record<string, number> = {}
-    for (const p of productos) c[p.marca.toLowerCase()] = (c[p.marca.toLowerCase()] ?? 0) + 1
-    return c
-  }, [productos])
-
   const marcas = (oculto: boolean) => (
     <ul className="ticker-track flex shrink-0 items-center" aria-hidden={oculto || undefined}>
       {[0, 1, 2].flatMap((rep) =>
         BRANDS.map((b) => {
-          const n = cantidad[b.toLowerCase()] ?? 0
           const escondido = oculto || rep > 0
           return (
             <li key={`${rep}-${b}`} className={rep > 0 ? 'ticker-repeat' : undefined} aria-hidden={rep > 0 || undefined}>
               <Link
                 to={`/catalogo?marca=${encodeURIComponent(b)}`}
                 tabIndex={escondido ? -1 : undefined}
-                aria-label={escondido ? undefined : `Ver ${b}${n ? ` (${n} modelos)` : ''}`}
-                className="group mx-2 flex h-[84px] w-[150px] flex-col items-center justify-center gap-2 rounded-2xl bg-white/[0.08] ring-1 ring-inset ring-white/20 backdrop-blur-sm transition-[background-color,transform,box-shadow] duration-300 hover:-translate-y-1 hover:bg-white/[0.16] hover:shadow-[0_16px_34px_-16px_rgb(0_0_0/0.65)] sm:mx-2.5 sm:h-[108px] sm:w-[210px]"
+                aria-label={escondido ? undefined : `Ver ${b}`}
+                className="group mx-2 flex h-[72px] w-[150px] items-center justify-center rounded-2xl bg-white/[0.08] ring-1 ring-inset ring-white/20 backdrop-blur-sm transition-[background-color,transform,box-shadow] duration-300 hover:-translate-y-1 hover:bg-white/[0.16] hover:shadow-[0_16px_34px_-16px_rgb(0_0_0/0.65)] sm:mx-2.5 sm:h-[92px] sm:w-[210px]"
               >
-                <span className="grid h-10 place-items-center sm:h-12">
-                  <LogoMarca marca={b} blanco className={ALTO[b] ?? 'h-7 sm:h-9'} texto="text-[22px] sm:text-[30px]" />
-                </span>
-                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/70 transition-colors group-hover:text-white sm:text-[11px]">
-                  {n > 0 ? `${n} ${n === 1 ? 'modelo' : 'modelos'}` : 'Ver modelos'}
-                </span>
+                <LogoMarca marca={b} blanco className={ALTO[b] ?? 'h-7 sm:h-9'} texto="text-[22px] sm:text-[30px]" />
               </Link>
             </li>
           )
