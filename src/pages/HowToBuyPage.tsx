@@ -3,9 +3,7 @@ import { PageHero } from '@/components/ui/PageHero'
 import { Button } from '@/components/ui/Button'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { Reveal } from '@/components/ui/Reveal'
-import { PhotoStrip } from '@/components/sections/PhotoStrip'
 import { ContactSection } from '@/components/sections/ContactSection'
-import { FOTOS } from '@/config/fotos'
 import { SITE } from '@/config/site'
 import { formatARS } from '@/lib/format'
 import { waLink } from '@/lib/whatsapp'
@@ -62,8 +60,12 @@ export default function HowToBuyPage() {
           </>
         }
         subtitle="Cuatro pasos, sin vueltas. Y si preferís, podés comprar directo por WhatsApp."
-        foto={FOTOS.dunk}
-        position="50% 50%"
+        datos={[
+          { icon: 'search', title: '1. Elegí tu par', text: 'Mirá el catálogo y elegí modelo y talle.' },
+          { icon: 'bag', title: '2. Armá el pedido', text: 'Sumalo al carrito y completá tus datos.' },
+          { icon: 'card', title: '3. Pagá como quieras', text: 'Mercado Pago, tarjeta, transferencia o efectivo.' },
+          { icon: 'truck', title: '4. Recibilo', text: 'Envío gratis a todo el país o retiro en el showroom.' },
+        ]}
         actions={
           <>
             <Button to="/catalogo" size="lg">
@@ -117,17 +119,6 @@ export default function HowToBuyPage() {
         </ul>
       </section>
 
-      <PhotoStrip
-        eyebrow="Fotos reales"
-        title="Así son nuestros pares"
-        text="Sacamos las fotos en el local, de cada modelo, para que sepas exactamente qué vas a recibir."
-        fotos={[
-          { foto: FOTOS.samba, label: 'Adidas Samba' },
-          { foto: FOTOS.nb530Suela, label: 'New Balance 530' },
-          { foto: FOTOS.dunkTalon, label: 'Dunk low crema' },
-          { foto: FOTOS.nb740, label: 'New Balance 740' },
-        ]}
-      />
 
       <section className="page-x section-y border-t border-line" aria-labelledby="faq">
         <p className="label mb-4 text-accent">Preguntas frecuentes</p>

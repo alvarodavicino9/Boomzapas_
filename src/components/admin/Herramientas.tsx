@@ -325,13 +325,13 @@ export function Herramientas({ pedidos, productos }: { pedidos: PedidoAdmin[]; p
     () => [
       { t: 'Ver la tienda', h: '/', i: 'store' as const, interno: true },
       { t: 'Instagram', h: SITE.instagramUrl, i: 'instagram' as const },
-      { t: 'WhatsApp del local', h: `https://wa.me/${SITE.whatsapp}`, i: 'whatsapp' as const },
+      { t: 'WhatsApp del showroom', h: `https://wa.me/${SITE.whatsapp}`, i: 'whatsapp' as const },
     ],
     [],
   )
   return (
     <div>
-      <PageTitle title="Herramientas" subtitle="Atajos para el día a día del local." />
+      <PageTitle title="Herramientas" subtitle="Atajos para el día a día del negocio." />
       <div className="grid gap-4 lg:grid-cols-2">
         <Calculadora />
         <Mensajes />

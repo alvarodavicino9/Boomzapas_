@@ -70,11 +70,10 @@ export function Footer() {
             </ul>
           </div>
 
-          <FooterCol title="Tienda">
+          <FooterCol title="Comprar">
             <Link to="/catalogo">Todo el catálogo</Link>
             <Link to="/catalogo?cat=urbanas">Urbanas</Link>
-            <Link to="/catalogo?cat=running">Running</Link>
-            <Link to="/catalogo?cat=lifestyle">Lifestyle</Link>
+            <Link to="/catalogo?cat=deportivas">Deportivas</Link>
             <Link to="/catalogo?nuevos=1">Nuevos ingresos</Link>
           </FooterCol>
 

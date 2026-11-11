@@ -1,4 +1,4 @@
-export type Categoria = 'urbanas' | 'running' | 'lifestyle'
+export type Categoria = 'deportivas' | 'urbanas'
 export type FiltroCategoria = 'todos' | Categoria
 
 export interface StockTalle {
@@ -13,6 +13,8 @@ export interface Producto {
   marca: string
   categoria: string
   precio: number
+  /** Precio de lista tachado cuando el par está en oferta (el que se cobra es "precio"). */
+  precioAntes?: number
   imagenes: string[]
   descripcion: string
   stock: StockTalle[]

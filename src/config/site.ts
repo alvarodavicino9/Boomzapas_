@@ -38,13 +38,13 @@ export const SITE = {
   ],
 } as const
 
-export const BRANDS = ['Nike', 'Adidas', 'Jordan', 'New Balance', 'Puma', 'Vans'] as const
+export const BRANDS = ['Nike', 'Adidas', 'Puma', 'Vans', 'New Balance'] as const
 
 export const CATEGORIAS = [
   { id: 'todos', label: 'Todos' },
+  { id: 'deportivas', label: 'Deportivas' },
   { id: 'urbanas', label: 'Urbanas' },
-  { id: 'running', label: 'Running' },
-  { id: 'lifestyle', label: 'Lifestyle' },
 ] as const
 
-export const DEFAULT_TALLES = ['36', '37', '38', '39', '40', '41', '42', '43', '44', '45']
+/** Todas las zapatillas vienen del 35 al 44. */
+export const DEFAULT_TALLES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44']

@@ -2,9 +2,7 @@ import { PageHero } from '@/components/ui/PageHero'
 import { Button } from '@/components/ui/Button'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { Reveal } from '@/components/ui/Reveal'
-import { PhotoStrip } from '@/components/sections/PhotoStrip'
 import { ContactSection } from '@/components/sections/ContactSection'
-import { FOTOS } from '@/config/fotos'
 import { SITE } from '@/config/site'
 import { useCopy } from '@/hooks/useCopy'
 import { formatARS } from '@/lib/format'
@@ -13,7 +11,7 @@ import { waLink } from '@/lib/whatsapp'
 const METHODS: { icon: IconName; title: string; text: string; tag?: string }[] = [
   { icon: 'bolt', title: 'Mercado Pago', text: 'Pagá con tu cuenta, con tarjeta o en cuotas.' },
   { icon: 'card', title: 'Tarjetas', text: 'Débito y crédito. Coordinamos el pago por WhatsApp.' },
-  { icon: 'store', title: 'QR', text: 'En el local, o te lo enviamos por WhatsApp.' },
+  { icon: 'store', title: 'QR', text: 'En el showroom, o te lo enviamos por WhatsApp.' },
   {
     icon: 'check',
     title: 'Transferencia o efectivo',
@@ -41,8 +39,12 @@ export default function PaymentsPage() {
           </>
         }
         subtitle="Elegí el que más te convenga. Siempre con atención personalizada y con descuento si pagás por transferencia o en efectivo."
-        foto={FOTOS.nb530}
-        position="50% 45%"
+        datos={[
+          { icon: 'bolt', title: 'Mercado Pago', text: 'Con tu cuenta, tarjeta o en cuotas.' },
+          { icon: 'tag', title: `${formatARS(SITE.transferDiscount)} menos por par`, text: 'Pagando por transferencia o en efectivo.' },
+          { icon: 'card', title: 'Débito y crédito', text: 'Coordinamos el pago por WhatsApp.' },
+          { icon: 'store', title: 'QR en el showroom', text: 'O te lo mandamos por WhatsApp.' },
+        ]}
         actions={
           <>
             <Button to="/catalogo" size="lg">
@@ -156,17 +158,6 @@ export default function PaymentsPage() {
         </ol>
       </section>
 
-      <PhotoStrip
-        eyebrow="Fotos reales"
-        title="Tus próximos pares"
-        text="Cada modelo, fotografiado en el local."
-        fotos={[
-          { foto: FOTOS.nb740Detalle, label: 'NB 740 · detalle' },
-          { foto: FOTOS.sambaDetalle, label: 'Samba · detalle' },
-          { foto: FOTOS.dunkDetalle, label: 'Dunk · detalle' },
-          { foto: FOTOS.nb530Detalle, label: 'NB 530 · detalle' },
-        ]}
-      />
 
       <ContactSection title="¿Tenés alguna duda con el pago?" />
     </>

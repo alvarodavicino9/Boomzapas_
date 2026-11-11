@@ -25,7 +25,7 @@ const METODOS = [
 ]
 
 const ESTADOS_INICIALES = [
-  { id: 'entregado', label: 'Vendido en el local', hint: 'Ya cobrado y entregado' },
+  { id: 'entregado', label: 'Vendido en el showroom', hint: 'Ya cobrado y entregado' },
   { id: 'pagado', label: 'Cobrado, falta entregar', hint: 'Queda para preparar' },
   { id: 'pendiente', label: 'Falta cobrar', hint: 'Queda esperando el pago' },
 ]
@@ -34,7 +34,7 @@ const ESTADOS_INICIALES = [
 const precioPara = (p: Producto, metodo: string) =>
   metodo === 'transferencia' || metodo === 'efectivo' ? Math.max(0, p.precio - SITE.transferDiscount) : p.precio
 
-/** Cargar una venta del local o un pedido que llegó por Instagram o WhatsApp, con uno o varios pares. */
+/** Cargar una venta del showroom o un pedido que llegó por Instagram o WhatsApp, con uno o varios pares. */
 export function PedidoNuevo({ open, onClose, productos, onCreado }: Props) {
   const [nombre, setNombre] = useState('')
   const [telefono, setTelefono] = useState('')
@@ -95,12 +95,12 @@ export function PedidoNuevo({ open, onClose, productos, onCreado }: Props) {
     if (entrega === 'envio' && !direccion.trim()) return setError('Falta la dirección del envío.')
     const id = crearPedidoManual(
       {
-        cliente: { nombre: nombre.trim() || 'Cliente del local', telefono: telefono.trim(), email: email.trim() || undefined },
+        cliente: { nombre: nombre.trim() || 'Cliente del showroom', telefono: telefono.trim(), email: email.trim() || undefined },
         items,
         metodo_pago: metodo,
         entrega,
         direccion: entrega === 'envio' ? direccion.trim() : undefined,
-        notas: entrega === 'envio' ? `Envío: ${direccion.trim()}` : 'Retiro en tienda',
+        notas: entrega === 'envio' ? `Envío: ${direccion.trim()}` : 'Retiro en el showroom',
         estado,
         total,
         descuento: desc || undefined,
@@ -116,7 +116,7 @@ export function PedidoNuevo({ open, onClose, productos, onCreado }: Props) {
   return (
     <Modal open={open} onClose={onClose} title="Nueva venta" size="lg">
       <div className="space-y-5 px-5 py-5 sm:px-8">
-        <p className="body-text">Para ventas en el local o pedidos que llegan por Instagram o WhatsApp.</p>
+        <p className="body-text">Para ventas en el showroom o pedidos que llegan por Instagram o WhatsApp.</p>
 
         <section className="space-y-3">
           <h3 className="label text-index">Pares</h3>
@@ -218,7 +218,7 @@ export function PedidoNuevo({ open, onClose, productos, onCreado }: Props) {
           </Field>
           <Field label="Entrega">
             <select className="field-line normal-case" value={entrega} onChange={(e) => setEntrega(e.target.value as 'envio' | 'retiro')}>
-              <option value="retiro">En el local</option>
+              <option value="retiro">En el showroom</option>
               <option value="envio">Envío</option>
             </select>
           </Field>

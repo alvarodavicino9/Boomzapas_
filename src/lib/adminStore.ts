@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { normCategoria } from './categorias'
 import { MOCK_PRODUCTOS } from '@/data/mock'
 import { SITE } from '@/config/site'
 import { MODO_DEMO as MODO_LOCAL } from '@/lib/api'
@@ -88,6 +89,8 @@ export interface ProdOverride {
   marca?: string
   categoria?: string
   precio?: number
+  /** Precio tachado de la oferta (0 = sin oferta). */
+  precioAntes?: number
   nuevo?: boolean
   oculto?: boolean
   descripcion?: string
@@ -221,7 +224,7 @@ function semilla(): PedidoAdmin[] {
       metodo_pago: metodo,
       entrega,
       direccion: entrega === 'envio' ? 'Av. Colón 1250, Córdoba' : undefined,
-      notas: entrega === 'envio' ? 'Envío por Correo Argentino' : 'Retiro en tienda',
+      notas: entrega === 'envio' ? 'Envío por Correo Argentino' : 'Retiro en el showroom',
       estado,
       total: items.reduce((a, it) => a + it.precio_unit * it.cantidad, 0),
     })
@@ -374,7 +377,7 @@ export function registrarPedidoDeTienda(input: {
     metodo_pago: input.metodo,
     entrega: input.entrega,
     direccion: input.direccion,
-    notas: input.entrega === 'envio' ? `Envío: ${input.direccion ?? ''}` : 'Retiro en tienda',
+    notas: input.entrega === 'envio' ? `Envío: ${input.direccion ?? ''}` : 'Retiro en el showroom',
     estado: 'pendiente',
     total: input.total,
   })
@@ -386,7 +389,7 @@ export function registrarPedidoDeTienda(input: {
 export function aplicarCatalogo(base: Producto[], propios: Producto[], ov: Record<number, ProdOverride>): Producto[] {
   return [...propios, ...base].map((p) => {
     const o = ov[p.id]
-    if (!o) return p
+    if (!o) return { ...p, categoria: normCategoria(p.categoria) }
     let stock = p.stock
     if (o.stock) {
       const mapa = new Map(p.stock.map((s) => [s.talle, s.cantidad]))
@@ -399,8 +402,9 @@ export function aplicarCatalogo(base: Producto[], propios: Producto[], ov: Recor
       ...p,
       nombre: o.nombre ?? p.nombre,
       marca: o.marca ?? p.marca,
-      categoria: o.categoria ?? p.categoria,
+      categoria: normCategoria(o.categoria ?? p.categoria),
       precio: o.precio ?? p.precio,
+      precioAntes: o.precioAntes !== undefined ? o.precioAntes || undefined : p.precioAntes,
       nuevo: o.nuevo ?? p.nuevo,
       oculto: o.oculto ?? p.oculto,
       descripcion: o.descripcion ?? p.descripcion,

@@ -32,7 +32,7 @@ const FAMILIAS: Familia[] = [
     corte: 'Bajo',
     cierre: 'Cordones',
     suela: 'Goma',
-    uso: 'Lifestyle',
+    uso: 'Urbano',
     descripcion:
       'La Jordan 1 en versión baja con la estética de las colaboraciones de Travis Scott: swoosh invertido, paneles combinados y detalles que la hacen inconfundible.',
     destacados: ['Swoosh invertido', 'Corte bajo', 'Paneles combinados'],
@@ -97,7 +97,7 @@ const FAMILIAS: Familia[] = [
     corte: 'Bajo',
     cierre: 'Cordones',
     suela: 'Amortiguada, con detalles plateados',
-    uso: 'Urbano y lifestyle',
+    uso: 'Urbano',
     descripcion:
       'Running de los 2000 con malla respirable, refuerzos metalizados y suela amortiguada. Cómoda y en tendencia.',
     destacados: ['Malla respirable', 'Refuerzos metalizados', 'Muy cómoda'],
@@ -216,7 +216,7 @@ const FAMILIAS: Familia[] = [
     corte: 'Alto',
     cierre: 'Cordones',
     suela: 'Goma con cámara de aire visible',
-    uso: 'Lifestyle',
+    uso: 'Urbano',
     descripcion:
       'La silueta que empezó todo. Corte alto, paneles combinados y estética de básquet clásica que se nota donde vayas.',
     destacados: ['Corte alto', 'Paneles combinados', 'Silueta icónica'],
@@ -227,7 +227,7 @@ const FAMILIAS: Familia[] = [
     corte: 'Medio',
     cierre: 'Cordones',
     suela: 'Goma con cámara de aire visible',
-    uso: 'Lifestyle',
+    uso: 'Urbano',
     descripcion:
       'Modelo emblemático con paneles de malla laterales y construcción marcada. Presencia fuerte y mucho carácter.',
     destacados: ['Paneles de malla laterales', 'Silueta marcada', 'Mucho carácter'],
@@ -238,7 +238,7 @@ const FAMILIAS: Familia[] = [
     corte: 'Bajo',
     cierre: 'Cordones',
     suela: 'Goma con cámara de aire visible',
-    uso: 'Lifestyle',
+    uso: 'Urbano',
     descripcion: 'La silueta de las Jordan en versión baja: más liviana y fácil de usar todos los días.',
     destacados: ['Corte bajo', 'Silueta clásica', 'Liviana'],
   },
@@ -258,7 +258,7 @@ const FAMILIAS: Familia[] = [
     corte: 'Bajo',
     cierre: 'Cordones',
     suela: 'Plataforma gruesa amortiguada',
-    uso: 'Urbano y lifestyle',
+    uso: 'Urbano',
     descripcion:
       'Estética de running de los 2000 con suela voluminosa y paneles superpuestos. Muy cómoda y con mucha presencia.',
     destacados: ['Suela voluminosa amortiguada', 'Paneles superpuestos', 'Muy cómoda'],
@@ -372,7 +372,7 @@ export const colorDe = (nombre: string): string => {
   return 'Según foto'
 }
 
-const CATEGORIA_LABEL: Record<string, string> = { urbanas: 'Urbanas', running: 'Running', lifestyle: 'Lifestyle' }
+const CATEGORIA_LABEL: Record<string, string> = { urbanas: 'Urbanas', deportivas: 'Deportivas' }
 
 export function detallesDe(p: Producto, talles: string[]): Detalles {
   const n = normText(p.nombre)

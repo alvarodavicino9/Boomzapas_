@@ -74,7 +74,7 @@ export function DoneStep({ order, onClose }: { order: OrderResult; onClose: () =
               : 'Enviar pedido por WhatsApp'}
         </Button>
         <Button variant="outline" full onClick={onClose}>
-          Volver a la tienda
+          Seguir comprando
         </Button>
       </div>
     </div>

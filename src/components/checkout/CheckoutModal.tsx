@@ -64,7 +64,7 @@ export function CheckoutModal() {
 
   const buildNotas = () =>
     [
-      form.entrega === 'envio' ? `Envío: ${form.direccion.trim()}` : 'Retiro en tienda',
+      form.entrega === 'envio' ? `Envío: ${form.direccion.trim()}` : 'Retiro en el showroom',
       form.email.trim() && `Email: ${form.email.trim()}`,
     ]
       .filter(Boolean)

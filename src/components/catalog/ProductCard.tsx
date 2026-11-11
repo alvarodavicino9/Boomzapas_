@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { ProductImage } from './ProductImage'
 import { Icon } from '@/components/ui/Icon'
-import { cn, formatARS, transferPrice } from '@/lib/format'
+import { cn, descuentoOferta, formatARS, transferPrice } from '@/lib/format'
 import { getStatus } from '@/lib/status'
 import { getTalles } from '@/lib/stock'
 import type { Producto } from '@/types'
@@ -45,9 +45,17 @@ export function ProductCard({ producto, onOpen, eager }: ProductCardProps) {
     .filter((t) => t.cantidad > 0)
     .map((t) => t.talle)
 
+  const oferta = soldOut ? 0 : descuentoOferta(producto)
+
   const irA = (i: number) => {
     const el = carril.current
     if (el) el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' })
+  }
+  /** Flechas: pasan a la foto anterior o siguiente (y vuelven a empezar al llegar al final). */
+  const mover = (e: React.MouseEvent, paso: number) => {
+    e.stopPropagation()
+    setCargar(true)
+    irA((idx + paso + fotos.length) % fotos.length)
   }
 
   return (
@@ -106,6 +114,28 @@ export function ProductCard({ producto, onOpen, eager }: ProductCardProps) {
           </span>
         )}
 
+        {oferta > 0 && (
+          <span className="pointer-events-none absolute right-2 top-2 rounded-full bg-[#1f9d55] px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.08em] text-white sm:right-3 sm:top-3 sm:text-[10px]">
+            {formatARS(oferta)} off
+          </span>
+        )}
+
+        {varias &&
+          ([-1, 1] as const).map((paso) => (
+            <button
+              key={paso}
+              type="button"
+              onClick={(e) => mover(e, paso)}
+              aria-label={paso < 0 ? `Foto anterior de ${producto.nombre}` : `Foto siguiente de ${producto.nombre}`}
+              className={cn(
+                'absolute top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full bg-white/85 text-black shadow-[0_2px_10px_rgb(0_0_0/0.18)] backdrop-blur-sm transition-[opacity,background-color,transform] duration-200 hover:bg-white active:scale-90 sm:size-9 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100',
+                paso < 0 ? 'left-1.5 sm:left-2.5' : 'right-1.5 sm:right-2.5',
+              )}
+            >
+              <Icon name="chevron" size={16} className={paso < 0 ? 'rotate-90' : '-rotate-90'} />
+            </button>
+          ))}
+
         {varias && (
           <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-2 flex justify-center gap-1">
             {fotos.map((_, i) => (
@@ -127,6 +157,11 @@ export function ProductCard({ producto, onOpen, eager }: ProductCardProps) {
           {soldOut ? 'Sin stock por ahora' : talles.length ? `Talles ${resumenTalles(talles)}` : 'Consultá talles'}
         </span>
         <span className="mt-auto block pt-2 sm:pt-2.5">
+          {oferta > 0 && (
+            <span className="block text-[11.5px] leading-4 text-index line-through decoration-1 sm:text-[12.5px]">
+              {formatARS(producto.precioAntes!)}
+            </span>
+          )}
           <span className="flex items-center justify-between gap-2">
             <span className={cn('whitespace-nowrap text-[15px] font-bold leading-5 sm:text-[17px]', soldOut && 'text-index line-through')}>
               {formatARS(producto.precio)}

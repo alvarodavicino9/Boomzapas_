@@ -16,7 +16,7 @@ const CANALES: Canal[] = [
   { icon: 'instagram', label: 'Instagram', value: `@${SITE.instagram}`, href: SITE.instagramUrl },
   {
     icon: 'pin',
-    label: 'Local',
+    label: 'Showroom',
     value: SITE.address,
     href: `https://maps.google.com/?q=${encodeURIComponent(SITE.address)}`,
   },

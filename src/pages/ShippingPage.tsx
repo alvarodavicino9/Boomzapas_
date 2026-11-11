@@ -119,10 +119,10 @@ export default function ShippingPage() {
             <div className="p-7 sm:p-10 lg:p-12">
               <p className="label text-accent">Sin costo</p>
               <h2 id="retiro" className="display-section mt-3">
-                Retiro en tienda
+                Retiro en el showroom
               </h2>
               <p className="body-text mt-4 max-w-md">
-                Pasá a buscar tu pedido por nuestro local en Córdoba. Te avisamos cuando esté listo y coordinamos el horario por WhatsApp.
+                Pasá a buscar tu pedido por nuestro showroom en Córdoba. Te avisamos cuando esté listo y coordinamos el horario por WhatsApp.
               </p>
               <address className="mt-8 grid gap-5 border-t border-line pt-6 not-italic sm:grid-cols-2">
                 <div className="flex items-start gap-3">
@@ -160,7 +160,7 @@ export default function ShippingPage() {
       <PhotoStrip
         eyebrow="Fotos reales"
         title="Lo que vas a recibir"
-        text="Fotografiamos cada par en el local. Lo que ves es lo que te llega."
+        text="Fotografiamos cada par en el showroom. Lo que ves es lo que te llega."
         fotos={[
           { foto: FOTOS.nb530, label: 'New Balance 530' },
           { foto: FOTOS.samba, label: 'Adidas Samba' },

@@ -42,7 +42,7 @@ export const buildOrderMessage = ({
     '',
     `Total: ${formatARS(total)}`,
     `Pago: ${metodoLabel[metodo]}`,
-    `Entrega: ${entrega === 'envio' ? 'Envío gratis por Correo Argentino' : 'Retiro en tienda'}`,
+    `Entrega: ${entrega === 'envio' ? 'Envío gratis por Correo Argentino' : 'Retiro en el showroom'}`,
     `Nombre: ${nombre}`,
   ].join('\n')
 }

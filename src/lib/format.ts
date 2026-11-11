@@ -6,6 +6,10 @@ export const formatARS = (n: number) => `$ ${Math.round(n).toString().replace(/\
 /** Precio final pagando por transferencia / efectivo. */
 export const transferPrice = (precio: number) => Math.max(0, precio - SITE.transferDiscount)
 
+/** Cuánto se descuenta en la oferta del par (0 si no está en oferta). */
+export const descuentoOferta = (p: { precio: number; precioAntes?: number }) =>
+  p.precioAntes && p.precioAntes > p.precio ? p.precioAntes - p.precio : 0
+
 export const formatDate = (iso: unknown) => {
   if (typeof iso !== 'string') return '—'
   const d = new Date(iso)

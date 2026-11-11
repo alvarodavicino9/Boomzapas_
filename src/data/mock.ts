@@ -2,16 +2,13 @@ import type { Producto, StockTalle } from '@/types'
 import { fotoDeModelo, MODELOS_ORIGINALES } from '@/data/fotosCatalogo'
 import { fotosDeModelo, MODELOS_DRIVE, OTROS_MODELOS } from '@/data/modelosDrive'
 
-const TALLES = ['38', '39', '40', '41', '42', '43', '44']
+const TALLES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44']
 
-/** Stock de ejemplo, repartido de forma estable según el id. */
-const stockDe = (id: number): StockTalle[] =>
-  TALLES.map((talle, i) => ({
-    producto_id: id,
-    talle,
-    // algunos talles agotados y algunos modelos casi sin stock para probar los estados
-    cantidad: id % 11 === 0 ? (i === 3 ? 1 : 0) : (id * 7 + i * 3) % 5 === 0 ? 0 : 1 + ((id + i) % 4),
-  }))
+/**
+ * Stock mientras la tienda no esté conectada al servidor: todos los modelos vienen del 35 al 44
+ * y se muestran todos los talles disponibles. El stock real se maneja desde el panel.
+ */
+const stockDe = (id: number): StockTalle[] => TALLES.map((talle) => ({ producto_id: id, talle, cantidad: 3 }))
 
 /**
  * Modelos de Drive que reemplazan a uno que ya existía (mismo par, foto nueva).
@@ -41,6 +38,7 @@ const conFotosDeEstudio: Producto[] = MODELOS_DRIVE.map((m) => {
     marca: m.marca,
     categoria: m.categoria,
     precio: m.precio,
+    precioAntes: m.precioAntes,
     imagenes: fotosDeModelo(m),
     descripcion: '',
     stock: stockDe(id),

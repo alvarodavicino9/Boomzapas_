@@ -39,7 +39,7 @@ function comprimir(file: File): Promise<string> {
   })
 }
 
-const VACIO = { nombre: '', marca: 'Nike', categoria: 'urbanas', precio: '', descripcion: '', nuevo: true }
+const VACIO = { nombre: '', marca: 'Nike', categoria: 'urbanas', precio: '', antes: '', descripcion: '', nuevo: true }
 
 export function ProductoEditor({ producto, open, crear, onClose, setStock, onCreado, onCompra }: Props) {
   const costos = useCostos()
@@ -69,6 +69,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
         marca: producto.marca,
         categoria: producto.categoria,
         precio: String(producto.precio),
+        antes: producto.precioAntes ? String(producto.precioAntes) : '',
         descripcion: producto.descripcion,
         nuevo: !!producto.nuevo,
       })
@@ -77,6 +78,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
   }, [open, crear, producto?.id])
 
   const precio = Number(f.precio) || 0
+  const antes = Number(f.antes) || 0
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((x) => ({ ...x, [k]: v }))
 
   const costoNum = Number(costo) || 0
@@ -90,6 +92,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
     }
     if (!f.nombre.trim()) return setError('Poné el nombre del modelo.')
     if (precio <= 0) return setError('Poné un precio válido.')
+    if (antes > 0 && antes <= precio) return setError('El precio tachado tiene que ser mayor que el precio de venta (o dejalo vacío).')
     if (crear) {
       if (!foto) return setError('Subí una foto del modelo.')
       const stock = Object.entries(talles)
@@ -101,6 +104,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
         marca: f.marca.trim() || 'Otra',
         categoria: f.categoria,
         precio,
+        precioAntes: antes || undefined,
         descripcion: f.descripcion.trim(),
         imagenes: [foto],
         stock,
@@ -116,6 +120,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
         marca: f.marca.trim(),
         categoria: f.categoria,
         precio,
+        precioAntes: antes,
         descripcion: f.descripcion.trim(),
         nuevo: f.nuevo,
       })
@@ -236,7 +241,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
             </select>
           </Field>
           <Field
-            label="Precio de lista"
+            label={antes > precio ? 'Precio de venta (oferta)' : 'Precio de venta'}
             hint={precio > 0 ? `Por transferencia: ${formatARS(transferPrice(precio))} (−${formatARS(SITE.transferDiscount)})` : undefined}
           >
             <input
@@ -247,6 +252,21 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
               inputMode="numeric"
               value={f.precio}
               onChange={(e) => set('precio', e.target.value)}
+              disabled={!editable}
+            />
+          </Field>
+          <Field
+            label="Precio tachado (oferta)"
+            hint={antes > precio ? `Se muestra ${formatARS(antes)} tachado y ${formatARS(antes - precio)} off` : 'Opcional. Dejalo vacío si no está en oferta.'}
+          >
+            <input
+              className="field-line"
+              type="number"
+              min={0}
+              step={500}
+              inputMode="numeric"
+              value={f.antes}
+              onChange={(e) => set('antes', e.target.value)}
               disabled={!editable}
             />
           </Field>

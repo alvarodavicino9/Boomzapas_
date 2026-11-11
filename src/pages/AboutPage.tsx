@@ -21,7 +21,7 @@ export default function AboutPage() {
           <div className="space-y-6 text-[18px] leading-8">
             <p>
               Boom Zapas nació en {SITE.since} en Córdoba como un emprendimiento 100% digital, con la posibilidad de visitar
-              el local cuando quieras.
+              el showroom cuando quieras.
             </p>
             <p className="text-index">
               Controlamos la calidad de cada par y te enviamos fotos antes del despacho, para que recibas exactamente lo que

@@ -21,7 +21,7 @@ export const PAGINAS: Record<string, MetaPagina> = {
   '/': {
     titulo: 'Boom Zapas | Zapatillas en Córdoba con envío gratis',
     descripcion:
-      'Zapatillas Nike, Adidas, Jordan, New Balance, Puma y Vans en Córdoba. Envío gratis a todo el país, retiro en el local y pago con Mercado Pago o transferencia.',
+      'Zapatillas Nike, Adidas, Jordan, New Balance, Puma y Vans en Córdoba. Envío gratis a todo el país, retiro en el showroom y pago con Mercado Pago o transferencia.',
     h1: 'Boom Zapas: zapatillas en Córdoba con envío gratis a todo el país',
   },
   '/catalogo': {
@@ -53,9 +53,9 @@ export const PAGINAS: Record<string, MetaPagina> = {
     h1: 'Guía de talles',
   },
   '/nosotros': {
-    titulo: 'Quiénes somos: tienda de zapatillas en Córdoba | Boom Zapas',
+    titulo: 'Quiénes somos: showroom de zapatillas en Córdoba | Boom Zapas',
     descripcion:
-      'Somos Boom Zapas, una tienda de zapatillas de Córdoba. Fotos reales de cada par, atención por WhatsApp y envíos a todo el país.',
+      'Somos Boom Zapas, un showroom de zapatillas de Córdoba. Fotos reales de cada par, atención por WhatsApp y envíos a todo el país.',
     h1: 'Quiénes somos',
   },
   '/contacto': {
@@ -69,7 +69,7 @@ export const PAGINAS: Record<string, MetaPagina> = {
 export const SIN_INDEXAR: Record<string, MetaPagina> = {
   noEncontrada: {
     titulo: 'Página no encontrada | Boom Zapas',
-    descripcion: 'La página que buscás no existe. Volvé a la tienda y encontrá tu próximo par.',
+    descripcion: 'La página que buscás no existe. Volvé al inicio y encontrá tu próximo par.',
     h1: 'Esta página no existe',
     noindex: true,
   },

@@ -11,7 +11,7 @@ import { useProductos } from '@/context/ProductsContext'
 import { useUI } from '@/context/UIContext'
 import { SITE } from '@/config/site'
 import { detallesDe } from '@/data/detalles'
-import { cn, formatARS, transferPrice } from '@/lib/format'
+import { cn, descuentoOferta, formatARS, transferPrice } from '@/lib/format'
 import { getTalles, isSoldOut } from '@/lib/stock'
 import { getStatus } from '@/lib/status'
 import { waLink } from '@/lib/whatsapp'
@@ -110,6 +110,7 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
   )
   const disponibles = talles.filter((t) => t.cantidad > 0).length
   const ahorro = p.precio - transferPrice(p.precio)
+  const oferta = descuentoOferta(p)
 
   const requireTalle = () => {
     if (!selected) {
@@ -227,6 +228,27 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
                 ))}
               </span>
             )}
+            {p.imagenes.length > 1 &&
+              ([-1, 1] as const).map((paso) => (
+                <button
+                  key={paso}
+                  type="button"
+                  onClick={() => {
+                    const n = p.imagenes.length
+                    const i = (photo + paso + n) % n
+                    setPhoto(i)
+                    const el = carril.current
+                    if (el) el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' })
+                  }}
+                  aria-label={paso < 0 ? 'Foto anterior' : 'Foto siguiente'}
+                  className={cn(
+                    'absolute top-1/2 z-10 grid size-10 -translate-y-1/2 place-items-center rounded-full bg-white/90 text-black shadow-[0_4px_14px_rgb(0_0_0/0.2)] backdrop-blur transition-[background-color,transform] hover:bg-white active:scale-90 lg:size-11',
+                    paso < 0 ? 'left-3' : 'right-3',
+                  )}
+                >
+                  <Icon name="chevron" size={18} className={paso < 0 ? 'rotate-90' : '-rotate-90'} />
+                </button>
+              ))}
             {status && (
               <span className="label absolute left-4 top-4 rounded-full bg-accent px-3.5 py-1.5 text-[10px] font-bold text-on-accent">
                 {status}
@@ -274,9 +296,17 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
           <h3 className="display-section mt-3 !text-[clamp(1.5rem,3vw,2.2rem)]">{p.nombre}</h3>
 
           <div className="mt-6 rounded-2xl border border-line bg-card p-5">
+            {oferta > 0 && (
+              <div className="mb-2 flex items-center gap-2.5">
+                <span className="text-[16px] text-index line-through decoration-1">{formatARS(p.precioAntes!)}</span>
+                <span className="rounded-full bg-[#1f9d55] px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-white">
+                  {formatARS(oferta)} off
+                </span>
+              </div>
+            )}
             <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
               <p className="text-[28px] font-bold leading-none">{formatARS(p.precio)}</p>
-              <p className="label text-index">Precio lista</p>
+              <p className="label text-index">{oferta > 0 ? 'Precio oferta' : 'Precio lista'}</p>
             </div>
             <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-4">
               <p className="text-[14px]">
@@ -442,7 +472,7 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
                 },
                 {
                   icon: 'store' as const,
-                  title: 'Retiro en tienda',
+                  title: 'Retiro en el showroom',
                   text: `Sin costo, en ${SITE.address}. Coordinamos el horario por WhatsApp.`,
                   to: '/envios',
                 },

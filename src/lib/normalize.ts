@@ -1,4 +1,5 @@
 import { fotosLocales } from '@/data/fotosCatalogo'
+import { normCategoria } from './categorias'
 import type { Producto, StockTalle } from '@/types'
 
 type Raw = Record<string, unknown>
@@ -46,8 +47,9 @@ export const normalizeProducto = (raw: Raw): Producto => {
     id,
     nombre,
     marca: str(raw.marca) ?? nombre.split(' ')[0],
-    categoria: (str(raw.categoria) ?? str(raw.tipo) ?? 'urbanas').toLowerCase(),
+    categoria: normCategoria(str(raw.categoria) ?? str(raw.tipo)),
     precio: Number(raw.precio ?? raw.price ?? 65000),
+    precioAntes: Number(raw.precio_antes ?? raw.precio_lista) || undefined,
     // Si la base no trae imágenes, se usan las fotos locales del modelo (por nombre).
     imagenes: (() => {
       const imgs = toImages(raw)

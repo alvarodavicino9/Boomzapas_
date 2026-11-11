@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { PageHero } from '@/components/ui/PageHero'
 import { Icon, type IconName } from '@/components/ui/Icon'
-import { PhotoStrip } from '@/components/sections/PhotoStrip'
-import { FOTOS } from '@/config/fotos'
 import { Button } from '@/components/ui/Button'
 import { Reveal } from '@/components/ui/Reveal'
 import { SITE } from '@/config/site'
@@ -14,7 +12,7 @@ const CHANNELS: { icon: IconName; label: string; value: string; href: string; no
   { icon: 'mail', label: 'Email', value: SITE.email, href: `mailto:${SITE.email}` },
   {
     icon: 'pin',
-    label: 'Local',
+    label: 'Showroom',
     value: SITE.address,
     href: `https://maps.google.com/?q=${encodeURIComponent(SITE.address)}`,
     note: 'Lunes a viernes, 10 a 19 hs',
@@ -54,8 +52,12 @@ export default function ContactPage() {
           </>
         }
         subtitle="Consultas, talles, stock o pedidos especiales. Te respondemos rápido, por el canal que prefieras."
-        foto={FOTOS.nb740Detalle}
-        position="50% 40%"
+        datos={[
+          { icon: 'whatsapp', title: 'WhatsApp', text: SITE.whatsappDisplay },
+          { icon: 'instagram', title: 'Instagram', text: `@${SITE.instagram}` },
+          { icon: 'pin', title: 'Showroom', text: SITE.address },
+          { icon: 'clock', title: 'Horarios', text: SITE.hours.map((h) => `${h.dias}: ${h.horario}`).join(' · ') },
+        ]}
         actions={
           <Button href={waLinkGeneric()} size="lg">
             <Icon name="whatsapp" size={18} />
@@ -98,7 +100,7 @@ export default function ContactPage() {
             <div className="on-bar mt-4 rounded-2xl p-6">
               <p className="label flex items-center gap-2.5 text-accent">
                 <Icon name="clock" size={16} />
-                Horarios del local
+                Horarios del showroom
               </p>
               <ul className="mt-4 space-y-2 text-[15px]">
                 {SITE.hours.map((h) => (
@@ -166,7 +168,7 @@ export default function ContactPage() {
                 <Icon name="pin" size={28} />
               </span>
               <span>
-                <span className="label block text-index">Nuestro local</span>
+                <span className="label block text-index">Nuestro showroom</span>
                 <span className="display-product mt-1 block">{SITE.address}</span>
               </span>
             </span>
@@ -177,16 +179,6 @@ export default function ContactPage() {
         </Reveal>
       </section>
 
-      <PhotoStrip
-        eyebrow="Fotos reales"
-        title="Pasá a conocer los pares"
-        fotos={[
-          { foto: FOTOS.nb530Detalle, label: 'New Balance 530' },
-          { foto: FOTOS.sambaDetalle, label: 'Adidas Samba' },
-          { foto: FOTOS.dunkDetalle, label: 'Dunk low crema' },
-          { foto: FOTOS.nb740Suela, label: 'New Balance 740' },
-        ]}
-      />
     </>
   )
 }

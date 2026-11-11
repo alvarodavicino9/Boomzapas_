@@ -38,7 +38,7 @@ export function BrandStory() {
                 atendidas por personas
               </h2>
               <p className="body-text mt-5 max-w-xl text-[15px] leading-7">
-                Boom Zapas nació en Córdoba. Fotografiamos cada par en el local para que veas exactamente lo que vas a recibir, y te acompañamos por WhatsApp desde la elección del talle hasta que llega a tu casa.
+                Boom Zapas nació en Córdoba. Fotografiamos cada par en el showroom para que veas exactamente lo que vas a recibir, y te acompañamos por WhatsApp desde la elección del talle hasta que llega a tu casa.
               </p>
               <ul className="mt-7 flex flex-wrap gap-3">
                 {PUNTOS.map((p) => (
@@ -50,7 +50,7 @@ export function BrandStory() {
               </ul>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button to="/nosotros" size="lg">
-                  Conocé la tienda
+                  Conocé el showroom
                 </Button>
                 <Button to="/contacto" variant="outline" size="lg">
                   Contacto

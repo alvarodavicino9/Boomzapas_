@@ -15,7 +15,7 @@ import { waLink } from '@/lib/whatsapp'
 
 const GRUPOS: { titulo: string; links: { to: string; label: string; icon: IconName; end?: boolean }[] }[] = [
   {
-    titulo: 'Tienda',
+    titulo: 'Comprar',
     links: [
       { to: '/', label: 'Inicio', icon: 'home', end: true },
       { to: '/catalogo', label: 'Catálogo', icon: 'grid', end: true },
