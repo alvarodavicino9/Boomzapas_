@@ -2,15 +2,15 @@ import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath, URL } from 'node:url'
-import { mkdir, readFile, writeFile } from 'node:fs/promises'
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fotosDeModelo, MODELOS_DRIVE, OTROS_MODELOS } from './src/data/modelosDrive'
 import { rutaProducto } from './src/lib/slug'
 import { SITE as SITE_INFO } from './src/config/site'
-import { jsonLdLista, jsonLdMigas, jsonLdProducto, metaMarca, metaProducto, PAGINAS, rutaMarca, SITE_URL } from './src/lib/seo'
+import { COMPARTIR, compartirMarca, compartirProducto, jsonLdLista, jsonLdMigas, jsonLdProducto, metaMarca, metaProducto, PAGINAS, rutaMarca, SITE_URL } from './src/lib/seo'
 import { slugify } from './src/lib/slug'
 // @ts-expect-error módulo JS sin tipos (arma las imágenes para compartir)
-import { tarjetaOg } from './scripts/tarjeta-og.mjs'
+import { tarjetaOg, tarjetaPagina } from './scripts/tarjeta-og.mjs'
 
 /**
  * Dirección pública de la tienda, para los links y las fotos de la vista previa al compartir.
@@ -29,6 +29,9 @@ interface PaginaEstatica {
   ruta: string
   titulo: string
   descripcion: string
+  /** Título y texto al compartir (si no, los de Google). */
+  ogTitulo?: string
+  ogDescripcion?: string
   h1: string
   tipo?: 'website' | 'product'
   imagen?: string
@@ -59,6 +62,8 @@ function armarPagina(base: string, d: PaginaEstatica): string {
   const url = `${SITE}${d.ruta === '/' ? '/' : d.ruta}`
   const titulo = esc(d.titulo)
   const desc = esc(d.descripcion)
+  const ogTitulo = esc(d.ogTitulo ?? d.titulo)
+  const ogDesc = esc(d.ogDescripcion ?? d.descripcion)
   const foto = d.imagen ? `${SITE}${d.imagen}` : `${SITE}/og.jpg`
   // el texto alternativo de la foto general sirve para cualquier página que no tenga foto propia
   let html = base.replace(/<title>[^<]*<\/title>/, () => `<title>${titulo}</title>`)
@@ -66,16 +71,16 @@ function armarPagina(base: string, d: PaginaEstatica): string {
   html = poner(html, '<link rel="canonical" href="', url)
   html = poner(html, '<meta property="og:type" content="', d.tipo ?? 'website')
   html = poner(html, '<meta property="og:url" content="', url)
-  html = poner(html, '<meta property="og:title" content="', titulo)
-  html = poner(html, '<meta property="og:description" content="', desc)
+  html = poner(html, '<meta property="og:title" content="', ogTitulo)
+  html = poner(html, '<meta property="og:description" content="', ogDesc)
   html = poner(html, '<meta property="og:image" content="', foto)
   if (d.imagen) {
     html = poner(html, '<meta property="og:image:width" content="', d.imagenAncho ?? '1200')
     html = poner(html, '<meta property="og:image:height" content="', d.imagenAlto ?? '630')
     html = poner(html, '<meta property="og:image:alt" content="', esc(d.imagenAlt ?? d.h1))
   }
-  html = poner(html, '<meta name="twitter:title" content="', titulo)
-  html = poner(html, '<meta name="twitter:description" content="', desc)
+  html = poner(html, '<meta name="twitter:title" content="', ogTitulo)
+  html = poner(html, '<meta name="twitter:description" content="', ogDesc)
   html = poner(html, '<meta name="twitter:image" content="', foto)
 
   if (d.precio && d.precio > 0) {
@@ -120,16 +125,50 @@ function paginasDeProducto(): Plugin {
 
       const listaParaGoogle = jsonLdLista(modelos.map((m) => ({ nombre: m.nombre, ruta: rutaProducto(m) })), SITE)
 
+      // Imagen para compartir de cada página y de cada marca (estilo portada: zapatillas sobre el aro rojo).
+      const logoOg = join('public', 'logo-320.webp')
+      const recortes = (await readdir(join('public', 'fotos', 'hero3d'))).filter((n) => n.endsWith('.webp')).map((n) => n.replace(/\.webp$/, ''))
+      const recorte = (n: string) => join('public', 'fotos', 'hero3d', `${n}.webp`)
+      await mkdir(join(outDir, 'og', 'marca'), { recursive: true })
+      const imagenPagina = async (archivo: string, d: Parameters<typeof tarjetaPagina>[0]) => {
+        try {
+          await writeFile(join(outDir, 'og', archivo), await tarjetaPagina(d))
+          return `/og/${archivo}`
+        } catch (e) {
+          console.warn(`  ⚠ no se pudo armar ${archivo}:`, (e as Error).message)
+          return undefined
+        }
+      }
+      const imagenDe: Record<string, string | undefined> = {}
+      for (const [ruta, c] of Object.entries(COMPARTIR)) {
+        const zapas = c.zapas.filter((n) => recortes.includes(n)).map(recorte)
+        imagenDe[ruta] = await imagenPagina(`${ruta === '/' ? 'inicio' : ruta.slice(1)}.jpg`, { ...c, zapas, logo: logoOg })
+      }
+      // la imagen general (la de cualquier dirección sin página propia) pasa a ser la del inicio
+      if (imagenDe['/']) await writeFile(join(outDir, 'og.jpg'), await readFile(join(outDir, 'og', 'inicio.jpg')))
+
       // Una página por marca (/catalogo/nike…): es lo que busca la gente ("zapatillas nike córdoba").
       const marcas = [...new Set(modelos.map((m) => m.marca))].sort((a, b) => a.localeCompare(b, 'es'))
       for (const marca of marcas) {
         const deLaMarca = modelos.filter((m) => m.marca === marca)
         const ruta = rutaMarca(marca)
         const meta = metaMarca(marca, deLaMarca.length)
+        const social = compartirMarca(marca, deLaMarca.length)
+        const suyos = recortes.filter((n) => n.startsWith(`${slugify(marca)}-`))
+        const imagenMarca = await imagenPagina(`marca/${slugify(marca)}.jpg`, {
+          ...social,
+          logo: logoOg,
+          ...(suyos.length >= 3
+            ? { zapas: suyos.slice(0, 3).map(recorte) }
+            : { fotos: deLaMarca.slice(0, 3).map((m) => join('public', m.imagenes[0])) }),
+        })
         const html = armarPagina(base, {
           ruta,
           titulo: meta.titulo,
           descripcion: meta.descripcion,
+          ogTitulo: social.titulo,
+          ogDescripcion: social.descripcion,
+          ...(imagenMarca ? { imagen: imagenMarca, imagenAncho: '1200', imagenAlto: '630', imagenAlt: `Zapatillas ${marca} en Boom Zapas` } : {}),
           h1: meta.h1,
           jsonld: [
             jsonLdMigas([{ nombre: 'Inicio', ruta: '/' }, { nombre: 'Catálogo', ruta: '/catalogo' }, { nombre: meta.h1, ruta }], SITE),
@@ -167,10 +206,15 @@ function paginasDeProducto(): Plugin {
 
       // Páginas del sitio (el inicio reemplaza al index.html de la tienda)
       for (const [ruta, m] of Object.entries(PAGINAS)) {
+        const c = COMPARTIR[ruta]
         const html = armarPagina(base, {
           ruta,
           titulo: m.titulo,
           descripcion: m.descripcion,
+          ...(c ? { ogTitulo: c.titulo, ogDescripcion: c.descripcion } : {}),
+          ...(imagenDe[ruta]
+            ? { imagen: imagenDe[ruta], imagenAncho: '1200', imagenAlto: '630', imagenAlt: `${c.linea1} ${c.linea2} · Boom Zapas` }
+            : {}),
           h1: m.h1,
           jsonld:
             ruta === '/'
@@ -192,10 +236,13 @@ function paginasDeProducto(): Plugin {
       for (const m of modelos) {
         const ruta = rutaProducto(m)
         const meta = metaProducto(m)
+        const social = compartirProducto(m)
         const html = armarPagina(base, {
           ruta,
           titulo: meta.titulo,
           descripcion: meta.descripcion,
+          ogTitulo: social.titulo,
+          ogDescripcion: social.descripcion,
           h1: m.nombre,
           tipo: 'product',
           // la tarjeta horizontal para compartir; si no se pudo armar, la foto del par

@@ -66,6 +66,113 @@ export const PAGINAS: Record<string, MetaPagina> = {
   },
 }
 
+const OFF = `${'$'}${SITE.promoPares.descuento.toLocaleString('es-AR')}`
+
+/**
+ * Lo que se ve al compartir el link de cada página (WhatsApp, Instagram, Facebook): un título y un texto
+ * pensados para la gente (los de Google, arriba, están pensados para el buscador), y la imagen que se arma
+ * al compilar: título grande en dos renglones, bajada, etiquetas y las zapatillas recortadas de la portada
+ * (/public/fotos/hero3d), la primera adelante. Para cambiar algo de lo que se ve al compartir, es acá.
+ */
+export interface Compartir {
+  titulo: string
+  descripcion: string
+  linea1: string
+  linea2: string
+  bajada: string
+  chips?: string[]
+  /** Nombres de las fotos recortadas de /public/fotos/hero3d (sin .webp). */
+  zapas: string[]
+}
+
+export const COMPARTIR: Record<string, Compartir> = {
+  '/': {
+    titulo: 'Boom Zapas · Tu próximo par está acá',
+    descripcion: `Zapatillas Nike, Adidas, Jordan, New Balance y Vans con fotos reales de cada par. Envío gratis a todo el país y ${OFF} off por par llevando 2 o más. Showroom en Córdoba.`,
+    linea1: 'TU PRÓXIMO PAR',
+    linea2: 'ESTÁ ACÁ',
+    bajada: 'Sneakers con fotos reales de cada par, desde Córdoba',
+    zapas: ['nike-sb-dunk-panda', 'adidas-samba-negras-clasicas', 'nike-air-jordan-1-low-x-travis-scott-grey-cream'],
+  },
+  '/catalogo': {
+    titulo: 'Catálogo Boom Zapas · Elegí tu próximo par',
+    descripcion: `Nike, Adidas, Jordan, New Balance, Puma y Vans con fotos reales y talles disponibles. Envío gratis a todo el país y ${OFF} off por par llevando 2 o más.`,
+    linea1: 'EL CATÁLOGO',
+    linea2: 'COMPLETO',
+    bajada: 'Nike, Adidas, Jordan, New Balance, Puma y Vans',
+    zapas: ['nike-air-jordan-1-low-x-travis-scott-grey-cream', 'nike-air-force-one', 'new-balance-530-cloud-white'],
+  },
+  '/envios': {
+    titulo: 'Envío gratis a todo el país · Boom Zapas',
+    descripcion: 'Te mandamos tus zapatillas gratis a todo el país por Correo Argentino, con código de seguimiento. O retiralas en nuestro showroom de Córdoba.',
+    linea1: 'ENVÍO GRATIS',
+    linea2: 'A TODO EL PAÍS',
+    bajada: 'Con seguimiento, o retiralas en el showroom de Córdoba',
+    chips: ['Correo Argentino', 'Retiro en Córdoba'],
+    zapas: ['new-balance-530-cloud-white', 'adidas-forum-84-low-white-and-black', 'nike-sb-dunk-bordeaux'],
+  },
+  '/pagos': {
+    titulo: 'Pagá como quieras · Boom Zapas',
+    descripcion: `Mercado Pago, tarjeta, QR, transferencia o efectivo. Y llevando 2 pares o más, ${OFF} menos en cada uno.`,
+    linea1: 'PAGÁ COMO',
+    linea2: 'QUIERAS',
+    bajada: 'Mercado Pago, tarjeta, QR, transferencia o efectivo',
+    chips: ['Mercado Pago', `2 pares: ${OFF} off c/u`],
+    zapas: ['adidas-samba-negras-clasicas', 'nike-sb-dunk-panda', 'adidas-adi2000-semi-total-black'],
+  },
+  '/como-comprar': {
+    titulo: 'Cómo comprar en Boom Zapas, paso a paso',
+    descripcion: 'Elegí tu par y tu talle, pagá como prefieras y recibilo en tu casa. Te acompañamos por WhatsApp en todo el proceso.',
+    linea1: 'COMPRAR ES',
+    linea2: 'MUY FÁCIL',
+    bajada: 'Elegís tu par, pagás y te llega a tu casa',
+    chips: ['Ayuda por WhatsApp', 'Envío gratis'],
+    zapas: ['nike-sb-dunk-bordeaux', 'adidas-samba-negras-clasicas', 'new-balance-530-cloud-white'],
+  },
+  '/guia-de-talles': {
+    titulo: 'Guía de talles · Boom Zapas',
+    descripcion: 'Medí tu pie y encontrá tu talle en la tabla en centímetros. Si dudás entre dos, te asesoramos por WhatsApp.',
+    linea1: 'ENCONTRÁ',
+    linea2: 'TU TALLE',
+    bajada: 'Tabla en centímetros y ayuda por WhatsApp',
+    chips: ['Tabla en cm', 'Te asesoramos'],
+    zapas: ['nike-air-force-one', 'adidas-adi2000-semi-total-black', 'nike-sb-dunk-panda'],
+  },
+  '/nosotros': {
+    titulo: 'Boom Zapas · No son solo zapatillas',
+    descripcion: `Showroom de zapatillas en Córdoba desde ${SITE.since}: +500 ventas, +450 clientes, fotos reales de cada par y atención por WhatsApp.`,
+    linea1: 'NO SON SOLO',
+    linea2: 'ZAPATILLAS',
+    bajada: `Showroom en Córdoba desde ${SITE.since}`,
+    chips: ['+500 ventas', '+450 clientes'],
+    zapas: ['adidas-forum-84-low-white-and-black', 'nike-air-jordan-1-low-x-travis-scott-grey-cream', 'nike-sb-dunk-bordeaux'],
+  },
+  '/contacto': {
+    titulo: 'Vení al showroom · Boom Zapas Córdoba',
+    descripcion: `Escribinos por WhatsApp o Instagram, o vení a ${SITE.address}. Lunes a viernes de 10 a 19 y sábados de 10 a 14.`,
+    linea1: 'VENÍ AL',
+    linea2: 'SHOWROOM',
+    bajada: SITE.address,
+    chips: ['WhatsApp', 'Instagram'],
+    zapas: ['adidas-adi2000-semi-total-black', 'nike-sb-dunk-panda', 'adidas-samba-negras-clasicas'],
+  },
+}
+
+/** Lo que se ve al compartir la página de una marca. */
+export const compartirMarca = (marca: string, cantidad: number): Omit<Compartir, 'zapas'> => ({
+  titulo: `Zapatillas ${marca} · Boom Zapas`,
+  descripcion: `${cantidad} ${cantidad === 1 ? 'modelo' : 'modelos'} ${marca} con fotos reales de cada par. Envío gratis a todo el país y ${OFF} off por par llevando 2 o más.`,
+  linea1: 'ZAPATILLAS',
+  linea2: marca.toUpperCase(),
+  bajada: `${cantidad} ${cantidad === 1 ? 'modelo' : 'modelos'} con fotos reales`,
+})
+
+/** Lo que se ve al compartir la ficha de una zapatilla: el precio va en el título, que es lo primero que se lee. */
+export const compartirProducto = (p: { nombre: string; precio: number }) => ({
+  titulo: `${p.nombre} · ${'$'}${Math.round(p.precio).toLocaleString('es-AR')}`,
+  descripcion: `Fotos reales de este par, envío gratis a todo el país${p.precio > SITE.promoPares.descuento ? ` y ${'$'}${Math.round(p.precio - SITE.promoPares.descuento).toLocaleString('es-AR')} c/u llevando 2 o más` : ''}. Boom Zapas, Córdoba.`,
+})
+
 /** Rutas que no tienen que aparecer en Google. */
 export const SIN_INDEXAR: Record<string, MetaPagina> = {
   noEncontrada: {
@@ -96,7 +203,7 @@ export function marcaDeSlug(slug: string): string {
 
 /** Título y descripción de la página de una marca (lo que busca la gente: "zapatillas nike córdoba"). */
 export function metaMarca(marca: string, cantidad?: number): MetaPagina {
-  const modelos = cantidad ? `${cantidad} modelos con fotos reales de cada par` : 'fotos reales de cada par'
+  const modelos = cantidad ? `${cantidad} ${cantidad === 1 ? 'modelo' : 'modelos'} con fotos reales de cada par` : 'fotos reales de cada par'
   return {
     titulo: `Zapatillas ${marca} en Córdoba | Boom Zapas`,
     descripcion: `Comprá zapatillas ${marca} en Córdoba: ${modelos}. Envío gratis a todo el país, retiro en el showroom y ${'$'}${SITE.promoPares.descuento.toLocaleString('es-AR')} off por par llevando 2 o más.`,
