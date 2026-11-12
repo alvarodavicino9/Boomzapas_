@@ -198,6 +198,8 @@ export function Hero3D() {
                 Sneakers · Córdoba
               </p>
               <h1 className="display-hero mt-3 !text-[clamp(2.1rem,4.1vw,4.1rem)] sm:mt-5">
+                {/* para Google y lectores de pantalla: de qué es la tienda y dónde */}
+                <span className="sr-only">Boom Zapas, zapatillas en Córdoba: </span>
                 Tu próximo par <span className="text-accent">está acá</span>
               </h1>
               <p className="mt-5 hidden max-w-[440px] text-pretty text-[15.5px] leading-[26px] text-white/65 sm:block">

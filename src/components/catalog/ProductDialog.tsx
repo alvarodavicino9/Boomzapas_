@@ -154,7 +154,8 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
 
   // Compartir: el menú del celular (WhatsApp, Instagram…) o, en la compu, copiar el link.
   const compartir = async () => {
-    const texto = `${p.nombre} · ${formatARS(p.precio)} en Boom Zapas`
+    // WhatsApp e Instagram agregan el link abajo y muestran la tarjeta con la foto del par
+    const texto = [`👟 ${p.nombre}`, `${formatARS(p.precio)} · envío gratis a todo el país`, 'Miralas en Boom Zapas:'].join('\n')
     if (navigator.share) {
       try {
         await navigator.share({ title: p.nombre, text: texto, url: link })

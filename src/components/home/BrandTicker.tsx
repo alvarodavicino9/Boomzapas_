@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { BRANDS } from '@/config/site'
 import { formatARS, PROMO } from '@/lib/format'
 import { LogoMarca } from './LogoMarca'
+import { rutaMarca } from '@/lib/seo'
 
 /** Alto de cada logo dentro de la banda (los anchos salen solos de su proporción). */
 const ALTO: Record<string, string> = {
@@ -25,7 +26,7 @@ export function BrandTicker() {
           return (
             <li key={`${rep}-${b}`} className={rep > 0 ? 'ticker-repeat' : undefined} aria-hidden={rep > 0 || undefined}>
               <Link
-                to={`/catalogo?marca=${encodeURIComponent(b)}`}
+                to={rutaMarca(b)}
                 tabIndex={escondido ? -1 : undefined}
                 aria-label={escondido ? undefined : `Ver ${b}`}
                 className="group mx-2 flex h-[72px] w-[150px] items-center justify-center rounded-2xl bg-[linear-gradient(160deg,rgb(255_255_255/0.14),rgb(255_255_255/0.04))] ring-1 ring-inset ring-white/15 backdrop-blur-sm transition-[background-color,transform,box-shadow] duration-300 hover:-translate-y-1 hover:ring-[#ff6b73]/60 hover:shadow-[0_16px_34px_-16px_rgb(0_0_0/0.65)] sm:mx-2.5 sm:h-[92px] sm:w-[210px]"

@@ -1,4 +1,5 @@
 import { SITE } from '../config/site'
+import { slugify } from './slug'
 
 /**
  * SEO en un solo lugar: lo usan el armado de la tienda (vite.config.ts, que genera el HTML de cada
@@ -79,10 +80,36 @@ export const SIN_INDEXAR: Record<string, MetaPagina> = {
 
 export const normalizarRuta = (p: string) => p.replace(/\/+$/, '') || '/'
 
+/** Marcas con nombre "lindo" (para armar el título de /catalogo/<marca> a partir de la dirección). */
+const MARCAS_CONOCIDAS = ['Nike', 'Adidas', 'Jordan', 'New Balance', 'Puma', 'Vans', 'Salomon', 'Converse', 'Reebok', 'Asics']
+
+/** Página de cada marca: /catalogo/nike, /catalogo/new-balance… */
+export const rutaMarca = (marca: string) => `/catalogo/${slugify(marca)}`
+
+export const RUTA_MARCA = /^\/catalogo\/([^/]+)$/
+
+/** Nombre de la marca a partir de la dirección ("new-balance" → "New Balance"). */
+export function marcaDeSlug(slug: string): string {
+  const s = decodeURIComponent(slug)
+  return MARCAS_CONOCIDAS.find((m) => slugify(m) === s) ?? s.split('-').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+}
+
+/** Título y descripción de la página de una marca (lo que busca la gente: "zapatillas nike córdoba"). */
+export function metaMarca(marca: string, cantidad?: number): MetaPagina {
+  const modelos = cantidad ? `${cantidad} modelos con fotos reales de cada par` : 'fotos reales de cada par'
+  return {
+    titulo: `Zapatillas ${marca} en Córdoba | Boom Zapas`,
+    descripcion: `Comprá zapatillas ${marca} en Córdoba: ${modelos}. Envío gratis a todo el país, retiro en el showroom y ${'$'}${SITE.promoPares.descuento.toLocaleString('es-AR')} off por par llevando 2 o más.`,
+    h1: `Zapatillas ${marca}`,
+  }
+}
+
 /** Qué decir de una ruta cualquiera (para el navegador). */
 export function metaDeRuta(pathname: string): MetaPagina {
   const p = normalizarRuta(pathname)
   if (PAGINAS[p]) return PAGINAS[p]
+  const marca = p.match(RUTA_MARCA)?.[1]
+  if (marca) return metaMarca(marcaDeSlug(marca))
   if (p.startsWith('/admin')) return SIN_INDEXAR.panel
   if (p.startsWith('/pago/')) return SIN_INDEXAR.pago
   return SIN_INDEXAR.noEncontrada
@@ -125,6 +152,21 @@ export function jsonLdMigas(items: { nombre: string; ruta: string }[], sitio = S
       position: i + 1,
       name: it.nombre,
       item: `${sitio}${it.ruta === '/' ? '/' : it.ruta}`,
+    })),
+  }
+}
+
+/** Lista de zapatillas de una página (catálogo o marca), con el link a la ficha de cada una. */
+export function jsonLdLista(items: { nombre: string; ruta: string }[], sitio = SITE_URL) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    numberOfItems: items.length,
+    itemListElement: items.map((it, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      url: `${sitio}${it.ruta}`,
+      name: it.nombre,
     })),
   }
 }

@@ -5,6 +5,7 @@ import { useProductos } from '@/context/ProductsContext'
 import { Icon } from '@/components/ui/Icon'
 import { SectionHead, rail } from './SectionHead'
 import { LogoMarca } from './LogoMarca'
+import { rutaMarca } from '@/lib/seo'
 
 /** Las cinco marcas de la tienda, cada una con un par de muestra. Llevan al catálogo filtrado por marca. */
 const MARCAS = [
@@ -32,7 +33,7 @@ export function ComprarPorMarca() {
           return (
             <li key={m.marca} className="w-[44%] shrink-0 snap-start sm:w-auto">
               <Link
-                to={`/catalogo?marca=${encodeURIComponent(m.marca)}`}
+                to={rutaMarca(m.marca)}
                 className="group relative block overflow-hidden rounded-2xl ring-1 ring-line transition-shadow duration-300 hover:shadow-[0_18px_40px_-18px_rgb(0_0_0/0.45)]"
               >
                 <span className="foto-estudio relative block">

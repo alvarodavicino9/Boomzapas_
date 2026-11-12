@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Icon } from '@/components/ui/Icon'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
@@ -20,6 +20,8 @@ import {
   type Orden,
 } from '@/lib/filters'
 import { formatARS, PROMO } from '@/lib/format'
+import { marcaDeSlug } from '@/lib/seo'
+import { slugify } from '@/lib/slug'
 import type { FiltroCategoria } from '@/types'
 
 const isCategoria = (v: string | null): v is FiltroCategoria => CATEGORIAS.some((c) => c.id === v)
@@ -29,6 +31,10 @@ const digits = (v: string | null) => (v ?? '').replace(/\D/g, '')
 export default function CatalogPage() {
   const { productos, status } = useProductos()
   const [params, setParams] = useSearchParams()
+  const navigate = useNavigate()
+  // Página de una marca (/catalogo/nike): arranca filtrada por esa marca
+  const { marca: marcaRuta } = useParams()
+  const marcaDeRuta = marcaRuta ? (productos.find((p) => slugify(p.marca) === marcaRuta)?.marca ?? marcaDeSlug(marcaRuta)) : null
   const [filtersOpen, setFiltersOpen] = useState(false)
 
   // Los filtros viven en la URL: se pueden compartir y funcionan con el botón "atrás".
@@ -38,7 +44,7 @@ export default function CatalogPage() {
   const orden: Orden = isOrden(ordenParam) ? ordenParam : 'novedad'
   const state: FilterState = {
     categoria: isCategoria(catParam) ? catParam : 'todos',
-    marcas: list(params.get('marca')),
+    marcas: params.has('marca') ? list(params.get('marca')) : marcaDeRuta ? [marcaDeRuta] : [],
     talle: params.get('talle') ?? '',
     precios: list(params.get('precio')).filter((id) => PRICE_RANGES.some((r) => r.id === id)),
     pmin: digits(params.get('pmin')),
@@ -48,18 +54,20 @@ export default function CatalogPage() {
     ofertas: params.get('ofertas') === '1',
   }
 
-  const setMany = (entries: Record<string, string>) =>
-    setParams(
-      (prev) => {
-        const next = new URLSearchParams(prev)
-        for (const [k, v] of Object.entries(entries)) {
-          if (v && v !== 'todos' && !(k === 'orden' && v === 'novedad')) next.set(k, v)
-          else next.delete(k)
-        }
-        return next
-      },
-      { replace: true },
-    )
+  const aplicar = (prev: URLSearchParams, entries: Record<string, string>) => {
+    const next = new URLSearchParams(prev)
+    for (const [k, v] of Object.entries(entries)) {
+      if (v && v !== 'todos' && !(k === 'orden' && v === 'novedad')) next.set(k, v)
+      else next.delete(k)
+    }
+    return next
+  }
+  const setMany = (entries: Record<string, string>) => {
+    if (!marcaRuta) return setParams((prev) => aplicar(prev, entries), { replace: true })
+    // Desde la página de una marca, cualquier cambio de filtros sigue en el catálogo general (con esa marca, si no la sacaron).
+    const next = aplicar(new URLSearchParams(params), 'marca' in entries ? entries : { marca: marcaDeRuta ?? '', ...entries })
+    navigate({ pathname: '/catalogo', search: next.toString() ? `?${next}` : '' }, { replace: true })
+  }
 
   const patch = (p: Partial<FilterState>) => {
     const e: Record<string, string> = {}
@@ -126,7 +134,7 @@ export default function CatalogPage() {
     )
     return sortProductos(out, orden)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productos, params.toString(), nuevoDesde])
+  }, [productos, params.toString(), nuevoDesde, marcaDeRuta])
 
   // Filtros activos como etiquetas que se pueden quitar de a una
   const chips: { key: string; label: string; remove: () => void }[] = [
@@ -155,7 +163,10 @@ export default function CatalogPage() {
     ...(state.ofertas ? [{ key: 'o', label: 'En oferta', remove: () => patch({ ofertas: false }) }] : []),
   ]
   const activeCount = chips.length
-  const reset = () => setParams(orden !== 'novedad' ? { orden } : {}, { replace: true })
+  const reset = () =>
+    marcaRuta
+      ? navigate({ pathname: '/catalogo', search: orden !== 'novedad' ? `?orden=${orden}` : '' }, { replace: true })
+      : setParams(orden !== 'novedad' ? { orden } : {}, { replace: true })
 
   // Panel de filtros del celular: Escape lo cierra y no deja scrollear el fondo
   useLockBodyScroll(filtersOpen)
@@ -190,7 +201,7 @@ export default function CatalogPage() {
       <header className="page-x border-b border-line bg-card pb-5 pt-7 sm:pb-7 sm:pt-10">
         <p className="label mb-2 text-accent">Nuestros productos</p>
         <h1 className="display-section !text-[clamp(1.6rem,4vw,2.5rem)]">
-          {query ? <>Resultados para “{query}”</> : 'Catálogo'}
+          {query ? <>Resultados para “{query}”</> : marcaDeRuta ? `Zapatillas ${marcaDeRuta}` : 'Catálogo'}
         </h1>
         <p className="body-text mt-2 max-w-2xl text-[13.5px] leading-6 sm:text-[15px]">
           Fotos reales de cada par · envío gratis a todo el país · llevando {PROMO.minimo} o más, {formatARS(PROMO.descuento)} off en cada par.

@@ -30,6 +30,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route index element={<HomePage />} />
           <Route path="catalogo" element={<CatalogPage />} />
+          <Route path="catalogo/:marca" element={<CatalogPage />} />
           {/* link directo a una zapatilla: el catálogo de fondo y la ficha abierta encima */}
           <Route path="zapatilla/:slug" element={<CatalogPage />} />
           <Route path="envios" element={<ShippingPage />} />
