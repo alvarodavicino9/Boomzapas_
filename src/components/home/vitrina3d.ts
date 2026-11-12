@@ -268,6 +268,8 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
   let pmx = 0
   let pmy = 0
   let compu = true
+  /** 0 en un monitor común; hasta 1 en pantallas anchas y bajas (notebook): la escena sube y se corre para no quedar debajo de la tarjeta. */
+  let apaisado = 0
   let entrada = reducido ? 1 : 0 // animación de llegada: el anillo se abre desde el centro
   let barrido = -1
 
@@ -341,8 +343,9 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
     renderer.setSize(w, h, false)
     camara.aspect = w / h
     compu = window.matchMedia('(min-width: 1024px)').matches
+    apaisado = compu ? Math.min(1, Math.max(0, (w / h - 1.8) / 0.55)) : 0
     if (compu) {
-      escenario.position.set(2.75, 0, 0)
+      escenario.position.set(2.75 - 0.25 * apaisado, 0, 0)
       camara.fov = 32
       camara.position.set(0, 1.5, 11)
     } else {
@@ -412,7 +415,7 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
 
     pmx = amortiguar(pmx, mx, 3, dt)
     pmy = amortiguar(pmy, my, 3, dt)
-    camara.lookAt(compu ? 1.35 + pmx * 0.25 : pmx * 0.2, compu ? -0.15 - pmy * 0.15 : 0.05 - pmy * 0.1, 0)
+    camara.lookAt(compu ? 1.35 + pmx * 0.25 : pmx * 0.2, compu ? -0.15 - 0.45 * apaisado - pmy * 0.15 : 0.05 - pmy * 0.1, 0)
 
     // brillo que cruza el par del frente al llegar
     barrido = barrido < 2 ? barrido + dt * 1.5 : barrido
@@ -425,7 +428,7 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
       const z = Math.cos(w)
       const f = (z + 1) / 2
       const f5 = Math.pow(f, 5)
-      const s = (0.45 + (compu ? 0.85 : 1.3) * f5) * (0.5 + 0.5 * e)
+      const s = (0.45 + (compu ? 0.85 * (1 - 0.12 * apaisado) : 1.3) * f5) * (0.5 + 0.5 * e)
       // el del frente se balancea un poco para que se note el volumen
       const vaiven = reducido ? 0 : Math.sin(t * 0.7 + p.fase) * 0.22 * f5
       p.soporte.rotation.y = -anillo.rotation.y - Math.sin(w) * 0.35 + vaiven

@@ -225,7 +225,7 @@ export function Hero3D() {
 
           {/* tarjeta del par que está al frente */}
           <div
-            className="relative z-10 mx-3 mb-3 rounded-[20px] border border-white/10 bg-[#120c0d]/80 p-4 backdrop-blur-md sm:mx-8 sm:mb-8 lg:absolute lg:bottom-8 lg:right-10 lg:m-0 lg:w-[320px]"
+            className="relative z-10 mx-3 mb-3 rounded-[20px] border border-white/10 bg-[#120c0d]/80 p-4 backdrop-blur-md sm:mx-8 sm:mb-8 lg:absolute lg:bottom-7 lg:right-8 lg:m-0 lg:w-[290px]"
             onMouseEnter={() => vitrinaRef.current?.pausar(true)}
             onMouseLeave={() => vitrinaRef.current?.pausar(false)}
             aria-live="polite"
@@ -237,9 +237,9 @@ export function Hero3D() {
               </span>
             </div>
             <div className={cn('transition-all duration-200', cambiando && 'translate-y-1 opacity-0')}>
-              <p className="mt-2 font-display text-[16px] font-extrabold uppercase leading-5 lg:min-h-[40px]">{par.nombre}</p>
+              <p className="mt-2 font-display text-[16px] font-extrabold uppercase leading-5 lg:min-h-[38px] lg:text-[14.5px] lg:leading-[19px]">{par.nombre}</p>
               <p className="mt-2 flex items-baseline gap-2.5">
-                <strong className="text-[21px] font-semibold">{formatARS(par.precio)}</strong>
+                <strong className="text-[21px] font-semibold lg:text-[19px]">{formatARS(par.precio)}</strong>
                 {par.precioAntes && par.precioAntes > par.precio && <s className="text-[13px] text-white/45">{formatARS(par.precioAntes)}</s>}
               </p>
             </div>
