@@ -6,7 +6,8 @@ import { srcsetWebp } from '@/lib/imagenes'
 
 /**
  * Banner de ofertas (el diseño de la carpeta BANNERS WEB). Lleva al catálogo con el filtro "En oferta".
- * En la compu se ve entero; en el celular se recorta desde la izquierda para que "OFERTAS" y el botón se lean grandes.
+ * En la compu se ve entero. En el celular el texto del banner queda chico y cortado, así que se muestra sólo
+ * la parte de la derecha (ticket, etiqueta SALE y logo) y la promo va abajo en texto.
  */
 export function BannerOfertas() {
   const { minimo, descuento } = SITE.promoPares
@@ -26,15 +27,19 @@ export function BannerOfertas() {
             height={750}
             loading="lazy"
             decoding="async"
-            className="block aspect-[1.32/1] w-full object-cover object-left transition-transform duration-700 ease-out group-hover:scale-[1.012] motion-reduce:transition-none sm:aspect-[2000/750]"
+            className="block aspect-[1.5/1] w-full object-cover object-[83%_50%] max-sm:origin-[55%_100%] max-sm:scale-[1.09] transition-transform duration-700 ease-out motion-reduce:transition-none sm:aspect-[2000/750] sm:group-hover:scale-[1.012]"
           />
-          {/* en el celular, debajo del banner, la promo en texto (en el banner queda chica) */}
-          <span className="flex items-center justify-between gap-3 bg-[#140b0c] px-4 py-3.5 text-white sm:hidden">
-            <span className="text-[13px] leading-5">
-              <b className="font-semibold">{formatARS(descuento)} menos por par</b>
-              <span className="block text-white/70">llevando {minimo} o más</span>
+          {/* en el celular, debajo de la foto, la promo en texto */}
+          <span className="flex items-end justify-between gap-4 bg-[#140b0c] px-5 pb-5 pt-4 text-white sm:hidden">
+            <span>
+              <span className="display-section block !text-[28px] !leading-none">
+                Ofer<span className="text-accent">tas</span>
+              </span>
+              <span className="mt-2 block text-[13px] leading-5 text-white/75">
+                <b className="font-semibold text-white">{formatARS(descuento)} menos por par</b> llevando {minimo} o más
+              </span>
             </span>
-            <span className="label shrink-0 rounded-full bg-accent px-3.5 py-2 text-white">Ver ofertas</span>
+            <span className="label shrink-0 rounded-full bg-accent px-4 py-2.5 text-white">Ver ofertas</span>
           </span>
         </Link>
       </Reveal>
