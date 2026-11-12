@@ -195,24 +195,24 @@ export function Hero3D() {
             <div className="pointer-events-auto max-w-[560px] lg:w-[46%]">
               <p className="label flex items-center gap-2.5 text-white/60">
                 <span className="h-0.5 w-7 bg-accent" />
-                Sneakers · Urban style · Córdoba
+                Sneakers · Córdoba
               </p>
               <h1 className="display-hero mt-3 !text-[clamp(2.1rem,4.1vw,4.1rem)] sm:mt-5">
                 Tu próximo par <span className="text-accent">está acá</span>
               </h1>
-              <p className="mt-4 hidden max-w-[420px] text-[15px] leading-6 text-white/60 sm:block">
-                Nike, Adidas, Jordan, New Balance y Vans. Envío gratis a todo el país y {formatARS(SITE.promoPares.descuento)} de descuento por par llevando {SITE.promoPares.minimo} o más.
+              <p className="mt-5 hidden max-w-[440px] text-pretty text-[15.5px] leading-[26px] text-white/65 sm:block">
+                Nike, Adidas, Jordan, New Balance y Vans, con envío gratis a todo el país.
+                <span className="mt-1 block font-medium text-white">
+                  Llevando {SITE.promoPares.minimo} pares o más, {formatARS(SITE.promoPares.descuento)} menos en cada uno.
+                </span>
               </p>
               <div className="mt-6 hidden flex-wrap gap-2.5 sm:flex">
                 <Link to="/catalogo" className="inline-flex h-12 items-center gap-2 rounded-full bg-accent px-6 text-[13.5px] font-semibold text-white shadow-[0_12px_30px_-12px_rgb(217_44_55/0.8)] transition-transform hover:-translate-y-px">
                   Ver catálogo <Icon name="arrow" size={15} />
                 </Link>
-                <Link to="/catalogo?nuevos=1" className="inline-flex h-12 items-center rounded-full border border-white/15 bg-white/5 px-6 text-[13.5px] font-semibold transition-colors hover:bg-white/10">
-                  Nuevos ingresos
-                </Link>
               </div>
               <dl className="mt-9 hidden gap-7 lg:flex">
-                {SITE.stats.filter((s) => s.label !== 'Respuesta rápida').map((s) => (
+                {SITE.stats.filter((s) => s.label === 'Ventas' || s.label === 'Clientes').map((s) => (
                   <div key={s.label}>
                     <dt className="sr-only">{s.label}</dt>
                     <dd className="font-display text-[20px] font-extrabold">{s.value}</dd>
