@@ -232,10 +232,11 @@ export function CatalogFilters({ value, onChange, query, onQuery, counts, marcas
           </div>
         </Group>
 
-        <Group id="f-disp" title="Disponibilidad" icon="box" badge={(value.stock ? 1 : 0) + (value.nuevos ? 1 : 0)}>
+        <Group id="f-disp" title="Disponibilidad" icon="box" badge={(value.stock ? 1 : 0) + (value.nuevos ? 1 : 0) + (value.ofertas ? 1 : 0)}>
           <div className="space-y-5">
             <Toggle checked={value.stock} onChange={(v) => onChange({ stock: v })} label="Solo con stock" hint="Oculta los modelos agotados." />
             <Toggle checked={value.nuevos} onChange={(v) => onChange({ nuevos: v })} label="Nuevos ingresos" hint="Los últimos pares que llegaron." />
+            <Toggle checked={value.ofertas} onChange={(v) => onChange({ ofertas: v })} label="En oferta" hint="Pares con precio rebajado." />
           </div>
         </Group>
       </div>

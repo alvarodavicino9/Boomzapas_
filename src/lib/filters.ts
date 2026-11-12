@@ -72,4 +72,6 @@ export interface FilterState {
   pmax: string
   stock: boolean
   nuevos: boolean
+  /** Sólo pares rebajados (con precio de lista tachado). */
+  ofertas: boolean
 }

@@ -45,6 +45,7 @@ export default function CatalogPage() {
     pmax: digits(params.get('pmax')),
     stock: params.get('stock') === '1',
     nuevos: params.get('nuevos') === '1',
+    ofertas: params.get('ofertas') === '1',
   }
 
   const setMany = (entries: Record<string, string>) =>
@@ -70,6 +71,7 @@ export default function CatalogPage() {
     if (p.pmax !== undefined) e.pmax = p.pmax
     if (p.stock !== undefined) e.stock = p.stock ? '1' : ''
     if (p.nuevos !== undefined) e.nuevos = p.nuevos ? '1' : ''
+    if (p.ofertas !== undefined) e.ofertas = p.ofertas ? '1' : ''
     setMany(e)
   }
 
@@ -119,6 +121,7 @@ export default function CatalogPage() {
         (max === null || p.precio <= max) &&
         (!state.stock || hasStock(p)) &&
         (!state.nuevos || p.nuevo || p.id >= nuevoDesde) &&
+        (!state.ofertas || (p.precioAntes ?? 0) > p.precio) &&
         coincideBusqueda(p, q),
     )
     return sortProductos(out, orden)
@@ -149,6 +152,7 @@ export default function CatalogPage() {
       : []),
     ...(state.stock ? [{ key: 's', label: 'Con stock', remove: () => patch({ stock: false }) }] : []),
     ...(state.nuevos ? [{ key: 'n', label: 'Nuevos ingresos', remove: () => patch({ nuevos: false }) }] : []),
+    ...(state.ofertas ? [{ key: 'o', label: 'En oferta', remove: () => patch({ ofertas: false }) }] : []),
   ]
   const activeCount = chips.length
   const reset = () => setParams(orden !== 'novedad' ? { orden } : {}, { replace: true })

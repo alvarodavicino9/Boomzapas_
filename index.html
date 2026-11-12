@@ -22,13 +22,12 @@
         } catch (e) {}
         document.documentElement.setAttribute('data-theme', m);
         document.querySelector('meta[name="theme-color"]').setAttribute('content', barra[m]);
-        // En el inicio, la foto grande de la portada se pide apenas abre (antes de que cargue el resto).
+        // En el inicio, la foto del primer par de la portada 3D se pide apenas abre (antes de que cargue el resto).
         if (location.pathname === '/') {
           var l = document.createElement('link');
           l.rel = 'preload';
           l.as = 'image';
-          l.setAttribute('imagesrcset', '/fotos/banners/zapatillas-800.webp 800w, /fotos/banners/zapatillas-1400.webp 1400w, /fotos/banners/zapatillas-2000.webp 2000w');
-          l.setAttribute('imagesizes', '(min-width: 1700px) 1600px, 100vw');
+          l.href = '/fotos/hero3d/nike-sb-dunk-panda.webp';
           l.setAttribute('fetchpriority', 'high');
           document.head.appendChild(l);
         }
