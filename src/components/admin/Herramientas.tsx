@@ -2,6 +2,7 @@ import { useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { Card, Field, PageTitle } from './ui'
+import { Flyer } from './Flyer'
 import { useUI } from '@/context/UIContext'
 import { descargarBlob, descargarCSV, agruparClientes, metodoLabel, totalStock } from '@/lib/adminStats'
 import { exportarRespaldo, importarRespaldo, restablecerDatosLocales, type PedidoAdmin } from '@/lib/adminStore'
@@ -333,6 +334,7 @@ export function Herramientas({ pedidos, productos }: { pedidos: PedidoAdmin[]; p
     <div>
       <PageTitle title="Herramientas" subtitle="Atajos para el día a día del negocio." />
       <div className="grid gap-4 lg:grid-cols-2">
+        <Flyer productos={productos} />
         <Calculadora />
         <Mensajes />
         <DatosCobro />
