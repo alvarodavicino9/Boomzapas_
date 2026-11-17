@@ -39,10 +39,9 @@ interface ProductDialogProps {
   onSelect?: (p: Producto) => void
 }
 
-type Tab = 'descripcion' | 'caracteristicas' | 'envio'
+type Tab = 'caracteristicas' | 'envio'
 
 const TABS: { id: Tab; label: string }[] = [
-  { id: 'descripcion', label: 'Descripción' },
   { id: 'caracteristicas', label: 'Características' },
   { id: 'envio', label: 'Envío y pago' },
 ]
@@ -59,7 +58,7 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
   const carril = useRef<HTMLDivElement>(null)
   const esCompu = useEsCompu()
   const [showError, setShowError] = useState(false)
-  const [tab, setTab] = useState<Tab>('descripcion')
+  const [tab, setTab] = useState<Tab>('caracteristicas')
   const [origin, setOrigin] = useState<string | null>(null)
   const [tablaOpen, setTablaOpen] = useState(false)
   const topRef = useRef<HTMLDivElement>(null)
@@ -94,7 +93,7 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
       setPhoto(0)
       carril.current?.scrollTo({ left: 0 })
       setShowError(false)
-      setTab('descripcion')
+      setTab('caracteristicas')
     } else {
       setTablaOpen(false)
     }
@@ -428,39 +427,22 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
         </div>
 
         <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className="pt-8">
-          {tab === 'descripcion' && (
-            <div className="grid gap-8 lg:grid-cols-[1.3fr_1fr]">
-              <div>
-                <p className="max-w-2xl text-[15px] leading-7">{info.descripcion}</p>
-                <p className="body-text mt-5 max-w-2xl">
-                  ¿Dudas con el talle o querés ver más fotos del par? Escribinos por WhatsApp y te mandamos fotos reales del modelo que vas a recibir.
-                </p>
-              </div>
-              <dl className="grid grid-cols-2 gap-3">
-                {[
-                  ['Marca', p.marca],
-                  ['Color', info.caracteristicas[2].value],
-                  ['Corte', info.caracteristicas[5].value],
-                  ['Estilo', info.caracteristicas[4].value],
-                ].map(([k, v]) => (
-                  <div key={k} className="rounded-xl border border-line bg-card p-4">
-                    <dt className="label text-index">{k}</dt>
-                    <dd className="mt-1 text-[14px] font-semibold">{v}</dd>
+          {tab === 'caracteristicas' && (
+            <>
+              {/* sólo si el producto tiene una descripción propia cargada desde el panel */}
+              {info.descripcion && <p className="mb-6 max-w-2xl text-[15px] leading-7">{info.descripcion}</p>}
+              <dl className="grid gap-x-12 md:grid-cols-2">
+                {info.caracteristicas.map((c) => (
+                  <div key={c.label} className="flex items-baseline justify-between gap-6 border-b border-line py-3.5">
+                    <dt className="label text-index">{c.label}</dt>
+                    <dd className="text-right text-[14px] font-medium">{c.value}</dd>
                   </div>
                 ))}
               </dl>
-            </div>
-          )}
-
-          {tab === 'caracteristicas' && (
-            <dl className="grid gap-x-12 md:grid-cols-2">
-              {info.caracteristicas.map((c) => (
-                <div key={c.label} className="flex items-baseline justify-between gap-6 border-b border-line py-3.5">
-                  <dt className="label text-index">{c.label}</dt>
-                  <dd className="text-right text-[14px] font-medium">{c.value}</dd>
-                </div>
-              ))}
-            </dl>
+              <p className="body-text mt-6 max-w-2xl">
+                ¿Dudas con el talle o querés ver más fotos del par? Escribinos por WhatsApp y te mandamos fotos reales del modelo que vas a recibir.
+              </p>
+            </>
           )}
 
           {tab === 'envio' && (

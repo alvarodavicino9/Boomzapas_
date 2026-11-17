@@ -23,8 +23,8 @@ export const SITE = {
   bank: {
     holder: 'Valentin Sambrini',
     alias: 'valesambrini.lemon',
-    cbu: '0000003100088109534086',
-    bank: 'Mercado Pago',
+    cbu: '0000168300000000314790',
+    bank: 'Lemon',
   },
 
   /** Promo: llevando 2 pares o más, $5.000 de descuento por cada par (con cualquier medio de pago). */

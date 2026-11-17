@@ -2,9 +2,9 @@ import { normText } from '@/lib/filters'
 import type { Producto } from '@/types'
 
 /**
- * Ficha de cada modelo: descripción, puntos destacados y características.
+ * Ficha de cada modelo: puntos destacados y características.
  * Se arma a partir de la familia del modelo (Dunk, Samba, Forum…) y del color que dice el nombre.
- * Si el producto trae `descripcion` desde la base de datos, esa tiene prioridad.
+ * La descripción sólo aparece si el producto trae una propia desde la base de datos (o en MODELOS).
  * Para ajustar un modelo puntual (materiales, medidas, etc.) alcanza con editar FAMILIAS o MODELOS.
  */
 export interface Detalles {
@@ -16,293 +16,168 @@ export interface Detalles {
 interface Familia {
   /** Fragmentos (sin tildes ni mayúsculas) que identifican la familia en el nombre. */
   match: string[]
-  estilo: string
   corte: string
-  cierre: string
-  suela: string
   uso: string
-  descripcion: string
   destacados: string[]
 }
 
 const FAMILIAS: Familia[] = [
   {
     match: ['jordan 1 low', 'jordan 1 mocca'],
-    estilo: 'Básquet clásico',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma',
     uso: 'Urbano',
-    descripcion:
-      'La Jordan 1 en versión baja con la estética de las colaboraciones de Travis Scott: swoosh invertido, paneles combinados y detalles que la hacen inconfundible.',
     destacados: ['Swoosh invertido', 'Corte bajo', 'Paneles combinados'],
   },
   {
     match: ['blazer'],
-    estilo: 'Básquet vintage',
     corte: 'Medio',
-    cierre: 'Cordones',
-    suela: 'Goma vulcanizada',
     uso: 'Urbano, todos los días',
-    descripcion:
-      'Silueta de básquet de los 70 con caña media, swoosh grande al costado y suela vulcanizada. Un clásico que combina con todo.',
     destacados: ['Caña media', 'Swoosh grande lateral', 'Estética vintage'],
   },
   {
     match: ['forum 84', 'forum clasicas', 'forum total white'],
-    estilo: 'Básquet retro',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Plataforma de goma',
     uso: 'Urbano, todos los días',
-    descripcion:
-      'La Forum en versión baja: silueta de básquet retro con paneles marcados y suela de plataforma, fresca para el día a día.',
     destacados: ['Corte bajo', 'Suela de plataforma', 'Paneles marcados'],
   },
   {
     match: ['gazelle'],
-    estilo: 'Indoor clásico',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma',
     uso: 'Urbano, todos los días',
-    descripcion: 'Un ícono de Adidas: perfil bajo, tres tiras laterales y líneas simples. Liviana y fácil de combinar.',
     destacados: ['Perfil bajo', 'Tres tiras laterales', 'Liviana'],
   },
   {
     match: ['adi2000'],
-    estilo: 'Skate retro',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma gruesa',
     uso: 'Urbano, todos los días',
-    descripcion:
-      'Inspirada en el skate de los 2000: suela gruesa, paneles superpuestos y el trébol de Adidas al costado. Mucha presencia.',
     destacados: ['Suela gruesa', 'Paneles superpuestos', 'Estética 2000'],
   },
   {
     match: ['adizero'],
-    estilo: 'Running',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Espuma liviana con amortiguación',
     uso: 'Running y entrenamiento',
-    descripcion:
-      'Línea de running liviana de Adidas, pensada para correr rápido o para usar todos los días con comodidad.',
     destacados: ['Muy liviana', 'Amortiguación para el paso', 'Parte superior de malla'],
   },
   {
     match: ['530'],
-    estilo: 'Running retro',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Amortiguada, con detalles plateados',
     uso: 'Urbano',
-    descripcion:
-      'Running de los 2000 con malla respirable, refuerzos metalizados y suela amortiguada. Cómoda y en tendencia.',
     destacados: ['Malla respirable', 'Refuerzos metalizados', 'Muy cómoda'],
   },
   {
     match: ['puma 180'],
-    estilo: 'Skate retro',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma gruesa',
     uso: 'Urbano, todos los días',
-    descripcion: 'Silueta skate de los 90 con volumen, lengüeta acolchada y suela gruesa. Look total black que va con todo.',
     destacados: ['Silueta voluminosa', 'Lengüeta acolchada', 'Suela gruesa'],
   },
   {
     match: ['hylane', 'hyline'],
-    estilo: 'Skate',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma, en contraste',
     uso: 'Urbano / skate',
-    descripcion:
-      'Zapatilla skate de Vans con perfil bajo, cordones anchos y paneles combinados. Cómoda y con mucha onda.',
     destacados: ['Cordones anchos', 'Paneles combinados', 'Cómoda para todo el día'],
   },
   {
     match: ['upland'],
-    estilo: 'Skate',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma gruesa',
     uso: 'Urbano / skate',
-    descripcion: 'Silueta skate con volumen, lengüeta acolchada y logo grande de Vans. Look retro con presencia.',
     destacados: ['Lengüeta acolchada', 'Logo grande', 'Suela gruesa'],
   },
   {
     match: ['dunk', 'travis'],
-    estilo: 'Skate / básquet retro',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma con vulcanizado',
     uso: 'Urbano, todos los días',
-    descripcion:
-      'Silueta de básquet de los 80 convertida en clásico de la calle. Corte bajo, paneles combinados y una línea limpia que va con casi todo.',
-    destacados: ['Corte bajo, fácil de combinar', 'Paneles bicolor característicos', 'Cómoda para todo el día'],
+    destacados: ['Corte bajo, fácil de combinar', 'Cómoda para todo el día'],
   },
   {
     match: ['samba'],
-    estilo: 'Indoor clásico',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma color caramelo',
     uso: 'Urbano, todos los días',
-    descripcion:
-      'Un clásico de las canchas de fútbol sala que se volvió básico del calzado urbano. Perfil bajo, tres tiras laterales y suela de goma plana.',
     destacados: ['Perfil bajo y liviano', 'Tres tiras laterales', 'Suela plana de goma'],
   },
   {
     match: ['forum high'],
-    estilo: 'Básquet retro',
     corte: 'Alto',
-    cierre: 'Cordones y tira al tobillo',
-    suela: 'Plataforma de goma',
     uso: 'Urbano, todos los días',
-    descripcion:
-      'Zapatilla de básquet de los 80 con corte alto y tira al tobillo. Presencia fuerte, estructura firme y mucho estilo.',
     destacados: ['Corte alto con tira al tobillo', 'Plataforma de suela marcada', 'Presencia retro'],
   },
   {
     match: ['forum low'],
-    estilo: 'Básquet retro',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Plataforma de goma',
     uso: 'Urbano, todos los días',
-    descripcion:
-      'La versión baja de la Forum: misma silueta de básquet retro con paneles marcados y suela de plataforma, más fresca para el día a día.',
     destacados: ['Corte bajo', 'Suela de plataforma', 'Paneles marcados'],
   },
   {
     match: ['superstar'],
-    estilo: 'Clásico de básquet',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma, patrón en espiga',
     uso: 'Urbano, todos los días',
-    descripcion:
-      'Reconocible por su puntera de goma y las tres tiras. Una zapatilla que no pasa de moda y combina con todo.',
     destacados: ['Puntera de goma inconfundible', 'Tres tiras laterales', 'Combina con todo'],
   },
   {
     match: ['campus'],
-    estilo: 'Skate retro',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma gruesa',
     uso: 'Urbano, todos los días',
-    descripcion:
-      'Estilo skate de los 2000 con suela gruesa y paneles de aspecto gamuzado. Cómoda, resistente y con mucha onda.',
     destacados: ['Suela gruesa', 'Estética skate retro', 'Cómoda y resistente'],
   },
   {
     match: ['air force'],
-    estilo: 'Básquet clásico',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Plataforma gruesa de goma',
     uso: 'Urbano, todos los días',
-    descripcion:
-      'Una de las zapatillas más reconocidas del mundo. Suela alta, líneas limpias y un look blanco o negro que sirve para todo.',
     destacados: ['Suela alta y robusta', 'Líneas limpias', 'Look atemporal'],
   },
   {
     match: ['jordan 1'],
-    estilo: 'Básquet clásico',
     corte: 'Alto',
-    cierre: 'Cordones',
-    suela: 'Goma con cámara de aire visible',
     uso: 'Urbano',
-    descripcion:
-      'La silueta que empezó todo. Corte alto, paneles combinados y estética de básquet clásica que se nota donde vayas.',
     destacados: ['Corte alto', 'Paneles combinados', 'Silueta icónica'],
   },
   {
     match: ['jordan 4'],
-    estilo: 'Básquet clásico',
     corte: 'Medio',
-    cierre: 'Cordones',
-    suela: 'Goma con cámara de aire visible',
     uso: 'Urbano',
-    descripcion:
-      'Modelo emblemático con paneles de malla laterales y construcción marcada. Presencia fuerte y mucho carácter.',
     destacados: ['Paneles de malla laterales', 'Silueta marcada', 'Mucho carácter'],
   },
   {
     match: ['jordan low'],
-    estilo: 'Básquet clásico',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma con cámara de aire visible',
     uso: 'Urbano',
-    descripcion: 'La silueta de las Jordan en versión baja: más liviana y fácil de usar todos los días.',
     destacados: ['Corte bajo', 'Silueta clásica', 'Liviana'],
   },
   {
     match: ['duramo'],
-    estilo: 'Running',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma liviana con amortiguación',
     uso: 'Running y entrenamiento liviano',
-    descripcion: 'Zapatilla de running liviana, pensada para salir a correr o para el día a día con comodidad.',
     destacados: ['Liviana', 'Amortiguación para el paso', 'Parte superior de malla'],
   },
   {
     match: ['9060', 'new balance'],
-    estilo: 'Running retro / chunky',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Plataforma gruesa amortiguada',
     uso: 'Urbano',
-    descripcion:
-      'Estética de running de los 2000 con suela voluminosa y paneles superpuestos. Muy cómoda y con mucha presencia.',
     destacados: ['Suela voluminosa amortiguada', 'Paneles superpuestos', 'Muy cómoda'],
   },
   {
     match: ['salomon'],
-    estilo: 'Trail / outdoor',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma con taco marcado',
     uso: 'Urbano y outdoor',
-    descripcion: 'Look técnico de montaña llevado a la calle. Suela con agarre y estética deportiva que está en tendencia.',
     destacados: ['Estética trail', 'Suela con taco marcado', 'En tendencia'],
   },
   {
     match: ['vans', 'knu'],
-    estilo: 'Skate',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma vulcanizada',
     uso: 'Urbano / skate',
-    descripcion: 'Zapatilla skate de silueta voluminosa, lengüeta acolchada y suela vulcanizada. Look de los 90.',
     destacados: ['Lengüeta acolchada', 'Silueta voluminosa', 'Look skate de los 90'],
   },
   {
     match: ['zoom'],
-    estilo: 'Running',
     corte: 'Bajo',
-    cierre: 'Cordones',
-    suela: 'Goma con amortiguación',
     uso: 'Running y urbano',
-    descripcion: 'Zapatilla de running con línea deportiva y suela amortiguada. Ideal para entrenar o para usar todos los días.',
     destacados: ['Línea deportiva', 'Suela amortiguada', 'Para entrenar o para el día a día'],
   },
 ]
 
 const GENERICA: Familia = {
   match: [],
-  estilo: 'Urbana',
   corte: 'Bajo',
-  cierre: 'Cordones',
-  suela: 'Goma',
   uso: 'Urbano, todos los días',
-  descripcion: 'Zapatilla cómoda y fácil de combinar para el día a día.',
   destacados: ['Cómoda para todo el día', 'Fácil de combinar'],
 }
 
@@ -311,14 +186,14 @@ const MODELOS: Record<string, Partial<Pick<Detalles, 'descripcion'>> & { color?:
 
 const COLORES: [string[], string][] = [
   [['grey panda'], 'Gris, blanco y negro'],
-  [['samba caramel'], 'Blanco, marrón y suela caramelo'],
-  [['cream black gum'], 'Crema y negro, suela de goma'],
-  [['graphite gum'], 'Blanco y marrón oscuro, suela de goma'],
+  [['samba caramel'], 'Blanco y marrón'],
+  [['cream black gum'], 'Crema y negro'],
+  [['graphite gum'], 'Blanco y marrón oscuro'],
   [['grafito brown'], 'Marrón y gris grafito'],
   [['celeste y rosa'], 'Celeste y rosa'],
   [['negras clasicas', 'white and black', 'speed 2 clasica'], 'Negro y blanco'],
   [['white green'], 'Blanco y verde'],
-  [['semi total black'], 'Negro con suela en contraste'],
+  [['semi total black'], 'Negro'],
   [['air force one'], 'Blanco'],
   [['total white'], 'Blanco total'],
   [['cloud grey', 'white and grey'], 'Blanco y gris'],
@@ -386,17 +261,13 @@ export function detallesDe(p: Producto, talles: string[]): Detalles {
     { label: 'Modelo', value: p.nombre },
     { label: 'Color', value: color },
     { label: 'Categoría', value: CATEGORIA_LABEL[p.categoria] ?? p.categoria },
-    { label: 'Estilo', value: fam.estilo },
     { label: 'Corte', value: fam.corte },
-    { label: 'Cierre', value: fam.cierre },
-    { label: 'Suela', value: fam.suela },
     { label: 'Ideal para', value: fam.uso },
     { label: 'Talles (AR)', value: rango },
-    { label: 'Fotos', value: 'Reales, a pedido del par exacto' },
   ]
 
   return {
-    descripcion: p.descripcion?.trim() || MODELOS[p.nombre]?.descripcion || fam.descripcion,
+    descripcion: p.descripcion?.trim() || MODELOS[p.nombre]?.descripcion || '',
     destacados: [...fam.destacados, `Color: ${color}`],
     caracteristicas,
   }

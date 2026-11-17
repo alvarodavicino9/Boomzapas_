@@ -34,8 +34,7 @@ export function BrandStory() {
             <div>
               <p className="label text-accent">Desde {SITE.since} · Córdoba</p>
               <h2 id="marca" className="display-section mt-4 !text-[clamp(1.7rem,3.8vw,2.8rem)]">
-                Zapatillas con onda, <br className="hidden sm:block" />
-                atendidas por personas
+                No son solo <span className="text-accent">zapatillas</span>
               </h2>
               <p className="body-text mt-5 max-w-xl text-[15px] leading-7">
                 Boom Zapas nació en Córdoba. Fotografiamos cada par en el showroom para que veas exactamente lo que vas a recibir, y te acompañamos por WhatsApp desde la elección del talle hasta que llega a tu casa.
