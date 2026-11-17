@@ -155,7 +155,8 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
   const modesto = (nav.hardwareConcurrency || 8) <= 4 || (nav.deviceMemory || 8) <= 4
   const dpr = window.devicePixelRatio || 1
   const celu = !window.matchMedia('(min-width: 1024px)').matches
-  let topePixeles = modesto ? 1.25 : celu ? 1.5 : 1.75
+  // en el celular la escena ocupa poco lugar: se puede dibujar a la resolución real de la pantalla (nítida) sin costo grande
+  let topePixeles = modesto ? (celu ? 1.75 : 1.25) : celu ? 2.5 : 1.75
 
   const loader = new TextureLoader()
   const texturas = await Promise.all(
@@ -166,7 +167,7 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
             src,
             (t) => {
               t.colorSpace = SRGBColorSpace
-              t.anisotropy = 4
+              t.anisotropy = 8
               ok(t)
             },
             undefined,
@@ -349,9 +350,9 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
       camara.fov = 32
       camara.position.set(0, 1.5, 11)
     } else {
-      escenario.position.set(0, 0.35, 0)
+      escenario.position.set(0, 0.2, 0)
       camara.fov = 38
-      camara.position.set(0, 2.0, 9.6)
+      camara.position.set(0, 1.9, 9.8)
     }
     camara.updateProjectionMatrix()
   }
@@ -386,8 +387,8 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
       if (cuadros === 90) {
         medido = true
         if (acumulado / cuadros > 1 / 40 && topePixeles > 1) {
-          topePixeles = 1
-          renderer.setPixelRatio(1)
+          topePixeles = celu ? 1.5 : 1
+          renderer.setPixelRatio(Math.min(dpr, topePixeles))
           medir()
           polvo.visible = false
         }
@@ -415,7 +416,7 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
 
     pmx = amortiguar(pmx, mx, 3, dt)
     pmy = amortiguar(pmy, my, 3, dt)
-    camara.lookAt(compu ? 1.35 + pmx * 0.25 : pmx * 0.2, compu ? -0.15 - 0.45 * apaisado - pmy * 0.15 : 0.05 - pmy * 0.1, 0)
+    camara.lookAt(compu ? 1.35 + pmx * 0.25 : pmx * 0.2, compu ? -0.15 - 0.45 * apaisado - pmy * 0.15 : 0.42 - pmy * 0.1, 0)
 
     // brillo que cruza el par del frente al llegar
     barrido = barrido < 2 ? barrido + dt * 1.5 : barrido
@@ -428,7 +429,7 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
       const z = Math.cos(w)
       const f = (z + 1) / 2
       const f5 = Math.pow(f, 5)
-      const s = (0.45 + (compu ? 0.85 * (1 - 0.12 * apaisado) : 1.3) * f5) * (0.5 + 0.5 * e)
+      const s = (0.45 + (compu ? 0.85 * (1 - 0.12 * apaisado) : 1.42) * f5) * (0.5 + 0.5 * e)
       // el del frente se balancea un poco para que se note el volumen
       const vaiven = reducido ? 0 : Math.sin(t * 0.7 + p.fase) * 0.22 * f5
       p.soporte.rotation.y = -anillo.rotation.y - Math.sin(w) * 0.35 + vaiven

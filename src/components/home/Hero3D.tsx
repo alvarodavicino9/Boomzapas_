@@ -172,14 +172,14 @@ export function Hero3D() {
           }}
         >
           {/* escena 3D: arriba en el celular, de fondo en la compu */}
-          <div ref={escenaRef} className="relative h-[330px] sm:h-[400px] lg:absolute lg:inset-0 lg:h-auto">
+          <div ref={escenaRef} className="relative h-[360px] sm:h-[420px] lg:absolute lg:inset-0 lg:h-auto">
             {/* el canvas lo agrega la escena 3D cuando arranca */}
             <img
               src={foto(PARES[listo ? 0 : frente].carpeta)}
               alt=""
               aria-hidden="true"
-              width={615}
-              height={640}
+              width={985}
+              height={1024}
               fetchPriority="high"
               decoding="async"
               className={cn(
