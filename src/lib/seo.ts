@@ -100,7 +100,7 @@ export const COMPARTIR: Record<string, Compartir> = {
     linea1: 'EL CATÁLOGO',
     linea2: 'COMPLETO',
     bajada: 'Nike, Adidas, Jordan, New Balance, Puma y Vans',
-    zapas: ['nike-air-jordan-1-low-x-travis-scott-grey-cream', 'nike-air-force-one', 'new-balance-530-cloud-white'],
+    zapas: ['nike-air-jordan-1-low-x-travis-scott-grey-cream', 'nike-sb-dunk-chocolate', 'new-balance-530-cloud-white'],
   },
   '/envios': {
     titulo: 'Envío gratis a todo el país · Boom Zapas',
@@ -136,7 +136,7 @@ export const COMPARTIR: Record<string, Compartir> = {
     linea2: 'TU TALLE',
     bajada: 'Tabla en centímetros y ayuda por WhatsApp',
     chips: ['Tabla en cm', 'Te asesoramos'],
-    zapas: ['nike-air-force-one', 'adidas-adi2000-semi-total-black', 'nike-sb-dunk-panda'],
+    zapas: ['nike-sb-dunk-chocolate', 'adidas-adi2000-semi-total-black', 'nike-sb-dunk-panda'],
   },
   '/nosotros': {
     titulo: 'Boom Zapas · No son solo zapatillas',

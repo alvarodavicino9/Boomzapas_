@@ -44,7 +44,7 @@ const RECORTES = new Set([
   'new-balance-530-cloud-white',
   'nike-sb-dunk-bordeaux',
   'adidas-forum-84-low-white-and-black',
-  'nike-air-force-one',
+  'nike-sb-dunk-chocolate',
   'adidas-adi2000-semi-total-black',
 ])
 const recorteDe = (p: Producto) => (RECORTES.has(slugify(p.nombre)) ? `/fotos/hero3d/${slugify(p.nombre)}.webp` : null)

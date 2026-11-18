@@ -19,7 +19,7 @@ const PARES = [
   { carpeta: 'new-balance-530-cloud-white', marca: 'New Balance', nombre: 'New Balance 530 Cloud White', precio: 61900, precioAntes: 66900 },
   { carpeta: 'nike-sb-dunk-bordeaux', marca: 'Nike', nombre: 'Nike SB Dunk Bordeaux', precio: 66900 },
   { carpeta: 'adidas-forum-84-low-white-and-black', marca: 'Adidas', nombre: 'Adidas Forum 84 Low White and Black', precio: 67900 },
-  { carpeta: 'nike-air-force-one', marca: 'Nike', nombre: 'Nike Air Force One', precio: 61900, precioAntes: 66900 },
+  { carpeta: 'nike-sb-dunk-chocolate', marca: 'Nike', nombre: 'Nike SB Dunk Chocolate', precio: 63500 },
   { carpeta: 'adidas-adi2000-semi-total-black', marca: 'Adidas', nombre: 'Adidas ADI2000 Semi Total Black', precio: 78900 },
 ]
 const foto = (carpeta: string) => `/fotos/hero3d/${carpeta}.webp`
@@ -207,7 +207,7 @@ export function Hero3D() {
                 Tu próximo par <span className="text-accent">está acá</span>
               </h1>
               <p className="mt-5 hidden max-w-[440px] text-pretty text-[15.5px] leading-[26px] text-white/65 sm:block">
-                Nike, Adidas, Jordan, New Balance y Vans, con envío gratis a todo el país.
+                Envío gratis a todo el país.
                 <span className="mt-1 block font-medium text-white">
                   Llevando {SITE.promoPares.minimo} pares o más, {formatARS(SITE.promoPares.descuento)} menos en cada uno.
                 </span>
