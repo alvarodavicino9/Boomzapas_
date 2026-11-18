@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { ORDENES, type Orden } from '@/lib/filters'
 import { cn } from '@/lib/format'
@@ -85,7 +85,7 @@ export function OrdenMenu({ value, onChange, className, ancho }: Props) {
 
       <AnimatePresence>
         {abierto && (
-          <motion.ul
+          <m.ul
             id={listaId}
             role="listbox"
             aria-label="Ordenar por"
@@ -118,7 +118,7 @@ export function OrdenMenu({ value, onChange, className, ancho }: Props) {
                 </li>
               )
             })}
-          </motion.ul>
+          </m.ul>
         )}
       </AnimatePresence>
     </div>

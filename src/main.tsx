@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
+import { LazyMotion } from 'framer-motion'
 import App from './App'
 import { CartProvider } from '@/context/CartContext'
 import { UIProvider } from '@/context/UIContext'
@@ -9,8 +10,12 @@ import '@fontsource-variable/lexend-exa'
 import '@fontsource-variable/lexend'
 import './index.css'
 
+// Las animaciones se bajan en un archivo aparte, después de lo necesario para mostrar la página.
+const animaciones = () => import('@/lib/animaciones').then((m) => m.default)
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
+    <LazyMotion features={animaciones} strict>
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <UIProvider>
         <ProductsProvider>
@@ -20,6 +25,7 @@ createRoot(document.getElementById('root')!).render(
         </ProductsProvider>
       </UIProvider>
     </BrowserRouter>
+    </LazyMotion>
   </StrictMode>,
 )
 

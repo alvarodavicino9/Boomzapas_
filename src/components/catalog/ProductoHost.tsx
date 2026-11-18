@@ -1,12 +1,15 @@
-import { useCallback, useEffect, useMemo } from 'react'
+import { lazy, Suspense, useCallback, useEffect, useMemo } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { ProductDialog } from './ProductDialog'
 import { useProductos } from '@/context/ProductsContext'
 import { useUI } from '@/context/UIContext'
 import { useAbrirProducto, type EstadoFicha } from '@/hooks/useAbrirProducto'
 import { rutaProducto, slugify } from '@/lib/slug'
 import { hasStock } from '@/lib/filters'
 import { aplicarSeo, jsonLdMigas, jsonLdProducto, metaProducto } from '@/lib/seo'
+import { useCuandoEsteLibre } from '@/hooks/useCuandoEsteLibre'
+
+// La ficha se baja aparte: con un link directo a una zapatilla se pide enseguida; si no, cuando el navegador queda libre.
+const ProductDialog = lazy(() => import('./ProductDialog').then((m) => ({ default: m.ProductDialog })))
 
 const RUTA = /^\/zapatilla\/([^/]+)\/?$/
 
@@ -21,6 +24,7 @@ export function ProductoHost() {
   const { productos, status } = useProductos()
   const { toast } = useUI()
   const abrir = useAbrirProducto()
+  const libre = useCuandoEsteLibre()
 
   const slug = location.pathname.match(RUTA)?.[1]
   const producto = useMemo(
@@ -76,5 +80,10 @@ export function ProductoHost() {
     })
   }, [producto])
 
-  return <ProductDialog producto={producto} onClose={cerrar} onSelect={abrir} />
+  if (!slug && !libre) return null
+  return (
+    <Suspense fallback={null}>
+      <ProductDialog producto={producto} onClose={cerrar} onSelect={abrir} />
+    </Suspense>
+  )
 }

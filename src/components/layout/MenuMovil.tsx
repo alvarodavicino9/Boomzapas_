@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Link, useLocation } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { Logo } from '@/components/ui/Logo'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { ModeSwitch } from '@/components/ui/ModeToggle'
@@ -67,8 +67,8 @@ export function MenuMovil() {
   return createPortal(
     <AnimatePresence>
       {menuOpen && (
-        <motion.div className="fixed inset-0 z-[480] lg:hidden" initial={{ opacity: 1 }} exit={{ opacity: 1 }}>
-          <motion.div
+        <m.div className="fixed inset-0 z-[480] lg:hidden" initial={{ opacity: 1 }} exit={{ opacity: 1 }}>
+          <m.div
             className="absolute inset-0 bg-black/60 backdrop-blur-[3px]"
             onClick={cerrar}
             aria-hidden="true"
@@ -77,7 +77,7 @@ export function MenuMovil() {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
           />
-          <motion.aside
+          <m.aside
             id="menu-movil"
             role="dialog"
             aria-modal="true"
@@ -120,7 +120,7 @@ export function MenuMovil() {
                   <p className="mb-1.5 px-3 text-[10.5px] font-bold uppercase tracking-[0.16em] text-index">{g.titulo}</p>
                   <ul>
                     {g.links.map((l, i) => (
-                      <motion.li
+                      <m.li
                         key={l.to}
                         initial={{ opacity: 0, x: 18 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -152,7 +152,7 @@ export function MenuMovil() {
                         </Link>
                           )
                         })()}
-                      </motion.li>
+                      </m.li>
                     ))}
                   </ul>
                 </nav>
@@ -187,8 +187,8 @@ export function MenuMovil() {
                 <ModeSwitch className="scale-90 origin-right" />
               </div>
             </div>
-          </motion.aside>
-        </motion.div>
+          </m.aside>
+        </m.div>
       )}
     </AnimatePresence>,
     document.body,

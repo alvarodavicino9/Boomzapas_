@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
 import { Icon } from './Icon'
 import { cn } from '@/lib/format'
@@ -56,7 +56,7 @@ export function Modal({ open, onClose, title, children, size = 'md', hideTitle }
   return createPortal(
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           className="fixed inset-0 z-[500] flex items-end justify-center sm:items-center sm:p-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -64,7 +64,7 @@ export function Modal({ open, onClose, title, children, size = 'md', hideTitle }
           transition={{ duration: 0.15 }}
         >
           <div className="absolute inset-0 bg-scrim" onClick={onClose} aria-hidden="true" />
-          <motion.div
+          <m.div
             ref={panelRef}
             role="dialog"
             aria-modal="true"
@@ -97,8 +97,8 @@ export function Modal({ open, onClose, title, children, size = 'md', hideTitle }
               </button>
             </div>
             <div className="overflow-y-auto overscroll-contain">{children}</div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>,
     document.body,

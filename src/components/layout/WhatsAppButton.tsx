@@ -1,7 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { Icon } from '@/components/ui/Icon'
 import { Logo } from '@/components/ui/Logo'
 import { cn } from '@/lib/format'
@@ -207,8 +207,8 @@ export function WhatsAppButton() {
         createPortal(
           <AnimatePresence>
             {open && (
-              <motion.div className="fixed inset-0 z-[470]" initial={{ opacity: 1 }} exit={{ opacity: 1 }}>
-                <motion.div
+              <m.div className="fixed inset-0 z-[470]" initial={{ opacity: 1 }} exit={{ opacity: 1 }}>
+                <m.div
                   className="absolute inset-0 bg-black/60 backdrop-blur-[3px]"
                   onClick={() => setOpen(false)}
                   aria-hidden="true"
@@ -216,7 +216,7 @@ export function WhatsAppButton() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 />
-                <motion.div
+                <m.div
                   ref={panelRef}
                   id={id}
                   role="dialog"
@@ -236,8 +236,8 @@ export function WhatsAppButton() {
                   <div className="[&>div]:pt-6">{cabecera}</div>
                   {cuerpo}
                   {pie}
-                </motion.div>
-              </motion.div>
+                </m.div>
+              </m.div>
             )}
           </AnimatePresence>,
           document.body,
@@ -247,7 +247,7 @@ export function WhatsAppButton() {
         {/* compu: panel flotante arriba del botón */}
         <AnimatePresence>
           {open && !esCel && (
-            <motion.div
+            <m.div
               ref={panelRef}
               id={id}
               role="dialog"
@@ -261,14 +261,14 @@ export function WhatsAppButton() {
               {cabecera}
               {cuerpo}
               {pie}
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
 
         <div className={cn('relative flex items-center gap-3 transition-opacity', open && esCel && 'pointer-events-none opacity-0')}>
           <AnimatePresence>
             {nudge && !open && (
-              <motion.span
+              <m.span
                 initial={{ opacity: 0, x: 12 }}
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: 12 }}
@@ -276,7 +276,7 @@ export function WhatsAppButton() {
               >
                 ¿Te ayudamos a elegir?
                 <span className="block text-[11px] font-medium text-black/55">Respondemos hoy</span>
-              </motion.span>
+              </m.span>
             )}
           </AnimatePresence>
           <button

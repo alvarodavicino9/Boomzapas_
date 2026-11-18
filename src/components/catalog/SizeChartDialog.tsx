@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { Icon } from '@/components/ui/Icon'
 import { Button } from '@/components/ui/Button'
 import { waPlantilla } from '@/lib/whatsapp'
@@ -34,7 +34,7 @@ export function SizeChartDialog({ open, onClose }: SizeChartDialogProps) {
   return createPortal(
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           className="fixed inset-0 z-[600] flex items-center justify-center p-3 sm:p-6"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -42,7 +42,7 @@ export function SizeChartDialog({ open, onClose }: SizeChartDialogProps) {
           transition={{ duration: 0.15 }}
         >
           <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
-          <motion.div
+          <m.div
             role="dialog"
             aria-modal="true"
             aria-label="Tabla de talles"
@@ -78,8 +78,8 @@ export function SizeChartDialog({ open, onClose }: SizeChartDialogProps) {
                 WhatsApp
               </Button>
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       )}
     </AnimatePresence>,
     document.body,

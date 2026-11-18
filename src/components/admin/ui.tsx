@@ -1,6 +1,6 @@
 import { useEffect, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { Icon } from '@/components/ui/Icon'
 import { cn } from '@/lib/format'
 
@@ -163,7 +163,7 @@ export function Drawer({
   return createPortal(
     <AnimatePresence>
       {open && (
-        <motion.div
+        <m.div
           className="fixed inset-0 z-[500] flex items-end justify-end sm:items-stretch"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -171,7 +171,7 @@ export function Drawer({
           transition={{ duration: 0.15 }}
         >
           <div className="absolute inset-0 bg-scrim" onClick={onClose} aria-hidden="true" />
-          <motion.aside
+          <m.aside
             role="dialog"
             aria-modal="true"
             aria-label={typeof title === 'string' ? title : 'Detalle'}
@@ -197,8 +197,8 @@ export function Drawer({
             </header>
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 py-5 sm:px-6">{children}</div>
             {footer && <footer className="border-t border-line px-5 py-4 sm:px-6">{footer}</footer>}
-          </motion.aside>
-        </motion.div>
+          </m.aside>
+        </m.div>
       )}
     </AnimatePresence>,
     document.body,

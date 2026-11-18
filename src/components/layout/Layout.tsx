@@ -1,4 +1,4 @@
-import { Suspense } from 'react'
+import { lazy, Suspense } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Navbar } from './Navbar'
 import { Footer } from './Footer'
@@ -6,10 +6,18 @@ import { ScrollToTop } from './ScrollToTop'
 import { Toaster } from './Toaster'
 import { AvisoAgregado } from './AvisoAgregado'
 import { WhatsAppButton } from './WhatsAppButton'
-import { CartDrawer } from '@/components/cart/CartDrawer'
-import { CheckoutModal } from '@/components/checkout/CheckoutModal'
+import { useUI } from '@/context/UIContext'
+import { useCuandoEsteLibre } from '@/hooks/useCuandoEsteLibre'
+
+// El carrito y el checkout se bajan aparte: no hacen falta para ver la página.
+// Se cargan cuando el navegador queda libre (o antes, si alguien abre el carrito).
+const CartDrawer = lazy(() => import('@/components/cart/CartDrawer').then((m) => ({ default: m.CartDrawer })))
+const CheckoutModal = lazy(() => import('@/components/checkout/CheckoutModal').then((m) => ({ default: m.CheckoutModal })))
 
 export function Layout() {
+  const { cartOpen, checkoutOpen } = useUI()
+  const libre = useCuandoEsteLibre()
+  const cargarPedido = libre || cartOpen || checkoutOpen
   return (
     <>
       <a
@@ -27,8 +35,12 @@ export function Layout() {
       </main>
       <Footer />
       {/* lugar para la barra de abajo del celular */}
-      <CartDrawer />
-      <CheckoutModal />
+      {cargarPedido && (
+        <Suspense fallback={null}>
+          <CartDrawer />
+          <CheckoutModal />
+        </Suspense>
+      )}
       <WhatsAppButton />
       <Toaster />
       <AvisoAgregado />

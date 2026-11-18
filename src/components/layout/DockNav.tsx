@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
-import { motion, useMotionValue, useSpring, useTransform, type MotionValue } from 'framer-motion'
+import { m, useMotionValue, useSpring, useTransform, type MotionValue } from 'framer-motion'
 import { Icon, type IconName } from '@/components/ui/Icon'
 import { cn } from '@/lib/format'
 
@@ -56,17 +56,17 @@ function DockItem({
     >
       {({ isActive }) => (
         <>
-          <motion.span
+          <m.span
             style={animate ? { scale: iconScale, y: iconY } : undefined}
             className={cn('relative hidden transition-colors xl:block', isActive ? 'text-[#ff4d58]' : 'text-white/45 group-hover:text-white/90')}
           >
             <Icon name={item.icon} size={16} />
-          </motion.span>
+          </m.span>
           <span className="relative whitespace-nowrap text-[12.5px] font-bold uppercase tracking-[0.11em]">{item.label}</span>
 
           {/* línea que sigue al mouse */}
           {hover && !isActive && (
-            <motion.span
+            <m.span
               layoutId="seccion-hover"
               transition={{ type: 'spring', stiffness: 520, damping: 40 }}
               className="absolute inset-x-3.5 bottom-[9px] h-px bg-white/45 xl:inset-x-4"
@@ -74,7 +74,7 @@ function DockItem({
           )}
           {/* sección actual: línea roja con brillo */}
           {isActive && (
-            <motion.span
+            <m.span
               layoutId="seccion-activa"
               transition={{ type: 'spring', stiffness: 420, damping: 36 }}
               className="absolute inset-x-3.5 bottom-[8px] h-[3px] rounded-full bg-[linear-gradient(90deg,#c41f2b,#ff4d58,#c41f2b)] shadow-[0_0_14px_2px_rgb(255_77_88/0.55)] xl:inset-x-4"
@@ -98,7 +98,7 @@ export function DockNav() {
 
   return (
     <nav aria-label="Principal" className="hidden lg:block">
-      <motion.ul
+      <m.ul
         onMouseMove={(e) => mouseX.set(e.clientX)}
         onMouseLeave={() => {
           mouseX.set(Infinity)
@@ -112,7 +112,7 @@ export function DockNav() {
             <DockItem item={item} mouseX={mouseX} animate={animate} hover={hover === item.to} />
           </li>
         ))}
-      </motion.ul>
+      </m.ul>
     </nav>
   )
 }

@@ -5,8 +5,8 @@
  * Rendimiento:
  *  - Se carga aparte (import dinámico desde Hero3D), después de que la portada ya se ve: three.js no frena la primera carga.
  *  - Sólo dibuja cuando la portada está en pantalla y la pestaña abierta.
- *  - Ajusta la calidad al equipo: menos resolución y menos partículas en celulares o compus con poca memoria,
- *    y si igual va lento (menos de ~40 cuadros por segundo) baja un escalón más solo.
+ *  - En el celular va siempre en calidad completa (resolución real de la pantalla, con suavizado).
+ *    En la compu, si el equipo es modesto o va lento (menos de ~40 cuadros por segundo), baja un escalón la resolución.
  *  - Al salir del inicio libera todo (texturas, geometrías y el contexto WebGL).
  */
 import {
@@ -156,7 +156,7 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
   const dpr = window.devicePixelRatio || 1
   const celu = !window.matchMedia('(min-width: 1024px)').matches
   // en el celular la escena ocupa poco lugar: se puede dibujar a la resolución real de la pantalla (nítida) sin costo grande
-  let topePixeles = modesto ? (celu ? 1.75 : 1.25) : celu ? 2.5 : 1.75
+  let topePixeles = celu ? 2.5 : modesto ? 1.25 : 1.75
 
   const loader = new TextureLoader()
   const texturas = await Promise.all(
@@ -182,7 +182,7 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
   canvas.setAttribute('aria-hidden', 'true')
   canvas.className = 'absolute inset-0 block size-full'
   // en pantallas de mucha densidad el suavizado casi no se nota y cuesta caro
-  const renderer = new WebGLRenderer({ canvas, antialias: dpr < 2 && !modesto, alpha: true, powerPreference: 'high-performance' })
+  const renderer = new WebGLRenderer({ canvas, antialias: celu || (dpr < 2 && !modesto), alpha: true, powerPreference: 'high-performance' })
   renderer.setPixelRatio(Math.min(dpr, topePixeles))
   renderer.setClearColor(0x000000, 0)
   contenedor.appendChild(canvas)
@@ -235,7 +235,7 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
   })
 
   // polvo rojo que sube despacio
-  const P = modesto ? 80 : celu ? 140 : 220
+  const P = celu ? 140 : modesto ? 80 : 220
   const pos = new Float32Array(P * 3)
   const vel = new Float32Array(P)
   for (let i = 0; i < P; i++) {
@@ -381,13 +381,13 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
     const real = (ahora - antes) / 1000
     const dt = Math.min(0.05, real)
     antes = ahora
-    if (!medido && reloj > 1.6) {
+    if (!celu && !medido && reloj > 1.6) {
       cuadros++
       acumulado += real
       if (cuadros === 90) {
         medido = true
         if (acumulado / cuadros > 1 / 40 && topePixeles > 1) {
-          topePixeles = celu ? 1.5 : 1
+          topePixeles = 1
           renderer.setPixelRatio(Math.min(dpr, topePixeles))
           medir()
           polvo.visible = false
@@ -416,7 +416,7 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
 
     pmx = amortiguar(pmx, mx, 3, dt)
     pmy = amortiguar(pmy, my, 3, dt)
-    camara.lookAt(compu ? 1.35 + pmx * 0.25 : pmx * 0.2, compu ? -0.15 - 0.45 * apaisado - pmy * 0.15 : 0.42 - pmy * 0.1, 0)
+    camara.lookAt(compu ? 1.35 + pmx * 0.25 : pmx * 0.2, compu ? -0.15 - 0.45 * apaisado - pmy * 0.15 : 0.62 - pmy * 0.1, 0)
 
     // brillo que cruza el par del frente al llegar
     barrido = barrido < 2 ? barrido + dt * 1.5 : barrido
@@ -429,7 +429,7 @@ export async function crearVitrina(contenedor: HTMLElement, opciones: VitrinaOpc
       const z = Math.cos(w)
       const f = (z + 1) / 2
       const f5 = Math.pow(f, 5)
-      const s = (0.45 + (compu ? 0.85 * (1 - 0.12 * apaisado) : 1.42) * f5) * (0.5 + 0.5 * e)
+      const s = (0.45 + (compu ? 0.85 * (1 - 0.12 * apaisado) : 1.3) * f5) * (0.5 + 0.5 * e)
       // el del frente se balancea un poco para que se note el volumen
       const vaiven = reducido ? 0 : Math.sin(t * 0.7 + p.fase) * 0.22 * f5
       p.soporte.rotation.y = -anillo.rotation.y - Math.sin(w) * 0.35 + vaiven

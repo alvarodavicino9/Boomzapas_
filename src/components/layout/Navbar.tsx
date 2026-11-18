@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { motion } from 'framer-motion'
+import { m } from 'framer-motion'
 import { Logo } from '@/components/ui/Logo'
 import { DockNav } from './DockNav'
 import { Buscador } from './Buscador'
@@ -33,12 +33,12 @@ export function Navbar() {
       <div className="page-x grid h-[84px] grid-cols-[1fr_auto_1fr] items-center gap-4">
         {/* logo al costado: se agranda al acercar el mouse */}
         <div className="flex items-center">
-          <motion.div whileHover={reduced ? undefined : { scale: 1.18 }} transition={{ type: 'spring', stiffness: 260, damping: 18 }} style={{ originX: 0 }}>
+          <m.div whileHover={reduced ? undefined : { scale: 1.18 }} transition={{ type: 'spring', stiffness: 260, damping: 18 }} style={{ originX: 0 }}>
             <Link to="/" className="block">
               <Logo size={64} wordmark wordmarkClassName="text-[24px] sm:text-[28px]" className="gap-2.5 sm:gap-3.5" />
               <span className="sr-only">: ir al inicio</span>
             </Link>
-          </motion.div>
+          </m.div>
         </div>
 
         <DockNav />
@@ -62,7 +62,7 @@ export function Navbar() {
             className="relative grid size-10 place-items-center rounded-full border border-line text-ink transition-colors hover:border-accent hover:bg-accent hover:text-on-accent"
           >
             {/* el carrito "salta" cuando se suma un par */}
-            <motion.span
+            <m.span
               key={`salto-${agregado?.id ?? 0}`}
               initial={agregado && !reduced ? { scale: 1.45, rotate: -12 } : false}
               animate={{ scale: 1, rotate: 0 }}
@@ -70,9 +70,9 @@ export function Navbar() {
               className="grid place-items-center"
             >
               <Icon name="bag" size={19} />
-            </motion.span>
+            </m.span>
             {count > 0 && (
-              <motion.span
+              <m.span
                 key={`n-${count}`}
                 initial={reduced ? false : { scale: 0.4 }}
                 animate={{ scale: 1 }}
@@ -81,7 +81,7 @@ export function Navbar() {
                 className="absolute -right-1.5 -top-1.5 grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1 text-[10.5px] font-bold text-on-accent ring-2 ring-[color:var(--bz-card)]"
               >
                 {count}
-              </motion.span>
+              </m.span>
             )}
           </button>
           {/* botón del menú del celular: píldora con las rayitas que se convierten en una cruz */}

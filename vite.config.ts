@@ -104,6 +104,33 @@ function armarPagina(base: string, d: PaginaEstatica): string {
  * Al abrirlo, la tienda arranca normal (y muestra la ficha de ese par). Un modelo sin página propia
  * (por ejemplo, uno cargado después en la base) funciona igual, sólo que con los datos generales.
  */
+/**
+ * La página se pinta primero (la base del index.html: barra con el logo y fondo) y recién después
+ * arranca el JavaScript: así algo aparece enseguida aunque el celular sea lento o la conexión mala.
+ * Vite pone el <script type="module"> y los <link rel="modulepreload"> en el <head>; acá se cambian por
+ * un cargador chico que los agrega apenas se dibujó el primer cuadro (con un respaldo por si la pestaña está atrás).
+ * En el inicio espera además a que se vea la foto de la portada de la base (como mucho 1,5 s).
+ */
+function cargarDespuesDePintar(): Plugin {
+  return {
+    name: 'boomzapas-cargar-despues-de-pintar',
+    apply: 'build',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html) {
+        const script = html.match(/<script type="module" crossorigin src="([^"]+)"><\/script>\s*/)
+        if (!script) return html
+        const precargas = [...html.matchAll(/<link rel="modulepreload" crossorigin href="([^"]+)">\s*/g)]
+        let out = html.replace(script[0], '')
+        for (const p of precargas) out = out.replace(p[0], '')
+        const lista = JSON.stringify(precargas.map((p) => p[1]))
+        const cargador = `<script>(function(){var hecho=0;function go(){if(hecho)return;hecho=1;${lista}.forEach(function(h){var l=document.createElement('link');l.rel='modulepreload';l.crossOrigin='';l.href=h;document.head.appendChild(l)});var s=document.createElement('script');s.type='module';s.crossOrigin='';s.src=${JSON.stringify(script[1])};document.head.appendChild(s)}var listo=0;function luego(){if(listo)return;listo=1;requestAnimationFrame(function(){setTimeout(go,0)});setTimeout(go,120)}var im=document.querySelector('#bz-base-hero img');if(im&&!im.complete){im.addEventListener('load',luego);im.addEventListener('error',luego);setTimeout(luego,1500)}else luego()})()</script>\n  </body>`
+        return out.replace('</body>', () => cargador)
+      },
+    },
+  }
+}
+
 function paginasDeProducto(): Plugin {
   let outDir = 'dist'
   return {
@@ -127,7 +154,7 @@ function paginasDeProducto(): Plugin {
 
       // Imagen para compartir de cada página y de cada marca (estilo portada: zapatillas sobre el aro rojo).
       const logoOg = join('public', 'logo-320.webp')
-      const recortes = (await readdir(join('public', 'fotos', 'hero3d'))).filter((n) => n.endsWith('.webp')).map((n) => n.replace(/\.webp$/, ''))
+      const recortes = (await readdir(join('public', 'fotos', 'hero3d'))).filter((n) => n.endsWith('.webp') && !/-\d+\.webp$/.test(n)).map((n) => n.replace(/\.webp$/, ''))
       const recorte = (n: string) => join('public', 'fotos', 'hero3d', `${n}.webp`)
       await mkdir(join(outDir, 'og', 'marca'), { recursive: true })
       const imagenPagina = async (archivo: string, d: Parameters<typeof tarjetaPagina>[0]) => {
@@ -292,7 +319,7 @@ function paginasDeProducto(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), paginasDeProducto()],
+  plugins: [react(), tailwindcss(), cargarDespuesDePintar(), paginasDeProducto()],
   resolve: {
     alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) },
   },
@@ -302,7 +329,6 @@ export default defineConfig({
       output: {
         manualChunks: {
           react: ['react', 'react-dom', 'react-router-dom'],
-          motion: ['framer-motion'],
         },
       },
     },

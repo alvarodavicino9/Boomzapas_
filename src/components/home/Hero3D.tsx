@@ -176,6 +176,10 @@ export function Hero3D() {
             {/* el canvas lo agrega la escena 3D cuando arranca */}
             <img
               src={foto(PARES[listo ? 0 : frente].carpeta)}
+              // el primer par tiene una versión liviana para la primera carga (la precarga index.html)
+              {...((listo ? 0 : frente) === 0
+                ? { srcSet: `/fotos/hero3d/${PARES[0].carpeta}-640.webp 640w, ${foto(PARES[0].carpeta)} 985w`, sizes: '(min-width: 1024px) 34vw, 62vw' }
+                : {})}
               alt=""
               aria-hidden="true"
               width={985}

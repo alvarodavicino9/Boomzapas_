@@ -27,7 +27,9 @@
           var l = document.createElement('link');
           l.rel = 'preload';
           l.as = 'image';
-          l.href = '/fotos/hero3d/nike-sb-dunk-panda.webp';
+          l.href = '/fotos/hero3d/nike-sb-dunk-panda-640.webp';
+          l.setAttribute('imagesrcset', '/fotos/hero3d/nike-sb-dunk-panda-640.webp 640w, /fotos/hero3d/nike-sb-dunk-panda.webp 985w');
+          l.setAttribute('imagesizes', '(min-width: 1024px) 34vw, 62vw');
           l.setAttribute('fetchpriority', 'high');
           document.head.appendChild(l);
         }
@@ -113,7 +115,19 @@
     </script>
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Base que se ve antes de que cargue la página (React la reemplaza al arrancar). No depende del CSS ni del JavaScript. -->
+    <!-- Base que se ve antes de que cargue la página (React la reemplaza al arrancar). No depende del CSS ni del JavaScript.
+         En el inicio incluye la foto del primer par en el mismo lugar que la portada, así se ve enseguida. -->
+    <div id="root"><style>
+      .bz-base-barra{position:fixed;inset:0 0 auto;z-index:2;height:85px;display:flex;align-items:center;gap:10px;padding:0 clamp(16px,4.3vw,82px);background:linear-gradient(135deg,#1f1012 0%,#130b0c 60%,#0d0809 100%);border-bottom:1px solid rgba(255,255,255,.1)}
+      .bz-base-barra img{width:64px;height:64px;border-radius:50%}
+      .bz-base-barra span{font:800 26px/.95 system-ui,sans-serif;letter-spacing:-.02em;color:#fff}
+      .bz-base{min-height:100vh;background:#070506;padding:97px 10px 0}
+      .bz-base-hero{position:relative;max-width:1600px;margin:0 auto;height:560px;overflow:hidden;border-radius:18px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);background:radial-gradient(48% 62% at 70% 62%,rgba(150,12,20,.5),transparent 70%),radial-gradient(30% 40% at 8% 20%,rgba(150,12,20,.2),transparent 70%),#0b0708}
+      .bz-base-hero img{position:absolute;left:50%;top:158px;width:62%;max-width:420px;height:auto;transform:translate(-50%,-50%) rotate(-6deg);filter:drop-shadow(0 30px 30px rgba(0,0,0,.6))}
+      @media (min-width:640px){.bz-base{padding:109px clamp(16px,4.3vw,82px) 0}.bz-base-hero{border-radius:28px}.bz-base-hero img{top:185px}}
+      @media (min-width:1024px){.bz-base-hero{height:clamp(560px,calc(100dvh - 145px),760px)}.bz-base-hero img{left:68%;top:44%;width:34%}}
+    </style><div class="bz-base-barra"><img src="/logo-160.webp" width="64" height="64" alt="" /><span>BOOM<br /><span style="color:#d92c37">ZAPAS</span></span></div><div class="bz-base"><div class="bz-base-hero" id="bz-base-hero"><img src="/fotos/hero3d/nike-sb-dunk-panda.webp" srcset="/fotos/hero3d/nike-sb-dunk-panda-640.webp 640w, /fotos/hero3d/nike-sb-dunk-panda.webp 985w" sizes="(min-width: 1024px) 34vw, 62vw" width="985" height="1024" alt="" fetchpriority="high" /></div><script>if(location.pathname!=='/')document.getElementById('bz-base-hero').remove()</script></div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

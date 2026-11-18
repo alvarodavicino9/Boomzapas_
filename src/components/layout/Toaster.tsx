@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { useUI } from '@/context/UIContext'
 
 export function Toaster() {
@@ -11,7 +11,7 @@ export function Toaster() {
     >
       <AnimatePresence>
         {toasts.map((t) => (
-          <motion.button
+          <m.button
             key={t.id}
             layout
             initial={{ opacity: 0, y: 12 }}
@@ -22,7 +22,7 @@ export function Toaster() {
             className="pointer-events-auto rounded-full bg-bar px-5 py-3 text-left text-[12px] font-semibold uppercase tracking-wide text-white shadow-lift"
           >
             {t.message}
-          </motion.button>
+          </m.button>
         ))}
       </AnimatePresence>
     </div>

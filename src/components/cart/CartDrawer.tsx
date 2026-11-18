@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { Button } from '@/components/ui/Button'
 import { ProductImage } from '@/components/catalog/ProductImage'
 import { useCart } from '@/context/CartContext'
@@ -31,7 +31,7 @@ export function CartDrawer() {
   return createPortal(
     <AnimatePresence>
       {cartOpen && (
-        <motion.div
+        <m.div
           className="fixed inset-0 z-[450]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -39,7 +39,7 @@ export function CartDrawer() {
           transition={{ duration: 0.15 }}
         >
           <div className="absolute inset-0 bg-scrim backdrop-blur-[2px]" onClick={closeCart} aria-hidden="true" />
-          <motion.aside
+          <m.aside
             role="dialog"
             aria-modal="true"
             aria-label="Tu pedido"
@@ -113,7 +113,7 @@ export function CartDrawer() {
                 <ul className="mt-2 flex-1 overflow-y-auto overscroll-contain px-5 sm:px-7">
                   <AnimatePresence initial={false}>
                     {items.map((i) => (
-                      <motion.li
+                      <m.li
                         key={i.key}
                         layout
                         initial={{ opacity: 0 }}
@@ -168,7 +168,7 @@ export function CartDrawer() {
                             </div>
                           </div>
                         </div>
-                      </motion.li>
+                      </m.li>
                     ))}
                   </AnimatePresence>
                 </ul>
@@ -231,8 +231,8 @@ export function CartDrawer() {
                 </footer>
               </>
             )}
-          </motion.aside>
-        </motion.div>
+          </m.aside>
+        </m.div>
       )}
     </AnimatePresence>,
     document.body,

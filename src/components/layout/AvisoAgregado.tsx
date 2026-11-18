@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { ProductImage } from '@/components/catalog/ProductImage'
 import { Icon } from '@/components/ui/Icon'
 import { useCart } from '@/context/CartContext'
@@ -27,7 +27,7 @@ export function AvisoAgregado() {
     <div aria-live="polite" className="pointer-events-none fixed inset-x-0 top-[calc(var(--header-h)+10px)] z-[440] flex justify-center px-3 sm:justify-end sm:px-6">
       <AnimatePresence>
         {agregado && (
-          <motion.div
+          <m.div
             key={agregado.id}
             role="status"
             initial={{ opacity: 0, y: -16, scale: 0.97 }}
@@ -76,7 +76,7 @@ export function AvisoAgregado() {
             </p>
             {/* barrita que muestra cuánto falta para que se cierre */}
             {!pausa && (
-              <motion.span
+              <m.span
                 aria-hidden="true"
                 className="block h-0.5 origin-left bg-accent"
                 initial={{ scaleX: 1 }}
@@ -84,7 +84,7 @@ export function AvisoAgregado() {
                 transition={{ duration: DURACION / 1000, ease: 'linear' }}
               />
             )}
-          </motion.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

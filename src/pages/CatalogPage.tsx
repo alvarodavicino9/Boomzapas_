@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, m } from 'framer-motion'
 import { Icon } from '@/components/ui/Icon'
 import { useLockBodyScroll } from '@/hooks/useLockBodyScroll'
 import { CatalogFilters } from '@/components/catalog/CatalogFilters'
@@ -288,7 +288,7 @@ export default function CatalogPage() {
       {/* Panel de filtros del celular: sube desde abajo */}
       <AnimatePresence>
         {filtersOpen && (
-          <motion.div
+          <m.div
             className="fixed inset-0 z-[450] lg:hidden"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -296,7 +296,7 @@ export default function CatalogPage() {
             transition={{ duration: 0.15 }}
           >
             <div className="absolute inset-0 bg-scrim" onClick={() => setFiltersOpen(false)} aria-hidden="true" />
-            <motion.div
+            <m.div
               role="dialog"
               aria-modal="true"
               aria-label="Filtros"
@@ -328,8 +328,8 @@ export default function CatalogPage() {
                   Ver {filtered.length} {filtered.length === 1 ? 'modelo' : 'modelos'}
                 </button>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
     </>

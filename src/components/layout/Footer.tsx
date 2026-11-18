@@ -117,6 +117,30 @@ export function Footer() {
             </p>
             <InstalarApp compacto />
           </div>
+          {/* firma del estudio que hizo la página */}
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[12.5px] sm:order-none">
+            <span>Desarrollado por</span>
+            <a
+              href="https://dssoftwarestudio.com.ar/"
+              target="_blank"
+              rel="noopener"
+              className="font-semibold text-ink transition-colors hover:text-accent-soft"
+            >
+              <span className="bg-[linear-gradient(90deg,#8b7cf6,#2fc8db)] bg-clip-text font-extrabold text-transparent">&lt;DSS/&gt;</span>{' '}
+              SoftwareStudio
+            </a>
+            <span aria-hidden="true" className="hidden sm:inline">·</span>
+            <a
+              href="https://www.instagram.com/ds.softwarestudio/"
+              target="_blank"
+              rel="noopener"
+              aria-label="Instagram de DS Software Studio"
+              className="inline-flex items-center gap-1.5 transition-colors hover:text-ink"
+            >
+              <Icon name="instagram" size={14} />
+              @ds.softwarestudio
+            </a>
+          </p>
           <div className="flex flex-wrap items-center gap-3">
             <ModeSwitch />
             <button
