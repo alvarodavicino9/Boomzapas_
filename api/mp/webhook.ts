@@ -22,7 +22,7 @@ function firmaValida(req: Req, dataId: string): boolean {
 }
 
 export default route(['POST', 'GET'], async (req, res) => {
-  if (!mpConfigurado()) throw new HttpError(500, 'Mercado Pago no está configurado.')
+  if (!mpConfigurado()) throw new HttpError(404, 'No encontrado')
 
   const body = (req.body && typeof req.body === 'object' ? req.body : {}) as { type?: string; data?: { id?: string | number } }
   const tipo = param(req, 'type') || param(req, 'topic') || body.type || ''

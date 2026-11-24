@@ -64,6 +64,11 @@ export const PAGINAS: Record<string, MetaPagina> = {
     descripcion: `Escribinos por WhatsApp o Instagram, o visitanos en ${SITE.address}. Lunes a viernes de 10 a 19 y sábados de 10 a 14.`,
     h1: 'Contacto',
   },
+  '/arrepentimiento': {
+    titulo: 'Botón de arrepentimiento | Boom Zapas',
+    descripcion: 'Tenés 10 días corridos para arrepentirte de tu compra, sin costo y sin trámites. Pedí la cancelación por WhatsApp o mail.',
+    h1: 'Botón de arrepentimiento',
+  },
 }
 
 const OFF = `${'$'}${SITE.promoPares.descuento.toLocaleString('es-AR')}`

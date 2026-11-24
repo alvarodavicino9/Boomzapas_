@@ -17,6 +17,7 @@ const SizeGuidePage = lazy(() => import('@/pages/SizeGuidePage'))
 const AdminPage = lazy(() => import('@/pages/AdminPage'))
 const PaymentResultPage = lazy(() => import('@/pages/PaymentResultPage'))
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage'))
+const ArrepentimientoPage = lazy(() => import('@/pages/ArrepentimientoPage'))
 
 export default function App() {
   const location = useLocation()
@@ -40,6 +41,7 @@ export default function App() {
           <Route path="nosotros" element={<AboutPage />} />
           <Route path="pago/:resultado" element={<PaymentResultPage />} />
           <Route path="contacto" element={<ContactPage />} />
+          <Route path="arrepentimiento" element={<ArrepentimientoPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
         <Route

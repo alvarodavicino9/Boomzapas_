@@ -1,10 +1,15 @@
 import { useCallback, useState } from 'react'
+import { MODO_DEMO } from '@/lib/api'
+import { SESION_ADMIN } from '@/lib/claveAdmin'
 
 const KEY = 'bz_admin_token'
 
 const read = () => {
   try {
-    return sessionStorage.getItem(KEY) ?? ''
+    const v = sessionStorage.getItem(KEY) ?? ''
+    // en modo local sólo vale la marca que deja la clave correcta
+    if (MODO_DEMO && v !== SESION_ADMIN) return ''
+    return v
   } catch {
     return ''
   }

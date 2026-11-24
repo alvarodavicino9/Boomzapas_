@@ -30,7 +30,7 @@ export function db(): SupabaseClient {
   if (client) return client
   const url = process.env.SUPABASE_URL
   const key = process.env.SUPABASE_SERVICE_KEY
-  if (!url || !key) throw new HttpError(500, 'Falta configurar SUPABASE_URL y SUPABASE_SERVICE_KEY en Vercel.')
+  if (!url || !key) throw new HttpError(404, 'No encontrado')
   client = createClient(url, key, { auth: { persistSession: false } })
   return client
 }
@@ -40,7 +40,7 @@ const digest = (v: string) => createHash('sha256').update(v).digest()
 /** Compara el token del encabezado x-admin-token con ADMIN_TOKEN (en tiempo constante). */
 export function requireAdmin(req: Req) {
   const expected = process.env.ADMIN_TOKEN
-  if (!expected) throw new HttpError(500, 'Falta configurar ADMIN_TOKEN en Vercel.')
+  if (!expected) throw new HttpError(404, 'No encontrado')
   const raw = req.headers['x-admin-token']
   const given = Array.isArray(raw) ? raw[0] : raw
   if (!given || !timingSafeEqual(digest(given), digest(expected))) throw new HttpError(401, 'No autorizado')
@@ -67,10 +67,16 @@ export function bodyOf(req: Req): Record<string, unknown> {
 
 type Handler = (req: Req, res: Res) => Promise<void>
 
+/** La API sólo se activa con Supabase y la clave del panel configurados en Vercel. */
+export const apiActiva = () => Boolean(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_KEY && process.env.ADMIN_TOKEN)
+
 /** Arma una función de Vercel: controla los métodos permitidos y convierte los errores en respuestas JSON. */
 export function route(methods: string[], fn: Handler) {
   return async (req: Req, res: Res) => {
     res.setHeader('Cache-Control', 'no-store')
+    res.setHeader('X-Content-Type-Options', 'nosniff')
+    // Mientras la tienda funciona sin servidor (sin Supabase configurado en Vercel), la API no existe para afuera.
+    if (!apiActiva()) return res.status(404).json({ error: 'No encontrado' })
     if (!methods.includes(req.method ?? '')) {
       res.setHeader('Allow', methods.join(', '))
       return res.status(405).json({ error: 'Método no permitido' })
@@ -79,9 +85,9 @@ export function route(methods: string[], fn: Handler) {
       await fn(req, res)
     } catch (e) {
       if (e instanceof HttpError) return res.status(e.status).json({ error: e.message })
+      // el detalle queda en los logs de Vercel; afuera no se muestra nada interno
       console.error(e)
-      const message = e instanceof Error ? e.message : 'Error del servidor'
-      return res.status(500).json({ error: message })
+      return res.status(500).json({ error: 'Error del servidor. Probá de nuevo en un rato.' })
     }
   }
 }

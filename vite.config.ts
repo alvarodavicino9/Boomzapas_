@@ -55,6 +55,7 @@ const MENU: [string, string][] = [
   ['/guia-de-talles', 'Guía de talles'],
   ['/nosotros', 'Quiénes somos'],
   ['/contacto', 'Contacto'],
+  ['/arrepentimiento', 'Botón de arrepentimiento'],
 ]
 
 /** Arma el HTML de una página a partir del de la tienda: su propio <head> y su contenido básico. */

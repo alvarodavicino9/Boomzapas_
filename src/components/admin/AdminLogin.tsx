@@ -1,14 +1,15 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/Button'
-import { Icon } from '@/components/ui/Icon'
 import { Logo } from '@/components/ui/Logo'
 import { ApiError, MODO_DEMO, adminStats } from '@/lib/api'
+import { SESION_ADMIN, claveCorrecta } from '@/lib/claveAdmin'
 
 export function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
   const [value, setValue] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [fallos, setFallos] = useState(0)
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -17,7 +18,18 @@ export function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
     setLoading(true)
     setError(null)
     try {
-      if (!MODO_DEMO) await adminStats(token) // valida el token contra el backend
+      if (MODO_DEMO) {
+        // cada intento fallido tarda más (frena a quien quiera probar claves)
+        if (fallos) await new Promise((r) => setTimeout(r, Math.min(8000, 600 * 2 ** fallos)))
+        if (!(await claveCorrecta(token))) {
+          setFallos((f) => f + 1)
+          setError('Clave incorrecta.')
+          return
+        }
+        onLogin(SESION_ADMIN)
+        return
+      }
+      await adminStats(token) // valida el token contra el backend
       onLogin(token)
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'No se pudo validar el token.')
@@ -49,12 +61,6 @@ export function AdminLogin({ onLogin }: { onLogin: (token: string) => void }) {
             autoFocus
           />
         </label>
-        {MODO_DEMO && (
-          <p className="flex items-start gap-2 rounded-xl bg-stage px-3 py-2.5 text-[12px] leading-4 text-index">
-            <Icon name="alert" size={14} className="mt-px shrink-0 text-[#f0a93b]" />
-            Modo local: entrá con cualquier clave. Los datos se guardan sólo en este navegador.
-          </p>
-        )}
         {error && (
           <p role="alert" className="label text-danger">
             {error}
