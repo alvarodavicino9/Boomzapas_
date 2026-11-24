@@ -94,10 +94,10 @@ export default function AboutPage() {
         <Reveal>
           <p className="label flex items-center gap-3 text-accent">
             <span aria-hidden="true" className="h-[2px] w-8 bg-accent" />
-            Desde {SITE.since} · Córdoba
+            Desde {SITE.since}
           </p>
           <h2 id="historia" className="display-section mt-4 !text-[clamp(1.6rem,4vw,2.5rem)]">
-            Una tienda de Córdoba, atendida por personas
+            De Córdoba para todo el país
           </h2>
           <div className="mt-6 space-y-4 text-[16px] leading-7 sm:text-[18px] sm:leading-8">
             <p>

@@ -5,7 +5,6 @@ import { ModeSwitch } from '@/components/ui/ModeToggle'
 import { InstalarApp } from './InstalarApp'
 import { SITE } from '@/config/site'
 import { waLinkGeneric } from '@/lib/whatsapp'
-import { RECLAMOS_CONSUMIDOR } from '@/lib/legal'
 
 const MAPA = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(SITE.address)}`
 
@@ -110,7 +109,7 @@ export function Footer() {
           </div>
         </div>
 
-        {/* ── Enlaces obligatorios para tiendas online (Ley 24.240) ── */}
+        {/* ── Botón de arrepentimiento (Ley 24.240) ── */}
         <div className="flex flex-col gap-3 border-t border-line px-5 py-5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6 sm:px-10">
           <Link
             to="/arrepentimiento"
@@ -118,14 +117,6 @@ export function Footer() {
           >
             <Icon name="refresh" size={15} /> Botón de arrepentimiento
           </Link>
-          <a
-            href={RECLAMOS_CONSUMIDOR}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-[13px] text-index transition-colors hover:text-ink"
-          >
-            Defensa de las y los consumidores. Para reclamos ingresá aquí <Icon name="external" size={12} />
-          </a>
         </div>
 
         {/* ── Cierre: copyright, modo y volver arriba ─────────── */}
