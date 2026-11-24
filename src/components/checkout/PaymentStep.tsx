@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { OrderSummary } from './OrderSummary'
-import { aplicaPromo, cn, formatARS, formatPorcentaje, planCuotas, planesCuotas, PROMO, precioUnitario } from '@/lib/format'
+import { aplicaPromo, cn, formatARS, planCuotas, planesCuotas, PROMO, precioUnitario } from '@/lib/format'
 import type { CartItem, MetodoPago } from '@/types'
 
 const METHODS: { id: MetodoPago; title: string; text: string }[] = [
@@ -156,7 +156,7 @@ export function PaymentStep({
                         })}
                       </div>
                       <p className="mt-2 px-2.5 text-[11.5px] leading-4 text-gallery/65">
-                        Las cuotas incluyen el recargo de Mercado Pago ({planes.slice(1).map((p) => `${p.cuotas}: ${formatPorcentaje(p.recargo)}`).join(' · ')}).
+                        Las cuotas incluyen el recargo de Mercado Pago.
                       </p>
                     </div>
                   )}

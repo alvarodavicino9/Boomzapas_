@@ -31,13 +31,18 @@ export const SITE = {
   promoPares: { minimo: 2, descuento: 5000 },
 
   /**
-   * Cuotas con tarjeta por Mercado Pago (link de pago): recargo que cobra Mercado Pago según la cantidad de cuotas.
-   * Se suma al total del pedido para mostrar cuánto sale en cuotas. Si Mercado Pago cambia los %, actualizalos acá.
+   * Cuotas con tarjeta por Mercado Pago (link de pago): cuánto paga de más el cliente en cada plan
+   * para que la tienda reciba el precio completo (ya incluye el costo de las cuotas, la comisión de Mercado Pago y el IVA).
+   * Sale del simulador de Mercado Pago (link de pago, acreditación a 10 días), para recibir $ 65.900:
+   *   2 cuotas (7,79 %)  → el cliente paga $ 77.398,20 → +17,448 %
+   *   3 cuotas (10,49 %) → el cliente paga $ 80.486,49 → +22,1343 %
+   *   6 cuotas (18,69 %) → el cliente paga $ 91.584,89 → +38,9756 %
+   * Si Mercado Pago cambia sus tasas: simulá de nuevo y poné acá (lo que paga el cliente ÷ lo que recibís − 1) × 100.
    */
   cuotasMercadoPago: [
-    { cuotas: 2, recargo: 7.79 },
-    { cuotas: 3, recargo: 10.49 },
-    { cuotas: 6, recargo: 18.69 },
+    { cuotas: 2, recargo: 17.448 },
+    { cuotas: 3, recargo: 22.1343 },
+    { cuotas: 6, recargo: 38.9756 },
   ],
 
   stats: [
