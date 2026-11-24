@@ -118,7 +118,12 @@ export default function HowToBuyPage() {
         </h2>
         <ol className="relative grid gap-8 md:grid-cols-4 md:gap-5">
           {/* línea que une los pasos */}
-          <span aria-hidden="true" className="absolute left-6 top-6 hidden h-[2px] w-[76%] bg-[linear-gradient(90deg,var(--bz-accent),rgb(217_44_55/0.15))] md:block" />
+          {/* de centro a centro de los círculos: 4 columnas con 20px de separación, círculos de 48px */}
+          <span
+            aria-hidden="true"
+            className="absolute top-[23px] hidden h-[2px] bg-[linear-gradient(90deg,var(--bz-accent),rgb(217_44_55/0.45))] md:block"
+            style={{ left: 24, right: 'calc((100% - 60px) / 4 - 24px)' }}
+          />
           <span aria-hidden="true" className="absolute bottom-6 left-6 top-6 w-[2px] bg-[linear-gradient(180deg,var(--bz-accent),rgb(217_44_55/0.15))] md:hidden" />
           {PASOS.map((p, i) => (
             <li key={p.title} className="relative flex gap-5 md:block">
