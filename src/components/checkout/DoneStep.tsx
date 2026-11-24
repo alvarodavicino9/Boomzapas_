@@ -140,7 +140,7 @@ export function DoneStep({ order, onClose }: { order: OrderResult; onClose: () =
           {entrega === 'envio' ? (
             <>
               <span className="block truncate font-semibold">
-                {cliente.envio ? `${cliente.envio.calle} ${cliente.envio.numero}${cliente.envio.piso ? `, ${cliente.envio.piso}` : ''}` : cliente.direccion}
+                {cliente.envio ? `${cliente.envio.calle} ${cliente.envio.numero}${cliente.envio.piso ? ` · Piso/depto ${cliente.envio.piso}` : ''}` : cliente.direccion}
               </span>
               <span className="block text-index">
                 {cliente.envio ? `${cliente.envio.localidad} · CP ${cliente.envio.cp} · ` : ''}3 a 7 días hábiles

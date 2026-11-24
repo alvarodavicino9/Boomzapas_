@@ -1,6 +1,6 @@
 import { SITE } from '@/config/site'
 import type { CartItem, MetodoPago, TipoEntrega } from '@/types'
-import { aplicaPromo, descuentoPromo, formatARS, formatPorcentaje, planCuotas, PROMO, precioPromo, precioUnitario } from './format'
+import { aplicaPromo, descuentoPromo, formatARS, planCuotas, PROMO, precioPromo, precioUnitario } from './format'
 import { SITE_URL } from './seo'
 import { rutaProducto } from './slug'
 
@@ -206,19 +206,18 @@ export const buildOrderMessage = ({ codigo, fecha, items, metodo, cuotas = 1, en
     ...productos,
     '',
     '💰 *RESUMEN*',
-    `• Subtotal: ${formatARS(subtotal)}`,
-    aplicaPromo(pares) ? `• Promo ${PROMO.minimo} pares o más: −${formatARS(promo)}` : null,
+    enCuotas ? null : `• Subtotal: ${formatARS(subtotal)}`,
+    aplicaPromo(pares) && !enCuotas ? `• Promo ${PROMO.minimo} pares o más: −${formatARS(promo)}` : null,
     `• Envío: ${entrega === 'envio' ? 'Gratis' : 'Retiro sin costo'}`,
-    enCuotas ? `• Recargo Mercado Pago (${plan.cuotas} cuotas, ${formatPorcentaje(plan.recargo)}): +${formatARS(plan.total - total)}` : null,
-    enCuotas ? `✅ *TOTAL: ${formatARS(plan.total)}* (${plan.cuotas} cuotas de ${formatARS(plan.cuota)})` : `✅ *TOTAL: ${formatARS(total)}*`,
+    enCuotas ? `✅ *TOTAL: ${formatARS(plan.total)}* en ${plan.cuotas} cuotas de ${formatARS(plan.cuota)}` : `✅ *TOTAL: ${formatARS(total)}*`,
     '',
     '💳 *PAGO*',
     metodo === 'mercadopago'
       ? enCuotas
-        ? `• Mercado Pago en *${plan.cuotas} cuotas de ${formatARS(plan.cuota)}*`
-        : '• Mercado Pago en *1 pago*'
+        ? `• Mercado Pago · ${plan.cuotas} cuotas`
+        : '• Mercado Pago · 1 pago'
       : `• ${metodoLabel[metodo]}`,
-    metodo === 'mercadopago' ? `• Link de pago por: *${formatARS(plan.total)}*` : null,
+    metodo === 'mercadopago' ? '• Envíenme el link de pago 🙏' : null,
     metodo === 'transferencia' ? `• Importe a transferir: *${formatARS(total)}*` : null,
     '',
     ...(entrega === 'envio'
@@ -227,11 +226,13 @@ export const buildOrderMessage = ({ codigo, fecha, items, metodo, cuotas = 1, en
           '• Correo Argentino · gratis · 3 a 7 días hábiles',
           `• Recibe: ${nombre}${dni ? ` · DNI ${dni}` : ''}`,
           e
-            ? `• Dirección: ${`${e.calle} ${e.numero}`.trim()}${e.piso ? `, ${e.piso}` : ''}`
+            ? `• Calle y altura: ${`${e.calle} ${e.numero}`.trim()}`
             : cliente.direccion
               ? `• Dirección: ${cliente.direccion}`
               : null,
-          e ? `• Localidad: ${e.localidad}, ${e.provincia}` : null,
+          e?.piso ? `• Piso / depto: ${e.piso}` : null,
+          e ? `• Localidad: ${e.localidad}` : null,
+          e ? `• Provincia: ${e.provincia}` : null,
           e ? `• Código postal: ${e.cp}` : null,
           cliente.referencias ? `• Referencias: ${cliente.referencias}` : null,
         ]
