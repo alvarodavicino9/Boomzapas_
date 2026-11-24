@@ -10,6 +10,7 @@ import { useUI } from '@/context/UIContext'
 import { ApiError, MODO_DEMO, crearPedido } from '@/lib/api'
 import { cn, descuentoPromo, formatARS, planCuotas, precioUnitario } from '@/lib/format'
 import { registrarPedidoDeTienda } from '@/lib/adminStore'
+import { numeroPedido, registrarPedido } from '@/lib/supabase'
 import type { MetodoPago, PedidoPayload } from '@/types'
 
 type Step = 'datos' | 'pago' | 'listo'
@@ -143,6 +144,33 @@ export function CheckoutModal() {
     }
 
     if (MODO_DEMO) {
+      // Número correlativo del pedido (0001, 0002…) y registro en Supabase. Si no responde, queda el código por fecha y hora.
+      const c = datosCliente()
+      const plan = planCuotas(total, metodo === 'mercadopago' ? cuotas : 1)
+      const n = await registrarPedido({
+        codigo,
+        cliente: c.nombre,
+        telefono: c.telefono,
+        total: plan.total,
+        metodo,
+        cuotas: plan.cuotas,
+        entrega: form.entrega,
+        precio_contado: total,
+        dni: c.dni,
+        email: c.email,
+        envio: c.envio,
+        referencias: c.referencias,
+        notas: c.notas,
+        origen: c.origen,
+        items: items.map((i) => ({
+          producto_id: i.productoId,
+          nombre: i.nombre,
+          talle: i.talle,
+          cantidad: i.cantidad,
+          precio_unit: precioUnitario(i.precio, count),
+        })),
+      })
+      const numero = n ? numeroPedido(n) : codigo
       // Sin servidor conectado: el pedido se confirma por WhatsApp (y queda anotado en el panel de este navegador).
       registrarPedidoDeTienda({
         items,
@@ -154,7 +182,7 @@ export function CheckoutModal() {
         email: form.email.trim() || undefined,
         direccion: form.entrega === 'envio' ? direccionCompleta(form) : undefined,
       })
-      finish(undefined, true, codigo)
+      finish(undefined, true, numero)
       setSubmitting(false)
       return
     }
