@@ -31,7 +31,7 @@ returns integer
 language plpgsql
 security definer
 set search_path = ''
-as $$
+as $fn$
 declare
   n integer;
   ip text;
@@ -43,9 +43,9 @@ begin
   if p is null or jsonb_typeof(p) <> 'object' then raise exception 'pedido inválido'; end if;
   if pg_column_size(p) > 16000 then raise exception 'pedido demasiado grande'; end if;
   if length(coalesce(p->>'cliente', '')) not between 3 and 120 then raise exception 'falta el nombre'; end if;
-  if length(regexp_replace(coalesce(p->>'telefono', ''), '\D', '', 'g')) not between 6 and 15 then raise exception 'teléfono inválido'; end if;
+  if length(regexp_replace(coalesce(p->>'telefono', ''), '[^0-9]', '', 'g')) not between 6 and 15 then raise exception 'teléfono inválido'; end if;
   if coalesce(jsonb_typeof(p->'items'), '') <> 'array' or jsonb_array_length(p->'items') not between 1 and 20 then raise exception 'pedido sin productos'; end if;
-  if coalesce(p->>'total', '') !~ '^\d{1,9}$' then raise exception 'total inválido'; end if;
+  if coalesce(p->>'total', '') = '' or p->>'total' ~ '[^0-9]' or length(p->>'total') > 9 then raise exception 'total inválido'; end if;
   total_num := (p->>'total')::integer;
   if total_num < 1000 or total_num > 20000000 then raise exception 'total inválido'; end if;
   if coalesce(p->>'metodo', '') not in ('mercadopago', 'transferencia', 'whatsapp') then raise exception 'medio de pago inválido'; end if;
@@ -66,7 +66,7 @@ begin
   returning numero into n;
   return n;
 end;
-$$;
+$fn$;
 
 revoke all on function public.registrar_pedido(jsonb) from public;
 grant execute on function public.registrar_pedido(jsonb) to anon, authenticated;
