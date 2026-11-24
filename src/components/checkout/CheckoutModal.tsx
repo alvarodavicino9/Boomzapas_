@@ -8,7 +8,7 @@ import { DoneStep, type OrderResult } from './DoneStep'
 import { useCart } from '@/context/CartContext'
 import { useUI } from '@/context/UIContext'
 import { ApiError, MODO_DEMO, crearPedido } from '@/lib/api'
-import { cn, descuentoPromo, precioUnitario } from '@/lib/format'
+import { cn, descuentoPromo, formatARS, planCuotas, precioUnitario } from '@/lib/format'
 import { registrarPedidoDeTienda } from '@/lib/adminStore'
 import type { MetodoPago, PedidoPayload } from '@/types'
 
@@ -30,6 +30,7 @@ export function CheckoutModal() {
   const [form, setForm] = useState<CustomerForm>(EMPTY_FORM)
   const [errors, setErrors] = useState<CustomerErrors>({})
   const [metodo, setMetodo] = useState<MetodoPago>('mercadopago')
+  const [cuotas, setCuotas] = useState(1)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [order, setOrder] = useState<OrderResult | null>(null)
@@ -70,6 +71,17 @@ export function CheckoutModal() {
     dni: form.dni.replace(/\D/g, '') || undefined,
     email: form.email.trim() || undefined,
     direccion: form.entrega === 'envio' ? direccionCompleta(form) : undefined,
+    envio:
+      form.entrega === 'envio'
+        ? {
+            calle: form.calle.trim(),
+            numero: form.numero.trim(),
+            piso: form.piso.trim() || undefined,
+            localidad: form.localidad.trim(),
+            provincia: form.provincia.trim(),
+            cp: form.cp.trim().toUpperCase(),
+          }
+        : undefined,
     referencias: form.entrega === 'envio' ? form.referencias.trim() || undefined : undefined,
     notas: form.notas.trim() || undefined,
     origen: form.origen || undefined,
@@ -77,8 +89,10 @@ export function CheckoutModal() {
 
   const buildNotas = (codigo: string) => {
     const c = datosCliente()
+    const plan = planCuotas(total, metodo === 'mercadopago' ? cuotas : 1)
     return [
-      `Código ${codigo}`,
+      `Pedido ${codigo}`,
+      plan.cuotas > 1 && `Mercado Pago en ${plan.cuotas} cuotas de ${formatARS(plan.cuota)} (total ${formatARS(plan.total)})`,
       form.entrega === 'envio' ? `Envío: ${c.direccion}` : 'Retiro en el showroom',
       c.referencias && `Referencias: ${c.referencias}`,
       c.dni && `DNI: ${c.dni}`,
@@ -98,6 +112,7 @@ export function CheckoutModal() {
       items,
       total,
       metodo,
+      cuotas: metodo === 'mercadopago' ? cuotas : 1,
       entrega: form.entrega,
       cliente: datosCliente(),
       offline,
@@ -194,6 +209,8 @@ export function CheckoutModal() {
               items={items}
               metodo={metodo}
               onMetodo={setMetodo}
+              cuotas={cuotas}
+              onCuotas={setCuotas}
               total={total}
               submitting={submitting}
               error={error}

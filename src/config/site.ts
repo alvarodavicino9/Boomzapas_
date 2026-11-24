@@ -30,6 +30,16 @@ export const SITE = {
   /** Promo: llevando 2 pares o más, $5.000 de descuento por cada par (con cualquier medio de pago). */
   promoPares: { minimo: 2, descuento: 5000 },
 
+  /**
+   * Cuotas con tarjeta por Mercado Pago (link de pago): recargo que cobra Mercado Pago según la cantidad de cuotas.
+   * Se suma al total del pedido para mostrar cuánto sale en cuotas. Si Mercado Pago cambia los %, actualizalos acá.
+   */
+  cuotasMercadoPago: [
+    { cuotas: 2, recargo: 7.79 },
+    { cuotas: 3, recargo: 10.49 },
+    { cuotas: 6, recargo: 18.69 },
+  ],
+
   stats: [
     { value: '+500', label: 'Ventas' },
     { value: '+450', label: 'Clientes' },

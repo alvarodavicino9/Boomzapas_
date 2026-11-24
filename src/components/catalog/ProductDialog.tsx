@@ -14,7 +14,7 @@ import { detallesDe } from '@/data/detalles'
 import { cn, descuentoOferta, formatARS, PROMO, precioPromo } from '@/lib/format'
 import { getTalles, isSoldOut } from '@/lib/stock'
 import { getStatus } from '@/lib/status'
-import { mensajeProducto, waLink } from '@/lib/whatsapp'
+import { mensajeProducto, waCompartir, waLink } from '@/lib/whatsapp'
 import { SITE_URL } from '@/lib/seo'
 import { rutaProducto } from '@/lib/slug'
 import type { Producto } from '@/types'
@@ -167,7 +167,7 @@ export function ProductDialog({ producto, onClose, onSelect }: ProductDialogProp
       await navigator.clipboard.writeText(link)
       toast('Link copiado. Pegalo donde quieras')
     } catch {
-      window.open(`https://wa.me/?text=${encodeURIComponent(`${texto}\n${link}`)}`, '_blank', 'noopener,noreferrer')
+      window.open(waCompartir(`${texto}\n${link}`), '_blank', 'noopener,noreferrer')
     }
   }
 

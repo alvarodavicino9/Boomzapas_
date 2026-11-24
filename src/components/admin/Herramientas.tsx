@@ -1,3 +1,4 @@
+import { waCompartir } from '@/lib/whatsapp'
 import { useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
@@ -149,7 +150,7 @@ function Mensajes() {
           >
             <Icon name="copy" size={14} className="mr-2" /> Copiar
           </Button>
-          <Button size="sm" href={`https://wa.me/?text=${encodeURIComponent(contenido)}`}>
+          <Button size="sm" href={waCompartir(contenido)}>
             <Icon name="whatsapp" size={15} className="mr-2" /> Abrir en WhatsApp
           </Button>
         </div>
