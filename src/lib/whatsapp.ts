@@ -217,7 +217,7 @@ export const buildOrderMessage = ({ codigo, fecha, items, metodo, cuotas = 1, en
         ? `• Mercado Pago · ${plan.cuotas} cuotas`
         : '• Mercado Pago · 1 pago'
       : `• ${metodoLabel[metodo]}`,
-    metodo === 'mercadopago' ? '• Envíenme el link de pago 🙏' : null,
+    metodo === 'mercadopago' ? '• Envíenme el link de pago' : null,
     metodo === 'transferencia' ? `• Importe a transferir: *${formatARS(total)}*` : null,
     '',
     ...(entrega === 'envio'
