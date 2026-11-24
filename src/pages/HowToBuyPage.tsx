@@ -126,18 +126,18 @@ export default function HowToBuyPage() {
           />
           <span aria-hidden="true" className="absolute bottom-6 left-6 top-6 w-[2px] bg-[linear-gradient(180deg,var(--bz-accent),rgb(217_44_55/0.15))] md:hidden" />
           {PASOS.map((p, i) => (
-            <li key={p.title} className="relative flex gap-5 md:block">
+            <li key={p.title} className="relative flex gap-5 md:flex-col md:gap-0">
               <Reveal delay={i * 0.07}>
                 <span className="relative z-10 grid size-12 shrink-0 place-items-center rounded-full bg-accent text-on-accent shadow-[0_10px_24px_-8px_rgb(217_44_55/0.8)] ring-4 ring-gallery">
                   <Icon name={p.icon} size={21} />
                 </span>
               </Reveal>
-              <Reveal delay={i * 0.07 + 0.05} className="min-w-0">
-                <div className="md:mt-6">
+              <Reveal delay={i * 0.07 + 0.05} className="min-w-0 md:flex md:flex-1 md:flex-col">
+                <div className="md:mt-6 md:flex md:flex-1 md:flex-col">
                   <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[color:var(--bz-accent-text)]">Paso {i + 1}</p>
                   <h3 className="mt-1.5 text-[1.2rem] font-bold leading-6">{p.title}</h3>
-                  <p className="mt-2 text-[14px] leading-6 text-index">{p.text}</p>
-                  <p className="mt-3 flex items-start gap-2 rounded-xl bg-accent/[0.08] px-3 py-2.5 text-[12.5px] font-medium leading-5 ring-1 ring-inset ring-accent/20">
+                  <p className="mt-2 text-[14px] leading-6 text-index md:mb-3">{p.text}</p>
+                  <p className="mt-3 flex items-start gap-2 rounded-xl md:mt-auto bg-accent/[0.08] px-3 py-2.5 text-[12.5px] font-medium leading-5 ring-1 ring-inset ring-accent/20">
                     <Icon name="sparkle" size={14} className="mt-0.5 shrink-0 text-[color:var(--bz-accent-text)]" />
                     {p.tip}
                   </p>
