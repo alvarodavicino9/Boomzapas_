@@ -4,15 +4,22 @@ import { aplicaPromo, descuentoPromo, formatARS, formatPorcentaje, planCuotas, P
 import { SITE_URL } from './seo'
 import { rutaProducto } from './slug'
 
+/** Celular o tablet: ahí el link abre la app de WhatsApp directo. */
+const esCelular = () =>
+  typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|Mobile|Opera Mini|IEMobile/i.test(navigator.userAgent)
+
 /**
  * Link para abrir WhatsApp con el mensaje escrito.
- * Se usa api.whatsapp.com (y no wa.me): con wa.me, en la compu, los emojis llegan rotos (como "�").
+ * - Celular: api.whatsapp.com abre la app.
+ * - Compu: directo a WhatsApp Web. La página intermedia de WhatsApp (wa.me / api.whatsapp.com)
+ *   muestra los íconos rotos ("�") en la compu, así que se la saltea.
  */
 export const waLink = (message: string, telefono: string = SITE.whatsapp) =>
-  `https://api.whatsapp.com/send?phone=${telefono}&text=${encodeURIComponent(message)}`
+  `${esCelular() ? 'https://api.whatsapp.com/send' : 'https://web.whatsapp.com/send'}?phone=${telefono}&text=${encodeURIComponent(message)}`
 
 /** Compartir un texto eligiendo el contacto. */
-export const waCompartir = (message: string) => `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`
+export const waCompartir = (message: string) =>
+  `${esCelular() ? 'https://api.whatsapp.com/send' : 'https://web.whatsapp.com/send'}?text=${encodeURIComponent(message)}`
 
 const DOMINIO = SITE_URL.replace(/^https?:\/\//, '')
 // la web va fuera de las cursivas: si no, WhatsApp toma el "_" como parte del link
