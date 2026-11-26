@@ -1,13 +1,16 @@
 import { useSyncExternalStore } from 'react'
 import { normCategoria } from './categorias'
 import { MOCK_PRODUCTOS } from '@/data/mock'
-import { SITE } from '@/config/site'
 import { MODO_DEMO as MODO_LOCAL } from '@/lib/api'
-import type { CartItem, EstadoPedido, MetodoPago, Producto, TipoEntrega } from '@/types'
+import { escribir, leerPublico, nube } from '@/lib/nube'
+import type { DireccionEnvio } from '@/lib/whatsapp'
+import type { EstadoPedido, Producto, TipoEntrega } from '@/types'
 
 /**
- * Datos del panel en modo local (sin servidor): pedidos de ejemplo y ediciones del catálogo,
- * guardados en este navegador. Con el servidor conectado, el panel usa la API en su lugar.
+ * Datos del panel, guardados en Supabase (se ven igual desde cualquier compu o celu):
+ * - pedidos (los de la web y los cargados a mano), caja y costos: sólo con la sesión del panel;
+ * - cambios del catálogo (precio, stock, ocultar) y modelos nuevos: los lee también la tienda.
+ * Arranca vacío: sin datos de ejemplo, la plata empieza en 0.
  */
 
 export const ESTADOS: EstadoPedido[] = ['pendiente', 'pagado', 'enviado', 'entregado', 'cancelado']
@@ -40,9 +43,24 @@ export interface PedidoAdmin {
   seguimiento?: string
   /** Descuento aplicado a mano (ya restado del total). */
   descuento?: number
-  /** El stock de este pedido ya se descontó (modo local). */
+  /** El stock de este pedido ya se descontó. */
   stock_descontado?: boolean
+  /** Datos que manda la web. */
+  dni?: string
+  cuotas?: number
+  envio?: DireccionEnvio
+  referencias?: string
+  origen?: string
+  /** Código por fecha y hora que llevó el mensaje de WhatsApp (si no hubo número). */
+  codigo?: string
+  /** Cargado a mano desde el panel. */
+  manual?: boolean
+  /** Lo que paga el cliente si eligió cuotas (incluye el recargo que se queda Mercado Pago). `total` es lo que recibe la tienda. */
+  total_cliente?: number
 }
+
+/** Número de pedido con 4 cifras: 12 → "0012". */
+export const nroPedido = (id: PedidoAdmin['id']) => (typeof id === 'number' || /^\d+$/.test(String(id)) ? String(id).padStart(4, '0') : String(id))
 
 // ── Caja ──────────────────────────────────────────────────────────────────
 
@@ -98,37 +116,31 @@ export interface ProdOverride {
   stock?: Record<string, number>
 }
 
-// ── Almacenamiento persistente con suscripción ────────────────────────────
+// ── Almacenes en memoria con suscripción ──────────────────────────────────
 
-function persistent<T>(key: string, init: () => T) {
+function memoria<T>(init: T, cacheKey?: string) {
   let cache: T | null = null
   const listeners = new Set<() => void>()
-
   const read = (): T => {
     if (cache !== null) return cache
-    try {
-      const raw = localStorage.getItem(key)
-      if (raw) {
-        cache = JSON.parse(raw) as T
-        return cache
+    if (cacheKey) {
+      try {
+        const raw = localStorage.getItem(cacheKey)
+        if (raw) return (cache = JSON.parse(raw) as T)
+      } catch {
+        /* sin storage */
       }
-    } catch {
-      /* sin storage o dato roto: se usa el valor inicial */
     }
-    cache = init()
-    try {
-      localStorage.setItem(key, JSON.stringify(cache))
-    } catch {
-      /* queda en memoria */
-    }
-    return cache
+    return (cache = init)
   }
   const write = (value: T) => {
     cache = value
-    try {
-      localStorage.setItem(key, JSON.stringify(value))
-    } catch {
-      /* queda en memoria */
+    if (cacheKey) {
+      try {
+        localStorage.setItem(cacheKey, JSON.stringify(value))
+      } catch {
+        /* queda en memoria */
+      }
     }
     listeners.forEach((l) => l())
   }
@@ -136,152 +148,163 @@ function persistent<T>(key: string, init: () => T) {
     listeners.add(cb)
     return () => listeners.delete(cb)
   }
-  const reset = () => {
-    cache = null
-    try {
-      localStorage.removeItem(key)
-    } catch {
-      /* nada */
-    }
-    listeners.forEach((l) => l())
-  }
-  return { read, write, reset, use: () => useSyncExternalStore(subscribe, read, read) }
+  return { read, write, use: () => useSyncExternalStore(subscribe, read, read) }
 }
 
-// ── Pedidos de ejemplo ────────────────────────────────────────────────────
-
-/** Los pedidos de ejemplo sólo usan modelos que se ven en la tienda. */
-const VISIBLES = MOCK_PRODUCTOS.filter((p) => !p.oculto)
-
-const NOMBRES = [
-  ['Martina Gómez', '3516 21-4410'],
-  ['Lucas Ferreyra', '3513 88-1203'],
-  ['Sofía Aguirre', '3512 04-7788'],
-  ['Joaquín Peralta', '3517 33-9051'],
-  ['Camila Rojas', '3516 70-2216'],
-  ['Tomás Villarreal', '3513 12-6643'],
-  ['Valentina Cabrera', '3512 55-0187'],
-  ['Nicolás Bustos', '3517 98-3320'],
-  ['Agustina Luna', '3516 41-7702'],
-  ['Franco Medina', '3513 60-5519'],
-  ['Julieta Sosa', '3512 29-8834'],
-  ['Mateo Herrera', '3517 14-2260'],
-]
-
-function semilla(): PedidoAdmin[] {
-  let r = 7
-  const rnd = () => {
-    r = (r * 1103515245 + 12345) & 0x7fffffff
-    return r / 0x7fffffff
-  }
-  const ahora = Date.now()
-  const lista: PedidoAdmin[] = []
-  const N = 22
-  for (let i = 0; i < N; i++) {
-    const dias = (N - 1 - i) * (14 / N) + rnd() * 0.5
-    const fecha = new Date(ahora - dias * 86400000 - rnd() * 3600000 * 5)
-    fecha.setHours(10 + Math.floor(rnd() * 9), Math.floor(rnd() * 60))
-    if (fecha.getTime() > ahora) fecha.setTime(ahora - 3600000)
-    const [nombre, telefono] = NOMBRES[Math.floor(rnd() * NOMBRES.length)]
-    const metodo = (['mercadopago', 'transferencia', 'whatsapp'] as MetodoPago[])[Math.floor(rnd() * 3)]
-    const entrega: TipoEntrega = rnd() > 0.45 ? 'envio' : 'retiro'
-    const nItems = rnd() > 0.8 ? 2 : 1
-    const items: ItemPedido[] = []
-    for (let k = 0; k < nItems; k++) {
-      const p = VISIBLES[Math.floor(rnd() * VISIBLES.length)]
-      const talle = p.stock[Math.floor(rnd() * p.stock.length)]?.talle ?? '41'
-      items.push({
-        producto_id: p.id,
-        nombre: p.nombre,
-        marca: p.marca,
-        talle,
-        cantidad: 1,
-        precio_unit: nItems >= SITE.promoPares.minimo ? Math.max(0, p.precio - SITE.promoPares.descuento) : p.precio,
-      })
-    }
-    const edad = dias
-    const estado: EstadoPedido =
-      edad > 6
-        ? rnd() > 0.1
-          ? 'entregado'
-          : 'cancelado'
-        : edad > 3
-          ? rnd() > 0.5
-            ? 'enviado'
-            : 'entregado'
-          : edad > 1
-            ? rnd() > 0.5
-              ? 'pagado'
-              : 'enviado'
-            : rnd() > 0.5
-              ? 'pendiente'
-              : 'pagado'
-    lista.push({
-      id: 1001 + i,
-      fecha: fecha.toISOString(),
-      cliente: { nombre, telefono },
-      items,
-      metodo_pago: metodo,
-      entrega,
-      direccion: entrega === 'envio' ? 'Av. Colón 1250, Córdoba' : undefined,
-      notas: entrega === 'envio' ? 'Envío por Correo Argentino' : 'Retiro en el showroom',
-      estado,
-      total: items.reduce((a, it) => a + it.precio_unit * it.cantidad, 0),
-    })
-  }
-  return lista.sort((a, b) => b.fecha.localeCompare(a.fecha))
-}
-
-function semillaCaja(): Movimiento[] {
-  const hace = (d: number, h = 12) => {
-    const f = new Date(Date.now() - d * 86400000)
-    f.setHours(h, 0, 0, 0)
-    return f.toISOString()
-  }
-  const lista: Omit<Movimiento, 'id'>[] = [
-    { fecha: hace(12, 11), tipo: 'gasto', categoria: 'Mercadería', concepto: 'Compra a proveedor (ejemplo)', monto: 380000, medio: 'Transferencia' },
-    { fecha: hace(10, 16), tipo: 'gasto', categoria: 'Publicidad', concepto: 'Promoción en Instagram', monto: 25000, medio: 'Tarjeta' },
-    { fecha: hace(7, 10), tipo: 'gasto', categoria: 'Envíos y embalaje', concepto: 'Cajas y bolsas', monto: 18000, medio: 'Efectivo' },
-    { fecha: hace(5, 18), tipo: 'gasto', categoria: 'Alquiler y servicios', concepto: 'Internet del local', monto: 22000, medio: 'Transferencia' },
-    { fecha: hace(2, 13), tipo: 'gasto', categoria: 'Comisiones', concepto: 'Comisiones Mercado Pago', monto: 9500, medio: 'Mercado Pago' },
-  ]
-  return lista.map((m, i) => ({ ...m, id: `ej${i}` }))
-}
-
-const pedidosStore = persistent<PedidoAdmin[]>('bz_admin_pedidos', semilla)
-const cajaStore = persistent<Movimiento[]>('bz_admin_caja', semillaCaja)
-/** Costo por modelo (id → $). Sirve en los dos modos: se guarda en este navegador. */
-const costosStore = persistent<Record<number, number>>('bz_admin_costos', () => ({}))
-const overridesStore = persistent<Record<number, ProdOverride>>('bz_admin_prod', () => ({}))
-const customStore = persistent<Producto[]>('bz_admin_custom', () => [])
+// Datos privados del panel: sólo en memoria (no quedan guardados en el navegador).
+const pedidosStore = memoria<PedidoAdmin[]>([])
+const cajaStore = memoria<Movimiento[]>([])
+const costosStore = memoria<Record<number, number>>({})
+// Catálogo: público, se guarda una copia para que la tienda abra con los precios y el stock al día.
+const overridesStore = memoria<Record<number, ProdOverride>>({}, 'bz_catalogo_ajustes')
+const customStore = memoria<Producto[]>([], 'bz_catalogo_propios')
 
 export const usePedidosLocales = pedidosStore.use
+export const getPedidos = pedidosStore.read
 export const useOverrides = overridesStore.use
 export const useProductosPropios = customStore.use
 export const useCaja = cajaStore.use
 export const useCostos = costosStore.use
 
+// Limpieza: los datos de ejemplo del panel anterior (guardados en el navegador) ya no se usan.
+try {
+  for (const k of ['bz_admin_pedidos', 'bz_admin_caja', 'bz_admin_costos', 'bz_admin_prod', 'bz_admin_custom']) localStorage.removeItem(k)
+} catch {
+  /* nada */
+}
+
+// ── Carga desde Supabase ──────────────────────────────────────────────────
+
+interface FilaPedido {
+  numero: number
+  creado_en: string
+  codigo: string | null
+  cliente: string | null
+  telefono: string | null
+  total: number | null
+  metodo: string | null
+  cuotas: number | null
+  entrega: string | null
+  estado: string | null
+  nota_interna: string | null
+  seguimiento: string | null
+  descuento: number | null
+  stock_descontado: boolean | null
+  datos: Record<string, unknown> | null
+}
+
+const MARCA_DE = new Map(MOCK_PRODUCTOS.map((p) => [p.id, p.marca]))
+
+function filaAPedido(f: FilaPedido): PedidoAdmin {
+  const d = (f.datos ?? {}) as Record<string, unknown>
+  const envio = (d.envio ?? undefined) as DireccionEnvio | undefined
+  const items = Array.isArray(d.items)
+    ? (d.items as Record<string, unknown>[]).map((it) => ({
+        producto_id: Number(it.producto_id) || 0,
+        nombre: String(it.nombre ?? 'Producto'),
+        marca: String(it.marca ?? MARCA_DE.get(Number(it.producto_id)) ?? ''),
+        talle: String(it.talle ?? ''),
+        cantidad: Number(it.cantidad) || 1,
+        precio_unit: Number(it.precio_unit) || 0,
+      }))
+    : []
+  const entrega: TipoEntrega = f.entrega === 'retiro' ? 'retiro' : 'envio'
+  const direccion = envio
+    ? `${envio.calle} ${envio.numero}${envio.piso ? `, ${envio.piso}` : ''} · ${envio.localidad}, ${envio.provincia} · CP ${envio.cp}`
+    : typeof d.direccion === 'string'
+      ? d.direccion
+      : undefined
+  return {
+    id: f.numero,
+    fecha: f.creado_en,
+    cliente: { nombre: f.cliente || 'Sin nombre', telefono: f.telefono || '', email: (d.email as string) || undefined },
+    items,
+    metodo_pago: f.metodo || '—',
+    entrega,
+    direccion,
+    notas: [d.notas, d.referencias ? `Referencias: ${d.referencias}` : null].filter(Boolean).join(' · ') || (entrega === 'retiro' ? 'Retiro en el showroom' : ''),
+    estado: f.estado || 'pendiente',
+    // lo que recibe la tienda: el precio de contado (en cuotas, el recargo se lo queda Mercado Pago)
+    total: Number(d.precio_contado) || Number(f.total) || items.reduce((a, i) => a + i.precio_unit * i.cantidad, 0),
+    total_cliente: Number(d.precio_contado) && Number(f.total) > Number(d.precio_contado) ? Number(f.total) : undefined,
+    nota_interna: f.nota_interna ?? undefined,
+    seguimiento: f.seguimiento ?? undefined,
+    descuento: f.descuento ?? undefined,
+    stock_descontado: !!f.stock_descontado,
+    dni: (d.dni as string) || undefined,
+    cuotas: f.cuotas ?? undefined,
+    envio,
+    referencias: (d.referencias as string) || undefined,
+    origen: (d.origen as string) || undefined,
+    codigo: f.codigo ?? undefined,
+    manual: !!d.manual,
+  }
+}
+
+/** Catálogo al día (lo usa la tienda y el panel). */
+export async function cargarCatalogoNube() {
+  const [ajustes, propios] = await Promise.all([
+    leerPublico<{ producto_id: number; datos: ProdOverride }>('catalogo_ajustes?select=producto_id,datos'),
+    leerPublico<{ id: number; datos: Producto }>('productos_propios?select=id,datos&order=id.desc'),
+  ])
+  overridesStore.write(Object.fromEntries(ajustes.map((a) => [a.producto_id, a.datos ?? {}])))
+  customStore.write(propios.map((p) => ({ ...p.datos, id: p.id, stock: (p.datos.stock ?? []).map((s) => ({ ...s, producto_id: p.id })) })))
+}
+
+/** Pedidos, caja y costos (requiere la sesión del panel). */
+export async function cargarPanelNube() {
+  const sb = await nube()
+  const [ped, caja, cos] = await Promise.all([
+    sb.from('pedidos').select('numero,creado_en,codigo,cliente,telefono,total,metodo,cuotas,entrega,estado,nota_interna,seguimiento,descuento,stock_descontado,datos').order('numero', { ascending: false }).limit(2000),
+    sb.from('caja').select('id,fecha,tipo,categoria,concepto,monto,medio,compra').order('fecha', { ascending: false }).limit(5000),
+    sb.from('costos').select('producto_id,costo'),
+  ])
+  const error = ped.error ?? caja.error ?? cos.error
+  if (error) throw new Error(error.message)
+  pedidosStore.write((ped.data as FilaPedido[]).map(filaAPedido))
+  cajaStore.write((caja.data as Movimiento[]).map((m) => ({ ...m, compra: m.compra ?? undefined })))
+  costosStore.write(Object.fromEntries((cos.data as { producto_id: number; costo: number }[]).map((c) => [c.producto_id, c.costo])))
+}
+
+/** Al salir del panel se borran de la memoria los datos privados. */
+export function vaciarPanel() {
+  pedidosStore.write([])
+  cajaStore.write([])
+  costosStore.write({})
+}
+
 // ── Caja y costos ─────────────────────────────────────────────────────────
 
-const nuevoId = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`
+const nuevoId = () => `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`
 
 export function agregarMovimiento(m: Omit<Movimiento, 'id'>) {
-  cajaStore.write([{ ...m, id: nuevoId() }, ...cajaStore.read()].sort((a, b) => b.fecha.localeCompare(a.fecha)))
+  const mov: Movimiento = { ...m, id: nuevoId(), monto: Math.max(0, Math.round(m.monto)) }
+  cajaStore.write([mov, ...cajaStore.read()].sort((a, b) => b.fecha.localeCompare(a.fecha)))
+  void escribir('caja', (sb) => sb.from('caja').insert({ ...mov, compra: mov.compra ?? null }))
 }
 
 export function eliminarMovimiento(id: string) {
   cajaStore.write(cajaStore.read().filter((m) => m.id !== id))
+  void escribir('caja', (sb) => sb.from('caja').delete().eq('id', id))
 }
 
 export function setCosto(id: number, costo: number | null) {
   const c = { ...costosStore.read() }
-  if (costo === null || !(costo > 0)) delete c[id]
-  else c[id] = Math.round(costo)
+  if (costo === null || !(costo > 0)) {
+    delete c[id]
+    void escribir('costo', (sb) => sb.from('costos').delete().eq('producto_id', id))
+  } else {
+    c[id] = Math.round(costo)
+    void escribir('costo', (sb) => sb.from('costos').upsert({ producto_id: id, costo: c[id] }))
+  }
   costosStore.write(c)
 }
 
 export function setCostos(lista: Record<number, number>) {
-  costosStore.write({ ...costosStore.read(), ...lista })
+  const limpio = Object.fromEntries(Object.entries(lista).filter(([, v]) => v > 0).map(([k, v]) => [Number(k), Math.round(v)]))
+  costosStore.write({ ...costosStore.read(), ...limpio })
+  const filas = Object.entries(limpio).map(([producto_id, costo]) => ({ producto_id: Number(producto_id), costo }))
+  if (filas.length) void escribir('costos', (sb) => sb.from('costos').upsert(filas))
 }
 
 /** Stock actual de un talle, leyendo el catálogo ya combinado. */
@@ -289,7 +312,7 @@ const stockDe = (productos: Producto[], id: number, talle: string) =>
   productos.find((p) => p.id === id)?.stock.find((s) => s.talle === talle)?.cantidad ?? 0
 
 /**
- * Compra de mercadería (modo local): suma los pares al stock, guarda el costo del modelo
+ * Compra de mercadería: suma los pares al stock, guarda el costo del modelo
  * y deja el gasto anotado en la caja.
  */
 export function registrarCompra(c: CompraMercaderia & { fecha: string; medio: string }, productos: Producto[]) {
@@ -312,7 +335,7 @@ export function registrarCompra(c: CompraMercaderia & { fecha: string; medio: st
 
 /**
  * Al pasar un pedido a pagado/enviado/entregado se descuentan sus pares del stock;
- * si se cancela o vuelve a pendiente, se devuelven (sólo en modo local).
+ * si se cancela o vuelve a pendiente, se devuelven.
  */
 export function cambiarEstadoLocal(p: PedidoAdmin, estado: string, productos: Producto[]) {
   const esVenta = ESTADOS_VENTA.includes(estado)
@@ -334,55 +357,50 @@ export function cambiarEstadoLocal(p: PedidoAdmin, estado: string, productos: Pr
 
 // ── Pedidos ───────────────────────────────────────────────────────────────
 
+const COLUMNAS: (keyof PedidoAdmin)[] = ['estado', 'nota_interna', 'seguimiento', 'descuento', 'stock_descontado']
+
 export function actualizarPedido(id: PedidoAdmin['id'], patch: Partial<PedidoAdmin>) {
   pedidosStore.write(pedidosStore.read().map((p) => (p.id === id ? { ...p, ...patch } : p)))
+  const fila: Record<string, unknown> = { actualizado_en: new Date().toISOString() }
+  for (const k of COLUMNAS) if (k in patch) fila[k] = patch[k] ?? null
+  void escribir('pedido', (sb) => sb.from('pedidos').update(fila).eq('numero', Number(id)))
 }
 
 export function eliminarPedido(id: PedidoAdmin['id']) {
   pedidosStore.write(pedidosStore.read().filter((p) => p.id !== id))
+  void escribir('pedido', (sb) => sb.from('pedidos').delete().eq('numero', Number(id)))
 }
 
-export function crearPedidoManual(p: Omit<PedidoAdmin, 'id' | 'fecha'>, productos?: Producto[]) {
-  const lista = pedidosStore.read()
-  const id = lista.reduce((m, x) => Math.max(m, Number(x.id) || 0), 1000) + 1
-  const nuevo: PedidoAdmin = { ...p, id, fecha: new Date().toISOString(), stock_descontado: false }
-  pedidosStore.write([nuevo, ...lista])
+/** Venta o pedido cargado a mano (showroom, Instagram…). Toma el número siguiente. */
+export async function crearPedidoManual(p: Omit<PedidoAdmin, 'id' | 'fecha'>, productos?: Producto[]): Promise<number | null> {
+  const fila = await escribir<{ numero: number; creado_en: string }>('venta', (sb) =>
+    sb
+      .from('pedidos')
+      .insert({
+        codigo: 'manual',
+        cliente: p.cliente.nombre,
+        telefono: p.cliente.telefono,
+        total: Math.round(p.total),
+        metodo: p.metodo_pago,
+        cuotas: 1,
+        entrega: p.entrega,
+        estado: 'pendiente',
+        descuento: p.descuento ?? null,
+        stock_descontado: false,
+        datos: { manual: true, items: p.items, email: p.cliente.email, direccion: p.direccion, notas: p.notas },
+      })
+      .select('numero,creado_en')
+      .single(),
+  )
+  if (!fila) return null
+  const nuevo: PedidoAdmin = { ...p, id: fila.numero, fecha: fila.creado_en, estado: 'pendiente', stock_descontado: false, manual: true }
+  pedidosStore.write([nuevo, ...pedidosStore.read()])
   // Una venta que ya entra cobrada descuenta el stock en el momento.
-  if (productos && ESTADOS_VENTA.includes(p.estado)) cambiarEstadoLocal({ ...nuevo, estado: 'pendiente' }, p.estado, productos)
-  return id
-}
-
-/** Guarda en este navegador el pedido hecho desde la tienda (sirve para probar el flujo completo). */
-export function registrarPedidoDeTienda(input: {
-  items: CartItem[]
-  total: number
-  metodo: MetodoPago
-  entrega: TipoEntrega
-  nombre: string
-  telefono: string
-  email?: string
-  direccion?: string
-}) {
-  // Promo de la tienda: llevando 2 pares o más, $5.000 off por cada par.
-  const pares = input.items.reduce((n, i) => n + i.cantidad, 0)
-  const conPromo = pares >= SITE.promoPares.minimo
-  return crearPedidoManual({
-    cliente: { nombre: input.nombre, telefono: input.telefono, email: input.email },
-    items: input.items.map((i) => ({
-      producto_id: i.productoId,
-      nombre: i.nombre,
-      marca: i.marca,
-      talle: i.talle,
-      cantidad: i.cantidad,
-      precio_unit: conPromo ? Math.max(0, i.precio - SITE.promoPares.descuento) : i.precio,
-    })),
-    metodo_pago: input.metodo,
-    entrega: input.entrega,
-    direccion: input.direccion,
-    notas: input.entrega === 'envio' ? `Envío: ${input.direccion ?? ''}` : 'Retiro en el showroom',
-    estado: 'pendiente',
-    total: input.total,
-  })
+  if (ESTADOS_VENTA.includes(p.estado)) {
+    if (productos) cambiarEstadoLocal(nuevo, p.estado, productos)
+    else actualizarPedido(nuevo.id, { estado: p.estado })
+  }
+  return fila.numero
 }
 
 // ── Catálogo ──────────────────────────────────────────────────────────────
@@ -420,67 +438,54 @@ export function editarProducto(id: number, patch: ProdOverride) {
   const prev = ov[id] ?? {}
   const next: ProdOverride = { ...prev, ...patch }
   if (patch.stock) next.stock = { ...(prev.stock ?? {}), ...patch.stock }
+  // Los modelos cargados desde el panel se guardan enteros; los del catálogo, como ajuste.
+  if (esProductoPropio(id)) {
+    const lista = customStore.read()
+    const actual = lista.find((p) => p.id === id)
+    if (actual) {
+      const [actualizado] = aplicarCatalogo([], [actual], { [id]: next })
+      customStore.write(lista.map((p) => (p.id === id ? actualizado : p)))
+      void escribir('modelo', (sb) => sb.from('productos_propios').upsert({ id, datos: actualizado }))
+      return
+    }
+  }
   overridesStore.write({ ...ov, [id]: next })
+  void escribir('catálogo', (sb) => sb.from('catalogo_ajustes').upsert({ producto_id: id, datos: next, actualizado_en: new Date().toISOString() }))
 }
 
 export function crearProducto(p: Omit<Producto, 'id'>) {
   const lista = customStore.read()
-  const id = lista.reduce((m, x) => Math.max(m, x.id), 1000) + 1
-  customStore.write([{ ...p, id, stock: p.stock.map((s) => ({ ...s, producto_id: id })) }, ...lista])
+  const id = Math.max(1000, ...lista.map((x) => x.id)) + 1 + Math.floor(Math.random() * 3)
+  const nuevo: Producto = { ...p, id, stock: p.stock.map((s) => ({ ...s, producto_id: id })) }
+  customStore.write([nuevo, ...lista])
+  void escribir('modelo', (sb) => sb.from('productos_propios').insert({ id, datos: nuevo }))
   return id
 }
 
 export function eliminarProductoPropio(id: number) {
   customStore.write(customStore.read().filter((p) => p.id !== id))
+  void escribir('modelo', (sb) => sb.from('productos_propios').delete().eq('id', id))
 }
 
 export const esProductoPropio = (id: number) => id > 1000
 
-// ── Mantenimiento ─────────────────────────────────────────────────────────
+// ── Respaldo ──────────────────────────────────────────────────────────────
 
-export function restablecerDatosLocales() {
-  cajaStore.reset()
-  costosStore.reset()
-  pedidosStore.reset()
-  overridesStore.reset()
-  customStore.reset()
-}
-
+/** Copia de todo lo del panel en un archivo (por las dudas, además de lo que guarda Supabase). */
 export function exportarRespaldo(): string {
   return JSON.stringify(
     {
-      version: 1,
+      version: 2,
       fecha: new Date().toISOString(),
       pedidos: pedidosStore.read(),
-      overrides: overridesStore.read(),
-      productos: customStore.read(),
       caja: cajaStore.read(),
       costos: costosStore.read(),
+      catalogo: overridesStore.read(),
+      productos: customStore.read(),
     },
     null,
     2,
   )
-}
-
-export function importarRespaldo(texto: string): boolean {
-  try {
-    const d = JSON.parse(texto) as {
-      pedidos?: PedidoAdmin[]
-      overrides?: Record<number, ProdOverride>
-      productos?: Producto[]
-      caja?: Movimiento[]
-      costos?: Record<number, number>
-    }
-    if (!Array.isArray(d.pedidos) || typeof d.overrides !== 'object' || !Array.isArray(d.productos)) return false
-    pedidosStore.write(d.pedidos)
-    overridesStore.write(d.overrides ?? {})
-    customStore.write(d.productos)
-    if (Array.isArray(d.caja)) cajaStore.write(d.caja)
-    if (d.costos && typeof d.costos === 'object') costosStore.write(d.costos)
-    return true
-  } catch {
-    return false
-  }
 }
 
 // ── Filas del servidor → PedidoAdmin ──────────────────────────────────────

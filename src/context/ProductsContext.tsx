@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { MODO_DEMO, getProductos } from '@/lib/api'
-import { aplicarCatalogo, useOverrides, useProductosPropios } from '@/lib/adminStore'
+import { aplicarCatalogo, cargarCatalogoNube, useOverrides, useProductosPropios } from '@/lib/adminStore'
 import type { Producto } from '@/types'
 
 type Status = 'loading' | 'ready' | 'error'
@@ -29,6 +29,8 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false
     setStatus('loading')
+    // Precios, stock y modelos nuevos que se cambian desde el panel (Supabase). Si no responde, queda el catálogo base.
+    cargarCatalogoNube().catch(() => {})
     getProductos()
       .then((data) => {
         if (cancelled) return
@@ -47,7 +49,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
   }, [nonce])
 
   const reload = useCallback(() => setNonce((n) => n + 1), [])
-  // En modo local, las ediciones del panel (precios, stock, productos nuevos) se aplican al catálogo.
+  // Las ediciones del panel (precios, stock, productos nuevos, guardadas en Supabase) se aplican al catálogo.
   const todos = useMemo(() => (MODO_DEMO ? aplicarCatalogo(base, propios, overrides) : base), [base, propios, overrides])
   const productos = useMemo(() => todos.filter((p) => !p.oculto), [todos])
   const value = useMemo(() => ({ productos, todos, status, error, reload }), [productos, todos, status, error, reload])

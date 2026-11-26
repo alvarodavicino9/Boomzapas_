@@ -1,12 +1,12 @@
 import { waCompartir } from '@/lib/whatsapp'
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { Card, Field, PageTitle } from './ui'
 import { Flyer } from './Flyer'
 import { useUI } from '@/context/UIContext'
 import { descargarBlob, descargarCSV, agruparClientes, metodoLabel, totalStock } from '@/lib/adminStats'
-import { exportarRespaldo, importarRespaldo, restablecerDatosLocales, type PedidoAdmin } from '@/lib/adminStore'
+import { exportarRespaldo, type PedidoAdmin } from '@/lib/adminStore'
 import { MODO_DEMO } from '@/lib/api'
 import { SITE } from '@/config/site'
 import { formatARS, formatDate, PROMO, precioPromo } from '@/lib/format'
@@ -268,56 +268,18 @@ function Exportar({ pedidos, productos }: { pedidos: PedidoAdmin[]; productos: P
 
 function Datos() {
   const { toast } = useUI()
-  const fileRef = useRef<HTMLInputElement>(null)
-  const [confirmar, setConfirmar] = useState(false)
-
-  const restaurar = async (f?: File) => {
-    if (!f) return
-    toast(importarRespaldo(await f.text()) ? 'Respaldo restaurado' : 'Ese archivo no es un respaldo válido')
-    if (fileRef.current) fileRef.current.value = ''
-  }
-
   return (
-    <Card title="Respaldo de datos" hint="En modo local, pedidos, stock y productos se guardan sólo en este navegador.">
-      <div className="space-y-3">
-        <Button
-          variant="outline"
-          full
-          onClick={() => {
-            descargarBlob(`respaldo-boomzapas-${new Date().toISOString().slice(0, 10)}.json`, new Blob([exportarRespaldo()], { type: 'application/json' }))
-            toast('Respaldo descargado')
-          }}
-        >
-          <Icon name="download" size={15} className="mr-2" /> Descargar respaldo
-        </Button>
-        <input ref={fileRef} type="file" accept="application/json,.json" className="sr-only" onChange={(e) => restaurar(e.target.files?.[0])} />
-        <Button variant="outline" full onClick={() => fileRef.current?.click()}>
-          Restaurar desde un respaldo
-        </Button>
-        {confirmar ? (
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              className="!border-danger !text-danger"
-              onClick={() => {
-                restablecerDatosLocales()
-                setConfirmar(false)
-                toast('Datos de ejemplo restablecidos')
-              }}
-            >
-              Sí, restablecer todo
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setConfirmar(false)}>
-              No
-            </Button>
-          </div>
-        ) : (
-          <button onClick={() => setConfirmar(true)} className="label inline-flex items-center gap-2 text-index hover:text-danger">
-            <Icon name="refresh" size={15} /> Volver a los datos de ejemplo
-          </button>
-        )}
-      </div>
+    <Card title="Respaldo de datos" hint="Todo queda guardado en Supabase. Igual podés bajar una copia en un archivo cuando quieras.">
+      <Button
+        variant="outline"
+        full
+        onClick={() => {
+          descargarBlob(`respaldo-boomzapas-${new Date().toISOString().slice(0, 10)}.json`, new Blob([exportarRespaldo()], { type: 'application/json' }))
+          toast('Respaldo descargado')
+        }}
+      >
+        <Icon name="download" size={15} className="mr-2" /> Descargar respaldo
+      </Button>
     </Card>
   )
 }

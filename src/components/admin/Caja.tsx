@@ -13,6 +13,7 @@ import {
   NO_OPERATIVOS,
   agregarMovimiento,
   eliminarMovimiento,
+  nroPedido,
   type Movimiento,
   type PedidoAdmin,
   type TipoMovimiento,
@@ -69,7 +70,7 @@ export function Caja({ pedidos, productos, caja, costos, setStock }: Props) {
         fecha: p.fecha,
         tipo: 'ingreso',
         categoria: 'Ventas',
-        concepto: `Pedido #${p.id} · ${p.cliente.nombre}`,
+        concepto: `Pedido N° ${nroPedido(p.id)} · ${p.cliente.nombre}`,
         monto: p.total,
         medio: MEDIO_DE_PEDIDO[p.metodo_pago] ?? metodoLabel(p.metodo_pago),
         manual: false,
@@ -138,9 +139,9 @@ export function Caja({ pedidos, productos, caja, costos, setStock }: Props) {
       </div>
 
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4">
-        <Numero label="Entró" valor={formatARS(entra)} sub={`${r.ventas} ventas y otros ingresos`} tono="ok" icon="trend" />
-        <Numero label="Salió" valor={formatARS(sale)} sub={`${lineas.filter((l) => l.tipo === 'gasto').length} gastos`} tono="mal" icon="receipt" />
-        <Numero label="Saldo" valor={formatARS(saldo)} sub="Entró menos salió" tono={saldo >= 0 ? 'ok' : 'mal'} icon="card" fuerte />
+        <Numero label="Entró" valor={formatARS(entra)} sub={`${r.ventas} ${r.ventas === 1 ? 'venta' : 'ventas'} y otros ingresos`} tono="ok" icon="trend" />
+        <Numero label="Salió" valor={formatARS(sale)} sub={(() => { const n = lineas.filter((l) => l.tipo === 'gasto').length; return n === 1 ? '1 gasto' : `${n} gastos` })()} tono="mal" icon="receipt" />
+        <Numero label="Saldo" valor={formatARS(saldo)} sub="Entró menos salió" tono={saldo >= 0 ? 'ok' : 'mal'} icon="billetera" fuerte />
         <Numero
           label="Ganancia"
           valor={r.gananciaNeta === null ? '—' : formatARS(r.gananciaNeta)}
@@ -244,14 +245,14 @@ export function Caja({ pedidos, productos, caja, costos, setStock }: Props) {
         ) : (
           <ul className="mt-3 divide-y divide-line border-t border-line">
             {visibles.map((l) => (
-              <li key={l.id} className="flex items-center gap-3 px-5 py-3 sm:px-6">
+              <li key={l.id} className="fila-panel flex items-center gap-3 px-5 py-3 sm:px-6">
                 <span
                   className={cn(
-                    'grid size-9 shrink-0 place-items-center rounded-full',
-                    l.tipo === 'ingreso' ? 'bg-[#3fbf7f]/15 text-[#3fbf7f]' : 'bg-danger/15 text-danger',
+                    'grid size-10 shrink-0 place-items-center rounded-xl ring-1 ring-inset',
+                    l.tipo === 'ingreso' ? 'bg-[#3fbf7f]/12 text-[#3fbf7f] ring-[#3fbf7f]/30' : 'bg-danger/12 text-danger ring-danger/30',
                   )}
                 >
-                  <Icon name={l.tipo === 'ingreso' ? 'plus' : 'minus'} size={15} />
+                  <Icon name={l.tipo === 'ingreso' ? 'trend' : 'receipt'} size={16} />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate text-[13.5px] font-medium">{l.concepto || l.categoria}</span>
@@ -314,15 +315,17 @@ function Numero({
   valor: string
   sub: string
   tono?: 'ok' | 'mal'
-  icon: 'trend' | 'receipt' | 'card' | 'star'
+  icon: 'trend' | 'receipt' | 'card' | 'star' | 'billetera'
   fuerte?: boolean
 }) {
+  const color = fuerte ? '#ff4b55' : tono === 'ok' ? '#3fbf7f' : tono === 'mal' ? '#ff6b6b' : '#f0a93b'
   return (
-    <div className={cn('surface border p-4 sm:p-5', fuerte ? 'border-accent/50' : 'border-line')}>
-      <div className="flex items-center justify-between">
-        <p className="label text-index">{label}</p>
-        <span className={cn('grid size-8 place-items-center rounded-full', fuerte ? 'bg-accent text-on-accent' : 'bg-stage')}>
-          <Icon name={icon} size={15} />
+    <div className={cn('surface relative overflow-hidden border p-4 sm:p-5', fuerte ? 'border-accent/50' : 'border-line')}>
+      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[3px]" style={{ background: `linear-gradient(90deg, ${color}, transparent)` }} />
+      <div className="flex items-center justify-between gap-2">
+        <p className="truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-index sm:text-[12px] sm:tracking-[0.1em]">{label}</p>
+        <span className="grid size-9 shrink-0 place-items-center rounded-xl" style={{ color, background: `${color}1f` }}>
+          <Icon name={icon} size={16} />
         </span>
       </div>
       <p

@@ -5,10 +5,10 @@ import { fotosDeModelo, MODELOS_DRIVE, OTROS_MODELOS } from '@/data/modelosDrive
 const TALLES = ['35', '36', '37', '38', '39', '40', '41', '42', '43', '44']
 
 /**
- * Stock mientras la tienda no esté conectada al servidor: todos los modelos vienen del 35 al 44
- * y se muestran todos los talles disponibles. El stock real se maneja desde el panel.
+ * Stock base: todos los modelos tienen al menos 1 par de cada talle, del 35 al 44.
+ * Desde el panel se suma lo que haya de más y se descuenta lo que se vende (se guarda en Supabase).
  */
-const stockDe = (id: number): StockTalle[] => TALLES.map((talle) => ({ producto_id: id, talle, cantidad: 3 }))
+const stockDe = (id: number): StockTalle[] => TALLES.map((talle) => ({ producto_id: id, talle, cantidad: 1 }))
 
 /**
  * Modelos de Drive que reemplazan a uno que ya existía (mismo par, foto nueva).

@@ -173,7 +173,7 @@ export function Productos({ productos, filtroInicial, setStock }: ProductosProps
                 <button
                   onClick={() => setSelId(p.id)}
                   className={cn(
-                    'grid w-full grid-cols-[56px_1fr_auto] items-center gap-4 px-4 py-3 text-left transition-colors hover:bg-stage sm:px-5',
+                    'grid w-full grid-cols-[56px_1fr_auto] items-center gap-4 px-4 py-3 text-left fila-panel sm:px-5',
                     p.oculto && 'opacity-55',
                   )}
                 >
@@ -228,9 +228,9 @@ export function Productos({ productos, filtroInicial, setStock }: ProductosProps
 
 function Dato({ label, valor, sub }: { label: string; valor: string; sub?: string }) {
   return (
-    <div className="surface border border-line p-4">
-      <p className="label text-index">{label}</p>
-      <p className="mt-2 whitespace-nowrap font-display text-[1.1rem] font-bold leading-none sm:text-[1.35rem]">{valor}</p>
+    <div className="surface border border-line p-4 sm:p-5">
+      <p className="text-[12px] font-semibold uppercase tracking-[0.1em] text-index">{label}</p>
+      <p className="mt-2.5 whitespace-nowrap font-display text-[1.1rem] font-bold leading-none sm:text-[1.35rem]">{valor}</p>
       {sub && <p className="mt-1.5 text-[12px] text-index">{sub}</p>}
     </div>
   )

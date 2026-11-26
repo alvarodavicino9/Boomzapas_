@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/Button'
 import { Card, Empty, EstadoBadge, ESTADO_COLOR, PageTitle, Pills, estadoLabel } from './ui'
 import { PERIODOS, alertasDeStock, calcularResumen, metodoLabel, type Periodo } from '@/lib/adminStats'
 import { cn, formatARS, formatDate } from '@/lib/format'
-import type { Movimiento, PedidoAdmin } from '@/lib/adminStore'
+import { nroPedido, type Movimiento, type PedidoAdmin } from '@/lib/adminStore'
 import type { Producto } from '@/types'
 import type { AdminNav } from './types'
 import { MODO_DEMO } from '@/lib/api'
@@ -29,14 +29,16 @@ function Kpi({
   value: string
   sub?: React.ReactNode
   icon: IconName
-  tone?: 'accent'
+  tone?: 'accent' | 'ok' | 'aviso' | 'info'
 }) {
+  const color = { accent: '#ff4b55', ok: '#3fbf7f', aviso: '#f0a93b', info: '#4aa3ff' }[tone ?? 'info']
   return (
-    <div className="surface border border-line p-5">
-      <div className="flex items-center justify-between">
-        <p className="label text-index">{label}</p>
-        <span className={cn('grid h-8 w-8 place-items-center rounded-full', tone === 'accent' ? 'bg-accent text-on-accent' : 'bg-stage')}>
-          <Icon name={icon} size={16} />
+    <div className="surface relative overflow-hidden border border-line p-5">
+      <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[3px]" style={{ background: `linear-gradient(90deg, ${color}, transparent)` }} />
+      <div className="flex items-center justify-between gap-2">
+        <p className="truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-index sm:text-[12px] sm:tracking-[0.1em]">{label}</p>
+        <span className="grid size-9 shrink-0 place-items-center rounded-xl" style={{ color, background: `${color}1f` }}>
+          <Icon name={icon} size={17} />
         </span>
       </div>
       <p className="mt-4 whitespace-nowrap font-display text-[1.05rem] font-bold leading-none tracking-tight min-[420px]:text-[1.3rem] sm:text-[1.7rem] lg:text-[1.55rem] xl:text-[2rem]">{value}</p>
@@ -128,7 +130,7 @@ export function Resumen({ pedidos, productos, caja, costos, resenasPendientes, n
         <Kpi
           label="Ingresos"
           icon="trend"
-          tone="accent"
+          tone="ok"
           value={formatARS(r.ingresos)}
           sub={
             r.delta === null ? (
@@ -142,7 +144,8 @@ export function Resumen({ pedidos, productos, caja, costos, resenasPendientes, n
         />
         <Kpi
           label="Ganancia"
-          icon="star"
+          icon="billetera"
+          tone="accent"
           value={r.gananciaNeta === null ? '—' : formatARS(r.gananciaNeta)}
           sub={
             r.gananciaNeta === null ? (
@@ -154,8 +157,8 @@ export function Resumen({ pedidos, productos, caja, costos, resenasPendientes, n
             )
           }
         />
-        <Kpi label="Ventas" icon="bag" value={String(r.ventas)} sub={`${r.pares} pares · ticket ${formatARS(r.ticket)}`} />
-        <Kpi label="Por cobrar" icon="clock" value={formatARS(r.porCobrar)} sub={`${r.pendientes} pedidos pendientes`} />
+        <Kpi label="Ventas" icon="zapa" tone="info" value={String(r.ventas)} sub={`${r.pares} ${r.pares === 1 ? 'par' : 'pares'} · prom. ${formatARS(r.ticket)}`} />
+        <Kpi label="Por cobrar" icon="clock" tone="aviso" value={formatARS(r.porCobrar)} sub={r.pendientes === 0 ? 'Nada pendiente' : `${r.pendientes} ${r.pendientes === 1 ? 'pedido pendiente' : 'pedidos pendientes'}`} />
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[1.7fr_1fr] [&>*]:min-w-0">
@@ -167,11 +170,16 @@ export function Resumen({ pedidos, productos, caja, costos, resenasPendientes, n
               return (
                 <div key={d.inicio} className="group relative flex h-full flex-1 flex-col justify-end">
                   <div
-                    className={cn(
-                      'w-full rounded-t-md transition-colors',
-                      d.total === 0 ? 'bg-line' : ultimo ? 'bg-accent-soft' : 'bg-accent/70 group-hover:bg-accent',
-                    )}
-                    style={{ height: `${h}%` }}
+                    className={cn('w-full rounded-t-lg transition-[filter,opacity]', d.total === 0 ? 'bg-white/[0.06]' : 'group-hover:brightness-125')}
+                    style={{
+                      height: `${h}%`,
+                      ...(d.total > 0 && {
+                        background: ultimo
+                          ? 'linear-gradient(180deg, #ff6b73 0%, #d92c37 100%)'
+                          : 'linear-gradient(180deg, rgb(238 63 74 / 0.95) 0%, rgb(140 17 26 / 0.55) 100%)',
+                        boxShadow: '0 1px 0 rgb(255 255 255 / 0.25) inset, 0 10px 24px -14px rgb(217 44 55 / 0.9)',
+                      }),
+                    }}
                   />
                   <span className="pointer-events-none absolute -top-1 left-1/2 z-10 hidden -translate-x-1/2 -translate-y-full whitespace-nowrap rounded-lg bg-bar px-3 py-1.5 text-[11.5px] text-white shadow-lift group-hover:block">
                     {d.label} · {formatARS(d.total)} · {d.pedidos} {d.pedidos === 1 ? 'venta' : 'ventas'}
@@ -337,9 +345,9 @@ export function Resumen({ pedidos, productos, caja, costos, resenasPendientes, n
               <li key={String(p.id)}>
                 <button
                   onClick={() => nav('pedidos', undefined, p.id)}
-                  className="grid w-full grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 rounded-xl px-3 py-3 text-left hover:bg-stage sm:grid-cols-[70px_1.2fr_1.4fr_auto_auto]"
+                  className="grid w-full grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 rounded-xl px-3 py-3 text-left fila-panel sm:grid-cols-[70px_1.2fr_1.4fr_auto_auto]"
                 >
-                  <span className="font-display text-lg">#{String(p.id)}</span>
+                  <span className="font-display text-lg text-accent-soft">{nroPedido(p.id)}</span>
                   <span className="col-start-1 truncate text-[13.5px] font-medium sm:col-start-auto">{p.cliente.nombre}</span>
                   <span className="hidden truncate text-[12.5px] text-index sm:block">
                     {p.items.map((i) => i.nombre).join(', ') || formatDate(p.fecha)}

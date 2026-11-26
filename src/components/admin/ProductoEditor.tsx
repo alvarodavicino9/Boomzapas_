@@ -172,7 +172,7 @@ export function ProductoEditor({ producto, open, crear, onClose, setStock, onCre
       open={open}
       onClose={onClose}
       title={crear ? 'Nuevo modelo' : (producto?.nombre ?? '')}
-      subtitle={crear ? 'Se agrega a la tienda en este navegador' : producto && `${producto.marca} · ID ${producto.id}`}
+      subtitle={crear ? 'Se agrega a la tienda para todos los clientes' : producto && `${producto.marca} · ID ${producto.id}`}
       footer={
         <div className="flex gap-2">
           <Button className="flex-1" onClick={guardar}>

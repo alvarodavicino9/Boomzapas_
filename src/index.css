@@ -268,6 +268,87 @@
   }
   .btn:disabled { background: var(--bz-stage); color: var(--bz-index); border-color: var(--bz-line); box-shadow: none; }
 
+  /* ── Panel de administración: paleta y controles propios (siempre oscuro, con el rojo de la marca) ── */
+  .modo-panel {
+    --bz-gallery: #0a0708;
+    --bz-card: #141012;
+    --bz-stage: rgb(255 255 255 / 0.06);
+    --bz-line: rgb(255 255 255 / 0.08);
+    --bz-control: rgb(255 255 255 / 0.24);
+    --bz-ink: #f7f3f3;
+    --bz-index: #a99c9f;
+    --bz-scrim: rgb(5 2 3 / 0.72);
+    --panel-borde: rgb(255 255 255 / 0.08);
+    --panel-brillo: rgb(255 255 255 / 0.05);
+    background:
+      radial-gradient(900px 520px at 100% -10%, rgb(217 44 55 / 0.16), transparent 70%),
+      radial-gradient(700px 500px at -10% 110%, rgb(120 20 30 / 0.12), transparent 70%),
+      #0a0708;
+    background-attachment: fixed;
+    color-scheme: dark;
+  }
+  .modo-panel .surface {
+    background: linear-gradient(180deg, rgb(255 255 255 / 0.045), rgb(255 255 255 / 0.012)), #120e10;
+    border-color: var(--panel-borde);
+    border-radius: 20px;
+    box-shadow: 0 1px 0 var(--panel-brillo) inset, 0 24px 48px -28px rgb(0 0 0 / 0.9);
+  }
+  .modo-panel .btn {
+    min-height: 42px;
+    padding: 0 18px;
+    gap: 8px;
+    border-radius: 14px;
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    white-space: nowrap;
+  }
+  .modo-panel .btn svg { flex-shrink: 0; }
+  /* acción principal: el rojo de la marca */
+  .modo-panel .btn-primary,
+  .modo-panel .btn-accent {
+    background: linear-gradient(180deg, #ee3f4a 0%, #c41f2b 100%);
+    border-color: #e0353f;
+    color: #fff;
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.25) inset, 0 10px 24px -12px rgb(217 44 55 / 0.9);
+  }
+  .modo-panel .btn-primary:hover:not(:disabled),
+  .modo-panel .btn-accent:hover:not(:disabled) {
+    background: linear-gradient(180deg, #f54a55 0%, #d02532 100%);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.3) inset, 0 14px 30px -12px rgb(217 44 55 / 1);
+    transform: none;
+  }
+  /* secundaria: vidrio */
+  .modo-panel .btn-outline {
+    background: rgb(255 255 255 / 0.05);
+    border: 1px solid rgb(255 255 255 / 0.12);
+    color: var(--bz-ink);
+    box-shadow: 0 1px 0 rgb(255 255 255 / 0.05) inset;
+  }
+  .modo-panel .btn-outline:hover:not(:disabled) { background: rgb(255 255 255 / 0.09); border-color: rgb(255 255 255 / 0.22); transform: none; }
+  .modo-panel .btn:disabled { opacity: 0.45; background: rgb(255 255 255 / 0.05); border-color: rgb(255 255 255 / 0.08); }
+  .modo-panel .field-line {
+    background: rgb(255 255 255 / 0.04);
+    border: 1px solid rgb(255 255 255 / 0.1);
+    letter-spacing: 0;
+    font-size: 13.5px;
+  }
+  .modo-panel .field-line:hover { border-color: rgb(255 255 255 / 0.2); }
+  .modo-panel .field-line:focus { border-color: rgb(217 44 55 / 0.7); box-shadow: 0 0 0 3px rgb(217 44 55 / 0.18); }
+  .modo-panel select.field-line option { background: #141012; color: #f7f3f3; }
+  /* filas de listas y tablas */
+  .modo-panel .fila-panel { transition: background-color 0.15s; }
+  .modo-panel .fila-panel:hover { background: linear-gradient(90deg, rgb(217 44 55 / 0.08), rgb(255 255 255 / 0.02)); }
+  .modo-panel .cabecera-tabla {
+    background: rgb(255 255 255 / 0.025);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--bz-index);
+  }
+
   /* nombre de la marca: "BOOM" plateado como el "SHOES SHOP" del logo, "ZAPAS" en rojo */
   .wm-boom {
     background: linear-gradient(180deg, #ffffff 0%, #e9e6e6 45%, #a9a3a4 100%);

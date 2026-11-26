@@ -4,7 +4,8 @@ import { Icon } from '@/components/ui/Icon'
 import { Drawer, Empty, EstadoBadge, PageTitle, Pills, SearchBox, estadoLabel } from './ui'
 import { PedidoNuevo } from './PedidoNuevo'
 import { useUI } from '@/context/UIContext'
-import { ESTADOS, actualizarPedido, eliminarPedido, type PedidoAdmin } from '@/lib/adminStore'
+import { ESTADOS, actualizarPedido, eliminarPedido, nroPedido, type PedidoAdmin } from '@/lib/adminStore'
+import { SITE_URL } from '@/lib/seo'
 import { descargarCSV, metodoLabel } from '@/lib/adminStats'
 import { MODO_DEMO } from '@/lib/api'
 import { SITE } from '@/config/site'
@@ -33,18 +34,20 @@ const resumenItems = (p: PedidoAdmin) =>
 function mensajeParaCliente(p: PedidoAdmin): string {
   const nombre = p.cliente.nombre.split(' ')[0]
   const prod = p.items.map((i) => `${i.nombre} T${i.talle}`).join(' + ')
-  const ref = `pedido #${p.id}${prod ? ` (${prod})` : ''}`
+  const ref = `pedido N° ${nroPedido(p.id)}${prod ? ` (${prod})` : ''}`
   switch (p.estado) {
     case 'pagado':
-      return `Hola ${nombre}! Recibimos tu pago ✅ Ya estamos preparando tu ${ref}. Te avisamos cuando salga.`
+      return `Hola ${nombre}! Recibimos tu pago. Ya estamos preparando tu ${ref}. Te avisamos cuando salga.`
     case 'enviado':
-      return `Hola ${nombre}! Tu ${ref} ya fue despachado por Correo Argentino 📦. Código de seguimiento: ${p.seguimiento ?? ''}`
+      return `Hola ${nombre}! Tu ${ref} ya fue despachado por Correo Argentino. Código de seguimiento: ${p.seguimiento ?? ''}`
     case 'entregado':
-      return `Hola ${nombre}! ¿Cómo te fueron las zapatillas? Si te gustaron, nos ayudaría mucho una reseña en la web 🙌`
+      return `Hola ${nombre}! ¿Cómo te fueron las zapatillas? Si te gustaron, nos ayudaría mucho una reseña en ${SITE_URL.replace(/^https?:\/\//, '')}`
     case 'cancelado':
       return `Hola ${nombre}! Te escribimos de Boom Zapas: tuvimos que cancelar tu ${ref}. Cualquier duda, escribinos.`
     default:
-      return `Hola ${nombre}! Te escribimos de Boom Zapas por tu ${ref}. Total: ${formatARS(p.total)}. Para abonar: alias ${SITE.bank.alias} (${SITE.bank.holder}). Cuando transfieras, mandanos el comprobante 🙏`
+      return p.metodo_pago === 'mercadopago'
+        ? `Hola ${nombre}! Te escribimos de Boom Zapas por tu ${ref}. Te pasamos el link de pago de Mercado Pago por ${formatARS(p.total_cliente ?? p.total)}${p.cuotas && p.cuotas > 1 ? ` (${p.cuotas} cuotas)` : ''}: `
+        : `Hola ${nombre}! Te escribimos de Boom Zapas por tu ${ref}. Total: ${formatARS(p.total)}. Para abonar: alias ${SITE.bank.alias} (${SITE.bank.holder}). Cuando transfieras, mandanos el comprobante.`
   }
 }
 
@@ -67,7 +70,7 @@ export function Pedidos({ pedidos, productos, filtroInicial, abrirId, onEstado }
     return pedidos.filter((p) => {
       if (filtro !== 'todos' && p.estado !== filtro) return false
       if (!t) return true
-      return `${p.id} ${p.cliente.nombre} ${p.cliente.telefono} ${resumenItems(p)} ${p.seguimiento ?? ''}`.toLowerCase().includes(t)
+      return `${p.id} ${nroPedido(p.id)} ${p.codigo ?? ''} ${p.dni ?? ''} ${p.cliente.nombre} ${p.cliente.telefono} ${resumenItems(p)} ${p.seguimiento ?? ''}`.toLowerCase().includes(t)
     })
   }, [pedidos, filtro, q])
 
@@ -77,7 +80,7 @@ export function Pedidos({ pedidos, productos, filtroInicial, abrirId, onEstado }
   const cambiar = async (p: PedidoAdmin, estado: string) => {
     try {
       await onEstado(p, estado)
-      toast(`Pedido #${p.id} · ${estadoLabel(estado)}`)
+      toast(`Pedido N° ${nroPedido(p.id)} · ${estadoLabel(estado)}`)
     } catch {
       toast('No se pudo actualizar el pedido')
     }
@@ -139,9 +142,9 @@ export function Pedidos({ pedidos, productos, filtroInicial, abrirId, onEstado }
       {lista.length === 0 ? (
         <Empty>{pedidos.length === 0 ? 'Todavía no hay pedidos.' : 'No hay pedidos con ese filtro.'}</Empty>
       ) : (
-        <div className="surface border border-line">
-          <div className="label hidden grid-cols-[70px_110px_1.1fr_1.6fr_120px_110px_150px] gap-4 border-b border-line px-5 py-3 text-index lg:grid">
-            <span>#</span>
+        <div className="surface overflow-hidden border border-line">
+          <div className="cabecera-tabla hidden grid-cols-[70px_110px_1.1fr_1.6fr_120px_110px_150px] gap-4 border-b border-line px-5 py-3 lg:grid">
+            <span>N°</span>
             <span>Fecha</span>
             <span>Cliente</span>
             <span>Productos</span>
@@ -154,9 +157,9 @@ export function Pedidos({ pedidos, productos, filtroInicial, abrirId, onEstado }
               <li key={String(p.id)}>
                 <button
                   onClick={() => setSel(p.id)}
-                  className="grid w-full grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1.5 px-5 py-4 text-left transition-colors hover:bg-stage lg:grid-cols-[70px_110px_1.1fr_1.6fr_120px_110px_150px]"
+                  className="grid w-full grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1.5 px-5 py-4 text-left fila-panel lg:grid-cols-[70px_110px_1.1fr_1.6fr_120px_110px_150px]"
                 >
-                  <span className="font-display text-lg lg:text-base">#{String(p.id)}</span>
+                  <span className="font-display text-lg text-accent-soft lg:text-base">{nroPedido(p.id)}</span>
                   <span className="col-start-2 row-start-1 text-right text-[13.5px] font-semibold lg:hidden">{formatARS(p.total)}</span>
                   <span className="hidden text-[12.5px] text-index lg:block">{formatDate(p.fecha)}</span>
                   <span className="col-span-2 min-w-0 lg:col-span-1">
@@ -183,8 +186,8 @@ export function Pedidos({ pedidos, productos, filtroInicial, abrirId, onEstado }
       <Drawer
         open={!!actual}
         onClose={() => setSel(null)}
-        title={actual ? `Pedido #${actual.id}` : ''}
-        subtitle={actual ? formatDate(actual.fecha) : undefined}
+        title={actual ? `Pedido N° ${nroPedido(actual.id)}` : ''}
+        subtitle={actual ? `${formatDate(actual.fecha)}${actual.manual ? ' · cargado a mano' : ' · desde la web'}` : undefined}
         footer={
           actual && (
             <div className="flex flex-wrap gap-2">
@@ -289,7 +292,9 @@ function DetallePedido({
       <Bloque titulo="Cliente">
         <p className="text-[14.5px] font-semibold">{p.cliente.nombre}</p>
         <p className="mt-1 text-[13px] text-index">{p.cliente.telefono || 'Sin teléfono'}</p>
+        {p.dni && <p className="text-[13px] text-index">DNI {p.dni.replace(/\B(?=(\d{3})+(?!\d))/g, '.')}</p>}
         {p.cliente.email && <p className="text-[13px] text-index">{p.cliente.email}</p>}
+        {p.origen && <p className="mt-2 text-[12px] text-index">Nos conoció por: {p.origen}</p>}
       </Bloque>
 
       <Bloque titulo="Productos">
@@ -320,15 +325,43 @@ function DetallePedido({
           <span className="label text-index">Total</span>
           <span className="font-display text-xl font-bold">{formatARS(p.total)}</span>
         </div>
+        {p.total_cliente ? (
+          <p className="mt-2 rounded-xl bg-stage px-3 py-2 text-[12.5px] leading-5 text-index">
+            El cliente paga <strong className="text-ink">{formatARS(p.total_cliente)}</strong> en {p.cuotas} cuotas: el link de pago va por ese
+            monto. La diferencia es el recargo que se queda Mercado Pago; a vos te queda {formatARS(p.total)}.
+          </p>
+        ) : null}
       </Bloque>
 
       <Bloque titulo="Pago y entrega">
         <dl className="grid grid-cols-[100px_1fr] gap-y-2 text-[13.5px]">
           <dt className="text-index">Pago</dt>
-          <dd>{metodoLabel(p.metodo_pago)}</dd>
+          <dd>
+            {metodoLabel(p.metodo_pago)}
+            {p.metodo_pago === 'mercadopago' && (p.cuotas && p.cuotas > 1 ? ` · ${p.cuotas} cuotas de ${formatARS(Math.ceil((p.total_cliente ?? p.total) / p.cuotas))}` : ' · 1 pago')}
+          </dd>
           <dt className="text-index">Entrega</dt>
           <dd>{p.entrega === 'envio' ? 'Envío por Correo Argentino' : `Retiro en ${SITE.address}`}</dd>
-          {p.direccion && (
+          {p.envio ? (
+            <>
+              <dt className="text-index">Calle</dt>
+              <dd>
+                {p.envio.calle} {p.envio.numero}
+              </dd>
+              {p.envio.piso && (
+                <>
+                  <dt className="text-index">Piso / depto</dt>
+                  <dd>{p.envio.piso}</dd>
+                </>
+              )}
+              <dt className="text-index">Localidad</dt>
+              <dd>
+                {p.envio.localidad}, {p.envio.provincia}
+              </dd>
+              <dt className="text-index">Código postal</dt>
+              <dd>{p.envio.cp}</dd>
+            </>
+          ) : p.direccion && (
             <>
               <dt className="text-index">Dirección</dt>
               <dd>{p.direccion}</dd>
@@ -388,7 +421,7 @@ function DetallePedido({
                 onClick={() => {
                   eliminarPedido(p.id)
                   onCerrar()
-                  toast(`Pedido #${p.id} eliminado`)
+                  toast(`Pedido N° ${nroPedido(p.id)} eliminado`)
                 }}
                 className="!border-danger !text-danger"
               >
@@ -421,7 +454,7 @@ function imprimirComprobante(p: PedidoAdmin) {
         `<tr><td>${esc(i.nombre)}<small>${esc(i.marca)} · Talle ${esc(i.talle)}</small></td><td>${i.cantidad}</td><td>${formatARS(i.precio_unit)}</td><td>${formatARS(i.precio_unit * i.cantidad)}</td></tr>`,
     )
     .join('')
-  w.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Pedido #${esc(String(p.id))} · Boom Zapas</title>
+  w.document.write(`<!doctype html><html lang="es"><head><meta charset="utf-8"><title>Pedido N° ${esc(nroPedido(p.id))} · Boom Zapas</title>
 <style>
 body{font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#111;margin:40px}
 header{display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #d92c37;padding-bottom:16px}
@@ -436,7 +469,7 @@ small{display:block;color:#777;font-size:12px}
 footer{margin-top:40px;color:#777;font-size:12px;text-align:center}
 @media print{body{margin:16px}}
 </style></head><body>
-<header><h1>BOOM <span>ZAPAS</span></h1><div class="meta"><strong>Pedido #${esc(String(p.id))}</strong><br>${esc(formatDate(p.fecha))}<br>${esc(estadoLabel(p.estado))}</div></header>
+<header><h1>BOOM <span>ZAPAS</span></h1><div class="meta"><strong>Pedido N° ${esc(nroPedido(p.id))}</strong><br>${esc(formatDate(p.fecha))}<br>${esc(estadoLabel(p.estado))}</div></header>
 <div class="cols"><div><h2>Cliente</h2>${esc(p.cliente.nombre)}<br>${esc(p.cliente.telefono || '')}${p.cliente.email ? '<br>' + esc(p.cliente.email) : ''}</div>
 <div><h2>Pago y entrega</h2>${esc(metodoLabel(p.metodo_pago))}<br>${p.entrega === 'envio' ? 'Envío' + (p.direccion ? ': ' + esc(p.direccion) : '') : 'Retiro en ' + esc(SITE.address)}${p.seguimiento ? '<br>Seguimiento: ' + esc(p.seguimiento) : ''}</div></div>
 <table><thead><tr><th>Producto</th><th>Cant.</th><th>Precio</th><th>Subtotal</th></tr></thead><tbody>${filas}</tbody></table>

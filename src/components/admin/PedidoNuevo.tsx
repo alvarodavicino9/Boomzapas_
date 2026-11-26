@@ -3,7 +3,7 @@ import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { Field } from './ui'
-import { crearPedidoManual, type ItemPedido } from '@/lib/adminStore'
+import { crearPedidoManual, nroPedido, type ItemPedido } from '@/lib/adminStore'
 import { useUI } from '@/context/UIContext'
 import { cn, descuentoPromo, formatARS, PROMO, precioUnitario } from '@/lib/format'
 import type { Producto } from '@/types'
@@ -81,10 +81,13 @@ export function PedidoNuevo({ open, onClose, productos, onCreado }: Props) {
     setError('')
   }
 
-  const guardar = () => {
+  const [guardando, setGuardando] = useState(false)
+
+  const guardar = async () => {
     if (items.length === 0) return setError('Agregá al menos un par.')
     if (entrega === 'envio' && !direccion.trim()) return setError('Falta la dirección del envío.')
-    const id = crearPedidoManual(
+    setGuardando(true)
+    const id = await crearPedidoManual(
       {
         cliente: { nombre: nombre.trim() || 'Cliente del showroom', telefono: telefono.trim(), email: email.trim() || undefined },
         items: items.map((i) => ({ ...i, precio_unit: precioUnitario(i.precio_unit, pares) })),
@@ -98,7 +101,9 @@ export function PedidoNuevo({ open, onClose, productos, onCreado }: Props) {
       },
       productos,
     )
-    toast(estado === 'pendiente' ? `Pedido #${id} cargado` : `Venta #${id} cargada · stock descontado`)
+    setGuardando(false)
+    if (id === null) return setError('No se pudo guardar. Revisá la conexión y probá de nuevo.')
+    toast(estado === 'pendiente' ? `Pedido N° ${nroPedido(id)} cargado` : `Venta N° ${nroPedido(id)} cargada · stock descontado`)
     limpiar()
     onClose()
     onCreado(id)
@@ -254,7 +259,7 @@ export function PedidoNuevo({ open, onClose, productos, onCreado }: Props) {
             )}
             Total <span className="ml-2 font-display text-xl font-bold text-ink">{formatARS(total)}</span>
           </div>
-          <Button onClick={guardar}>{estado === 'pendiente' ? 'Cargar pedido' : 'Registrar venta'}</Button>
+          <Button onClick={guardar} disabled={guardando}>{guardando ? 'Guardando…' : estado === 'pendiente' ? 'Cargar pedido' : 'Registrar venta'}</Button>
         </div>
       </div>
     </Modal>

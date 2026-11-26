@@ -1,15 +1,18 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
 import { Stars } from '@/components/ui/Stars'
 import { Card, Empty, Field, PageTitle } from './ui'
 import { useUI } from '@/context/UIContext'
-import { agregarResenaPublicada, aprobarResena, quitarResena, useResenasLocales } from '@/lib/resenas'
+import { agregarResenaPublicada, aprobarResena, cargarResenasPanel, eliminarResena, useResenasPanel } from '@/lib/resenas'
 import { cn, formatDate } from '@/lib/format'
 
 export function Resenas() {
-  const resenas = useResenasLocales()
+  const resenas = useResenasPanel()
   const { toast } = useUI()
+  useEffect(() => {
+    cargarResenasPanel().catch(() => toast('No se pudieron cargar las reseñas.'))
+  }, [toast])
   const [nombre, setNombre] = useState('')
   const [modelo, setModelo] = useState('')
   const [texto, setTexto] = useState('')
@@ -18,9 +21,9 @@ export function Resenas() {
   const pendientes = resenas.filter((r) => r.pendiente)
   const publicadas = resenas.filter((r) => !r.pendiente)
 
-  const cargar = () => {
+  const cargar = async () => {
     if (!nombre.trim() || texto.trim().length < 8) return setError('Poné el nombre y un comentario de al menos 8 letras.')
-    agregarResenaPublicada({ user: nombre, text: texto, model: modelo, rating: puntaje })
+    if (!(await agregarResenaPublicada({ user: nombre, text: texto, model: modelo, rating: puntaje }))) return setError('No se pudo guardar. Probá de nuevo.')
     setNombre('')
     setModelo('')
     setTexto('')
@@ -48,7 +51,7 @@ export function Resenas() {
             <Icon name="check" size={14} className="mr-2" /> Publicar
           </Button>
         )}
-        <Button variant="outline" size="sm" onClick={() => (quitarResena(r.id), toast('Reseña eliminada'))}>
+        <Button variant="outline" size="sm" onClick={() => (eliminarResena(r.id), toast('Reseña eliminada'))}>
           <Icon name="trash" size={14} className="mr-2" /> Eliminar
         </Button>
       </div>

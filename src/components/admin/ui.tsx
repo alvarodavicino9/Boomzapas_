@@ -12,6 +12,49 @@ export const ESTADO_COLOR: Record<string, string> = {
   cancelado: '#8a7d80',
 }
 
+/** Avatar con las iniciales y un color propio de cada persona (siempre el mismo para el mismo nombre). */
+export function Avatar({ nombre, size = 44 }: { nombre: string; size?: number }) {
+  const ini =
+    nombre
+      .trim()
+      .split(/\s+/)
+      .map((x) => x[0])
+      .slice(0, 2)
+      .join('')
+      .toUpperCase() || '·'
+  let h = 0
+  for (const ch of nombre) h = (h * 31 + ch.charCodeAt(0)) % 360
+  const tonos = [355, 18, 38, 200, 265, 320, 160]
+  const tono = tonos[h % tonos.length]
+  return (
+    <span
+      aria-hidden="true"
+      className="grid shrink-0 place-items-center rounded-2xl font-bold text-white"
+      style={{
+        width: size,
+        height: size,
+        fontSize: size * 0.32,
+        background: `linear-gradient(145deg, hsl(${tono} 70% 52%), hsl(${tono} 65% 32%))`,
+        boxShadow: `0 8px 20px -10px hsl(${tono} 70% 45%), inset 0 1px 0 rgb(255 255 255 / 0.25)`,
+      }}
+    >
+      {ini}
+    </span>
+  )
+}
+
+/** Etiqueta chica de color (recurrente, nuevo, etc.). */
+export function Etiqueta({ children, color = '#ff6b73' }: { children: ReactNode; color?: string }) {
+  return (
+    <span
+      className="inline-flex shrink-0 items-center gap-1 rounded-full px-2 py-0.5 text-[10.5px] font-semibold"
+      style={{ color, background: `${color}1f`, boxShadow: `inset 0 0 0 1px ${color}40` }}
+    >
+      {children}
+    </span>
+  )
+}
+
 export const estadoLabel = (e: string) => e.charAt(0).toUpperCase() + e.slice(1)
 
 export function EstadoBadge({ estado, className }: { estado: string; className?: string }) {
@@ -47,8 +90,8 @@ export function Card({
       {(title || action) && (
         <header className="flex items-start justify-between gap-4 px-5 pt-5 sm:px-6">
           <div>
-            {title && <h2 className="text-[15px] font-semibold leading-5">{title}</h2>}
-            {hint && <p className="mt-1 text-[12.5px] leading-4 text-index">{hint}</p>}
+            {title && <h2 className="text-[15.5px] font-semibold leading-5">{title}</h2>}
+            {hint && <p className="mt-1 text-[12.5px] leading-[18px] text-index">{hint}</p>}
           </div>
           {action}
         </header>
@@ -85,24 +128,36 @@ export function Pills<T extends string>({
   options: { id: T; label: string; count?: number }[]
 }) {
   return (
-    <div className="flex flex-wrap gap-2" role="group">
-      {options.map((o) => (
-        <button
-          key={o.id}
-          type="button"
-          aria-pressed={value === o.id}
-          onClick={() => onChange(o.id)}
-          className={cn(
-            'inline-flex h-9 items-center gap-2 rounded-full border px-4 text-[12.5px] font-medium transition-colors',
-            value === o.id ? 'border-accent bg-accent text-on-accent' : 'border-line bg-card hover:border-control',
-          )}
-        >
-          {o.label}
-          {o.count !== undefined && (
-            <span className={cn('text-[11px]', value === o.id ? 'opacity-80' : 'text-index')}>{o.count}</span>
-          )}
-        </button>
-      ))}
+    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden" role="group">
+      {options.map((o) => {
+        const activo = value === o.id
+        return (
+          <button
+            key={o.id}
+            type="button"
+            aria-pressed={activo}
+            onClick={() => onChange(o.id)}
+            className={cn(
+              'inline-flex h-9 shrink-0 items-center gap-2 rounded-full border px-3.5 text-[13px] font-medium transition-colors',
+              activo
+                ? 'border-[rgb(217_44_55/0.6)] bg-[rgb(217_44_55/0.16)] font-semibold text-ink'
+                : 'border-line bg-card text-index hover:border-control hover:text-ink',
+            )}
+          >
+            {o.label}
+            {o.count !== undefined && (
+              <span
+                className={cn(
+                  'grid h-5 min-w-5 place-items-center rounded-full px-1.5 text-[11px] font-semibold tabular-nums',
+                  activo ? 'bg-accent text-white' : 'bg-stage text-index',
+                )}
+              >
+                {o.count}
+              </span>
+            )}
+          </button>
+        )
+      })}
     </div>
   )
 }

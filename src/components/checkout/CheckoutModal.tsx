@@ -9,7 +9,6 @@ import { useCart } from '@/context/CartContext'
 import { useUI } from '@/context/UIContext'
 import { ApiError, MODO_DEMO, crearPedido } from '@/lib/api'
 import { cn, descuentoPromo, formatARS, planCuotas, precioUnitario } from '@/lib/format'
-import { registrarPedidoDeTienda } from '@/lib/adminStore'
 import { numeroPedido, registrarPedido } from '@/lib/supabase'
 import type { MetodoPago, PedidoPayload } from '@/types'
 
@@ -171,17 +170,7 @@ export function CheckoutModal() {
         })),
       })
       const numero = n ? numeroPedido(n) : codigo
-      // Sin servidor conectado: el pedido se confirma por WhatsApp (y queda anotado en el panel de este navegador).
-      registrarPedidoDeTienda({
-        items,
-        total,
-        metodo,
-        entrega: form.entrega,
-        nombre: form.nombre.trim(),
-        telefono: form.telefono.trim(),
-        email: form.email.trim() || undefined,
-        direccion: form.entrega === 'envio' ? direccionCompleta(form) : undefined,
-      })
+      // El pedido queda guardado en Supabase (lo ve el panel) y se confirma por WhatsApp.
       finish(undefined, true, numero)
       setSubmitting(false)
       return
