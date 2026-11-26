@@ -5,6 +5,7 @@ import { SITE } from '@/config/site'
 import { descargarBlob } from '@/lib/adminStats'
 import { cn, formatARS, PROMO } from '@/lib/format'
 import { slugify } from '@/lib/slug'
+import { RECORTADOS } from '@/data/recortes'
 import type { Producto } from '@/types'
 import { Card, Field, Pills } from './ui'
 
@@ -47,8 +48,14 @@ const RECORTES = new Set([
   'nike-sb-dunk-chocolate',
   'adidas-adi2000-semi-total-black',
 ])
-const recorteDe = (p: Producto) => (RECORTES.has(slugify(p.nombre)) ? `/fotos/hero3d/${slugify(p.nombre)}.webp` : null)
-const esRecorte = (src: string) => src.startsWith('/fotos/hero3d/')
+/** El resto de los modelos tiene su recorte en /public/fotos/recortes (sin fondo, para que la zapatilla se vea entera). */
+const recorteDe = (p: Producto) => {
+  const slug = slugify(p.nombre)
+  if (RECORTES.has(slug)) return `/fotos/hero3d/${slug}.webp`
+  if (RECORTADOS.has(slug)) return `/fotos/recortes/${slug}.webp`
+  return null
+}
+const esRecorte = (src: string) => src.startsWith('/fotos/hero3d/') || src.startsWith('/fotos/recortes/')
 
 const DISPLAY = '"Lexend Exa Variable", "Lexend Exa", "Lexend Variable", system-ui, sans-serif'
 const TEXTO = '"Lexend Variable", Lexend, system-ui, sans-serif'
@@ -302,11 +309,32 @@ async function dibujar(o: Opciones): Promise<HTMLCanvasElement> {
 
   const img = o.foto ? await cargar(o.foto) : null
   if (img && o.foto && esRecorte(o.foto)) {
+    // la marca enorme y calada detrás, para llenar el fondo (sobre todo en la historia, que es alta)
+    ctx.save()
+    const marca = p.marca.toUpperCase()
+    let fs = historia ? 300 : cuadrado ? 210 : 250
+    ctx.font = `800 ${fs}px ${DISPLAY}`
+    while (ctx.measureText(marca).width > W * 1.02 && fs > 90) {
+      fs -= 10
+      ctx.font = `800 ${fs}px ${DISPLAY}`
+    }
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.lineWidth = 3
+    ctx.strokeStyle = o.estilo === 'claro' ? 'rgba(20,13,14,0.09)' : 'rgba(255,255,255,0.09)'
+    const filas = historia ? [-1, 0, 1] : [0]
+    for (const f of filas) {
+      ctx.globalAlpha = f === 0 ? 1 : 0.55
+      ctx.strokeText(marca, cx, cy - caja.h * 0.08 + f * fs * 1.02)
+    }
+    ctx.restore()
+
     // zapatilla recortada flotando sobre un aro, como en la portada de la página
-    const s = Math.min((caja.w * 0.92) / img.width, (caja.h * 0.86) / img.height)
+    const giro = historia ? -12 : -7
+    const s = Math.min((caja.w * (historia ? 0.98 : 0.92)) / img.width, (caja.h * (historia ? 0.78 : 0.84)) / img.height)
     const dw = img.width * s
     const dh = img.height * s
-    const pisoY = caja.y + caja.h - caja.h * 0.07
+    const pisoY = Math.min(caja.y + caja.h - caja.h * 0.07, cy + dh / 2 + caja.h * 0.04)
     const rx = Math.min(caja.w * 0.42, dw * 0.62)
     const ry = rx * 0.22
     ctx.save()
@@ -326,24 +354,18 @@ async function dibujar(o: Opciones): Promise<HTMLCanvasElement> {
     ctx.fill()
     ctx.restore()
     ctx.save()
-    ctx.translate(cx, pisoY - ry * 0.6 - dh / 2)
-    ctx.rotate((-7 * Math.PI) / 180)
+    ctx.translate(cx, pisoY - ry * 0.35 - dh / 2)
+    ctx.rotate((giro * Math.PI) / 180)
     ctx.shadowColor = 'rgba(0,0,0,0.5)'
     ctx.shadowBlur = 50
     ctx.shadowOffsetY = 30
     ctx.drawImage(img, -dw / 2, -dh / 2, dw, dh)
     ctx.restore()
   } else if (img) {
-    // foto de estudio en una tarjeta redondeada; se recorta arriba y abajo (el par está en el medio) para aprovechar el lugar
+    // foto común: entera (sin cortar la zapatilla) sobre una tarjeta con la misma foto desenfocada de fondo
     const asp = img.width / img.height
-    const cajaAsp = caja.w / caja.h
-    const tarjetaAsp = Math.min(1.35, Math.max(asp, cajaAsp))
-    let tw = caja.w
-    let th = tw / tarjetaAsp
-    if (th > caja.h) {
-      th = caja.h
-      tw = th * tarjetaAsp
-    }
+    const tw = caja.w
+    const th = Math.min(caja.h, tw / Math.max(asp, 0.8))
     const tx = cx - tw / 2
     const ty = caja.y + (caja.h - th) / 2
     const r = 44
@@ -360,7 +382,11 @@ async function dibujar(o: Opciones): Promise<HTMLCanvasElement> {
     ctx.beginPath()
     ctx.roundRect(tx, ty, tw, th, r)
     ctx.clip()
-    const s = Math.max(tw / img.width, th / img.height)
+    const sf = Math.max(tw / img.width, th / img.height) * 1.15
+    ctx.filter = 'blur(40px) brightness(1.03)'
+    ctx.drawImage(img, cx - (img.width * sf) / 2, ty + th / 2 - (img.height * sf) / 2, img.width * sf, img.height * sf)
+    ctx.filter = 'none'
+    const s = Math.min(tw / img.width, th / img.height)
     ctx.drawImage(img, cx - (img.width * s) / 2, ty + th / 2 - (img.height * s) / 2, img.width * s, img.height * s)
     ctx.restore()
   } else {
