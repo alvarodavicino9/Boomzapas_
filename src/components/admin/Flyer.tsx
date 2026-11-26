@@ -309,26 +309,6 @@ async function dibujar(o: Opciones): Promise<HTMLCanvasElement> {
 
   const img = o.foto ? await cargar(o.foto) : null
   if (img && o.foto && esRecorte(o.foto)) {
-    // la marca enorme y calada detrás, para llenar el fondo (sobre todo en la historia, que es alta)
-    ctx.save()
-    const marca = p.marca.toUpperCase()
-    let fs = historia ? 300 : cuadrado ? 210 : 250
-    ctx.font = `800 ${fs}px ${DISPLAY}`
-    while (ctx.measureText(marca).width > W * 1.02 && fs > 90) {
-      fs -= 10
-      ctx.font = `800 ${fs}px ${DISPLAY}`
-    }
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.lineWidth = 3
-    ctx.strokeStyle = o.estilo === 'claro' ? 'rgba(20,13,14,0.09)' : 'rgba(255,255,255,0.09)'
-    const filas = historia ? [-1, 0, 1] : [0]
-    for (const f of filas) {
-      ctx.globalAlpha = f === 0 ? 1 : 0.55
-      ctx.strokeText(marca, cx, cy - caja.h * 0.08 + f * fs * 1.02)
-    }
-    ctx.restore()
-
     // zapatilla recortada flotando sobre un aro, como en la portada de la página
     const giro = historia ? -12 : -7
     const s = Math.min((caja.w * (historia ? 0.98 : 0.92)) / img.width, (caja.h * (historia ? 0.78 : 0.84)) / img.height)
