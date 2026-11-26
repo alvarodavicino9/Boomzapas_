@@ -110,7 +110,7 @@ export function Pedidos({ pedidos, productos, filtroInicial, abrirId, onEstado }
         title="Pedidos"
         subtitle={`${pedidos.length} en total · ${conteo('pendiente')} esperando pago`}
         action={
-          <div className="flex gap-2">
+          <div className="acciones">
             <Button variant="outline" size="sm" onClick={exportar} disabled={lista.length === 0}>
               <Icon name="download" size={15} className="mr-2" /> CSV
             </Button>

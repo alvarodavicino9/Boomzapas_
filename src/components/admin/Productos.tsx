@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Icon } from '@/components/ui/Icon'
-import { Empty, PageTitle, Pills, SearchBox } from './ui'
+import { Empty, Etiqueta, PageTitle, Pills, SearchBox } from './ui'
 import { ProductoEditor } from './ProductoEditor'
 import { CompraMercaderia } from './CompraMercaderia'
 import { Modal } from '@/components/ui/Modal'
@@ -85,7 +85,7 @@ export function Productos({ productos, filtroInicial, setStock }: ProductosProps
         title="Productos y stock"
         subtitle={`${productos.length} modelos · ${unidades} pares en stock`}
         action={
-          <div className="flex flex-wrap gap-2">
+          <div className="acciones">
             <Button variant="outline" size="sm" onClick={() => setCompra({})}>
               <Icon name="box" size={15} className="mr-2" /> Entró mercadería
             </Button>
@@ -112,9 +112,11 @@ export function Productos({ productos, filtroInicial, setStock }: ProductosProps
         >
           <span className="label text-index">Costos</span>
           <span className="mt-2 text-[13.5px] font-semibold leading-5">
-            {cuenta.sincosto ? `Completar ${cuenta.sincosto} sin costo` : 'Ajustar costos'}
+            {cuenta.sincosto ? 'Cargar costos' : 'Ajustar costos'}
           </span>
-          <span className="mt-1 text-[12px] text-index">Para ver la ganancia real</span>
+          <span className="mt-1 text-[12px] leading-snug text-index">
+            {cuenta.sincosto ? `Faltan ${cuenta.sincosto} ${cuenta.sincosto === 1 ? 'modelo' : 'modelos'} para ver la ganancia real` : 'Todos los modelos tienen costo'}
+          </span>
         </button>
       </div>
 
@@ -184,17 +186,21 @@ export function Productos({ productos, filtroInicial, setStock }: ProductosProps
                     className="h-14 w-14 rounded-xl bg-stage object-cover"
                   />
                   <span className="min-w-0">
-                    <span className="block truncate text-[14px] font-medium">{p.nombre}</span>
-                    <span className="block truncate text-[12px] text-index">
+                    <span className="line-clamp-2 block text-[14px] font-medium leading-snug sm:truncate">{p.nombre}</span>
+                    <span className="mt-0.5 block text-[12px] leading-snug text-index sm:truncate">
                       {p.marca} · {formatARS(p.precio)}
                       {costos[p.id] ? (
                         <span className="text-[#3fbf7f]"> · gana {formatARS(p.precio - costos[p.id])}</span>
                       ) : (
                         <span> · sin costo</span>
                       )}
-                      {p.nuevo && <span className="ml-2 rounded-full bg-accent/20 px-2 py-0.5 text-[10.5px] font-semibold text-accent-soft">NUEVO</span>}
-                      {p.oculto && <span className="ml-2 rounded-full bg-stage px-2 py-0.5 text-[10.5px] font-semibold">OCULTO</span>}
                     </span>
+                    {(p.nuevo || p.oculto) && (
+                      <span className="mt-1.5 flex gap-1.5">
+                        {p.nuevo && <Etiqueta color="#ff5a63">Nuevo</Etiqueta>}
+                        {p.oculto && <Etiqueta color="#a8a2a3">Oculto</Etiqueta>}
+                      </span>
+                    )}
                   </span>
                   <span className="flex flex-col items-end gap-1">
                     <span className="font-display text-lg font-bold leading-none">{totalStock(p)}</span>

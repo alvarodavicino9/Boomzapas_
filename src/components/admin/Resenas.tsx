@@ -111,9 +111,6 @@ export function Resenas() {
           </div>
         </Card>
       </div>
-      <p className="body-text mt-5">
-        Las reseñas se guardan en este navegador hasta que el servidor tenga su tabla de reseñas.
-      </p>
     </div>
   )
 }

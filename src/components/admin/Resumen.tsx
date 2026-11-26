@@ -93,7 +93,7 @@ export function Resumen({ pedidos, productos, caja, costos, resenasPendientes, n
         title="Resumen"
         subtitle={`Cómo viene el negocio: ${r.rango.label}.`}
         action={
-          <div className="flex flex-wrap gap-2">
+          <div className="acciones">
             <Button variant="outline" size="sm" onClick={() => nav('caja')}>
               <Icon name="card" size={15} className="mr-2" /> Caja
             </Button>
@@ -157,7 +157,12 @@ export function Resumen({ pedidos, productos, caja, costos, resenasPendientes, n
             )
           }
         />
-        <Kpi label="Ventas" icon="zapa" tone="info" value={String(r.ventas)} sub={`${r.pares} ${r.pares === 1 ? 'par' : 'pares'} · prom. ${formatARS(r.ticket)}`} />
+        <Kpi label="Ventas" icon="zapa" tone="info" value={String(r.ventas)} sub={
+            <>
+              {r.pares} {r.pares === 1 ? 'par' : 'pares'}
+              {r.ventas > 0 && <span className="block">Promedio {formatARS(r.ticket)}</span>}
+            </>
+          } />
         <Kpi label="Por cobrar" icon="clock" tone="aviso" value={formatARS(r.porCobrar)} sub={r.pendientes === 0 ? 'Nada pendiente' : `${r.pendientes} ${r.pendientes === 1 ? 'pedido pendiente' : 'pedidos pendientes'}`} />
       </div>
 

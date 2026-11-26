@@ -515,7 +515,7 @@ export function Flyer({ productos }: { productos: Producto[] }) {
           {fotos.length > 1 && (
             <div>
               <p className="label mb-1.5 text-index">Foto</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-5 gap-2 sm:flex sm:flex-wrap">
                 {fotos.map((src, i) => (
                   <button
                     key={src + i}
@@ -524,14 +524,14 @@ export function Flyer({ productos }: { productos: Producto[] }) {
                     aria-pressed={fotoIdx === i}
                     aria-label={esRecorte(src) ? 'Usar la foto recortada (sin fondo)' : `Usar la foto ${i + 1}`}
                     className={cn(
-                      'relative size-[68px] overflow-hidden rounded-xl border-2 transition-colors',
+                      'relative aspect-square w-full overflow-hidden rounded-xl border-2 transition-colors sm:size-[68px]',
                       fotoIdx === i ? 'border-accent' : 'border-line hover:border-control',
-                      esRecorte(src) ? 'bg-[#1a0d0f] p-1.5' : 'bg-[#ecebe9]',
+                      esRecorte(src) ? 'bg-[#1a0d0f] p-1 pb-3 sm:p-1.5 sm:pb-3.5' : 'bg-[#ecebe9]',
                     )}
                   >
                     <img src={src} alt="" className={cn('size-full', esRecorte(src) ? 'object-contain' : 'object-cover')} />
                     {esRecorte(src) && (
-                      <span className="absolute inset-x-0 bottom-0 bg-accent py-px text-center text-[9px] font-semibold uppercase tracking-wide text-white">
+                      <span className="absolute inset-x-0 bottom-0 whitespace-nowrap bg-accent py-px text-center text-[8px] font-semibold uppercase tracking-wide text-white sm:text-[9px]">
                         Sin fondo
                       </span>
                     )}
@@ -543,15 +543,15 @@ export function Flyer({ productos }: { productos: Producto[] }) {
 
           <div>
             <p className="label mb-1.5 text-index">Formato</p>
-            <Pills value={formato} onChange={setFormato} options={(Object.keys(FORMATOS) as Formato[]).map((f) => ({ id: f, label: FORMATOS[f].label }))} />
+            <Pills wrap value={formato} onChange={setFormato} options={(Object.keys(FORMATOS) as Formato[]).map((f) => ({ id: f, label: FORMATOS[f].label }))} />
           </div>
           <div>
             <p className="label mb-1.5 text-index">Estilo</p>
-            <Pills value={estilo} onChange={setEstilo} options={(Object.keys(ESTILOS) as Estilo[]).map((e) => ({ id: e, label: ESTILOS[e].label }))} />
+            <Pills wrap value={estilo} onChange={setEstilo} options={(Object.keys(ESTILOS) as Estilo[]).map((e) => ({ id: e, label: ESTILOS[e].label }))} />
           </div>
           <div>
             <p className="label mb-1.5 text-index">Etiqueta</p>
-            <Pills value={etiquetaFinal} onChange={setEtiqueta} options={(Object.keys(ETIQUETAS) as Etiqueta[]).map((e) => ({ id: e, label: ETIQUETAS[e] }))} />
+            <Pills wrap value={etiquetaFinal} onChange={setEtiqueta} options={(Object.keys(ETIQUETAS) as Etiqueta[]).map((e) => ({ id: e, label: ETIQUETAS[e] }))} />
           </div>
           <div className="flex flex-wrap gap-x-6 gap-y-3">
             <Check v={precio} set={setPrecio}>Mostrar el precio</Check>
@@ -577,18 +577,18 @@ export function Flyer({ productos }: { productos: Producto[] }) {
             aria-label={`Vista previa del flyer de ${producto.nombre}`}
             className={cn(
               'mx-auto block w-full rounded-2xl shadow-[0_20px_50px_-24px_rgb(0_0_0/0.7)] ring-1 ring-line',
-              formato === 'historia' ? 'max-w-[210px] sm:max-w-[300px]' : 'max-w-[280px] sm:max-w-[420px]',
+              formato === 'historia' ? 'max-w-[240px] sm:max-w-[300px]' : 'max-w-[340px] sm:max-w-[420px]',
             )}
           />
           <p className="mt-2 text-center text-[12px] text-index">
             {FORMATOS[formato].w} × {FORMATOS[formato].h} px · lista para Instagram
           </p>
-          <div className="mt-3 flex flex-wrap justify-center gap-2.5">
-            <button type="button" onClick={descargar} className="inline-flex h-11 items-center gap-2 rounded-full bg-accent px-5 text-[13.5px] font-semibold text-white">
+          <div className="mx-auto mt-3 grid max-w-[340px] auto-cols-fr grid-flow-col gap-2.5 sm:flex sm:max-w-none sm:justify-center">
+            <button type="button" onClick={descargar} className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-accent px-5 text-[13.5px] font-semibold text-white">
               <Icon name="download" size={16} /> Descargar imagen
             </button>
             {puedeCompartir && (
-              <button type="button" onClick={compartir} className="inline-flex h-11 items-center gap-2 rounded-full border border-line px-5 text-[13.5px] font-semibold hover:border-control">
+              <button type="button" onClick={compartir} className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-line px-5 text-[13.5px] font-semibold hover:border-control">
                 <Icon name="share" size={16} /> Compartir
               </button>
             )}

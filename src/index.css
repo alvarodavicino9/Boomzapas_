@@ -348,6 +348,13 @@
     text-transform: uppercase;
     color: var(--bz-index);
   }
+  /* botones de arriba de cada sección: en el celular ocupan todo el ancho, en partes iguales */
+  .modo-panel .acciones { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); gap: 0.5rem; width: 100%; }
+  .modo-panel .acciones > .btn { padding-inline: 0.75rem !important; }
+  @media (min-width: 640px) {
+    .modo-panel .acciones { display: flex; width: auto; }
+    .modo-panel .acciones > .btn { padding-inline: 1.25rem !important; }
+  }
 
   /* nombre de la marca: "BOOM" plateado como el "SHOES SHOP" del logo, "ZAPAS" en rojo */
   .wm-boom {

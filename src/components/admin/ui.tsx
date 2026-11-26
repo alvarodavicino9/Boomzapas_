@@ -122,13 +122,24 @@ export function Pills<T extends string>({
   value,
   onChange,
   options,
+  wrap = false,
 }: {
   value: T
   onChange: (v: T) => void
   options: { id: T; label: string; count?: number }[]
+  /** En el celular, que bajen de renglón en vez de deslizarse (para pocas opciones). */
+  wrap?: boolean
 }) {
   return (
-    <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden" role="group">
+    <div
+      className={cn(
+        'flex gap-1.5 sm:gap-2',
+        wrap
+          ? 'flex-wrap'
+          : '-mx-4 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-visible sm:px-0 [&::-webkit-scrollbar]:hidden',
+      )}
+      role="group"
+    >
       {options.map((o) => {
         const activo = value === o.id
         return (
@@ -138,7 +149,7 @@ export function Pills<T extends string>({
             aria-pressed={activo}
             onClick={() => onChange(o.id)}
             className={cn(
-              'inline-flex h-9 shrink-0 items-center gap-2 rounded-full border px-3.5 text-[13px] font-medium transition-colors',
+              'inline-flex h-9 shrink-0 items-center gap-2 rounded-full border px-3 text-[13px] font-medium transition-colors sm:px-3.5',
               activo
                 ? 'border-[rgb(217_44_55/0.6)] bg-[rgb(217_44_55/0.16)] font-semibold text-ink'
                 : 'border-line bg-card text-index hover:border-control hover:text-ink',

@@ -4,7 +4,7 @@ import { Icon } from '@/components/ui/Icon'
 import { Avatar, Card, Empty, Etiqueta, PageTitle, SearchBox } from './ui'
 import { agruparClientes, descargarCSV } from '@/lib/adminStats'
 import type { PedidoAdmin } from '@/lib/adminStore'
-import { formatARS, formatDate } from '@/lib/format'
+import { cn, formatARS, formatDate } from '@/lib/format'
 import { waCliente } from '@/lib/whatsapp'
 import { useUI } from '@/context/UIContext'
 
@@ -38,7 +38,7 @@ export function Clientes({ pedidos }: { pedidos: PedidoAdmin[] }) {
         }
       />
 
-      <div className="mb-5 grid grid-cols-3 gap-3">
+      <div className="mb-5 grid grid-cols-2 gap-3 sm:grid-cols-3">
         {[
           { l: 'Clientes', v: String(todos.length), s: todos.length ? 'que ya compraron' : 'Todavía ninguno', c: '#4aa3ff' },
           {
@@ -48,12 +48,12 @@ export function Clientes({ pedidos }: { pedidos: PedidoAdmin[] }) {
             c: '#3fbf7f',
           },
           { l: 'Mejor cliente', v: todos[0] ? todos[0].nombre.split(' ')[0] : '—', s: todos[0] ? formatARS(todos[0].gastado) : '—', c: '#f0a93b' },
-        ].map((k) => (
-          <div key={k.l} className="surface relative overflow-hidden border border-line p-4 sm:p-5">
+        ].map((k, i) => (
+          <div key={k.l} className={cn('surface relative overflow-hidden border border-line p-4 sm:p-5', i === 2 && 'col-span-2 sm:col-span-1')}>
             <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[3px]" style={{ background: `linear-gradient(90deg, ${k.c}, transparent)` }} />
-            <p className="text-[11.5px] font-semibold uppercase tracking-[0.1em] text-index">{k.l}</p>
+            <p className="truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-index sm:text-[11.5px] sm:tracking-[0.1em]">{k.l}</p>
             <p className="mt-2.5 truncate font-display text-xl font-bold leading-none sm:text-2xl">{k.v}</p>
-            <p className="mt-1.5 truncate text-[12px] text-index">{k.s}</p>
+            <p className="mt-1.5 text-[12px] leading-snug text-index sm:truncate">{k.s}</p>
           </div>
         ))}
       </div>
@@ -96,9 +96,10 @@ export function Clientes({ pedidos }: { pedidos: PedidoAdmin[] }) {
                     <span className="truncate text-[14px] font-semibold">{c.nombre}</span>
                     {c.pedidos >= 2 && <Etiqueta color="#3fbf7f">Recurrente</Etiqueta>}
                   </span>
-                  <span className="block truncate text-[12px] text-index">
-                    {c.pedidos} {c.pedidos === 1 ? 'pedido' : 'pedidos'} · {c.pares} {c.pares === 1 ? 'par' : 'pares'} · último {formatDate(c.ultimo)}
+                  <span className="block text-[12px] text-index">
+                    {c.pedidos} {c.pedidos === 1 ? 'pedido' : 'pedidos'} · {c.pares} {c.pares === 1 ? 'par' : 'pares'}
                   </span>
+                  <span className="block text-[12px] text-index">Último: {formatDate(c.ultimo)}</span>
                 </span>
                 <span className="hidden text-right text-[13.5px] tabular-nums md:block">{c.pedidos}</span>
                 <span className="hidden text-right text-[13.5px] tabular-nums md:block">{c.pares}</span>

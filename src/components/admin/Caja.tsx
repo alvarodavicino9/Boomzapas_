@@ -118,9 +118,9 @@ export function Caja({ pedidos, productos, caja, costos, setStock }: Props) {
         title="Caja"
         subtitle={`Lo que entró y salió en ${rango.label}.`}
         action={
-          <div className="flex flex-wrap gap-2">
+          <div className="acciones">
             <Button variant="outline" size="sm" onClick={() => setCompra(true)}>
-              <Icon name="box" size={15} className="mr-2" /> Cargar mercadería
+              <Icon name="box" size={15} className="mr-2" /> <span className="sm:hidden">Mercadería</span><span className="hidden sm:inline">Cargar mercadería</span>
             </Button>
             <Button variant="outline" size="sm" onClick={() => setNuevo('ingreso')}>
               <Icon name="plus" size={15} className="mr-2" /> Ingreso
@@ -255,9 +255,10 @@ export function Caja({ pedidos, productos, caja, costos, setStock }: Props) {
                   <Icon name={l.tipo === 'ingreso' ? 'trend' : 'receipt'} size={16} />
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[13.5px] font-medium">{l.concepto || l.categoria}</span>
-                  <span className="block truncate text-[12px] text-index">
-                    {formatDate(l.fecha)} · {l.categoria} · {l.medio}
+                  <span className="line-clamp-2 block text-[13.5px] font-medium leading-snug sm:truncate">{l.concepto || l.categoria}</span>
+                  <span className="mt-0.5 block text-[12px] leading-snug text-index sm:truncate">
+                    {formatDate(l.fecha)} · {l.categoria}
+                    {l.medio ? ` · ${l.medio}` : ''}
                   </span>
                 </span>
                 <span className={cn('shrink-0 text-[14px] font-semibold', l.tipo === 'ingreso' ? 'text-[#3fbf7f]' : 'text-ink')}>
